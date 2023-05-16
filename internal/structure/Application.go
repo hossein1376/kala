@@ -1,15 +1,14 @@
 package structure
 
 import (
-	"database/sql"
-
 	"golang.org/x/exp/slog"
+	"kala/internal/ent"
 )
 
 type Application struct {
 	Config Config
 	Logger *slog.Logger
-	Sql    *sql.DB
+	Client *ent.Client
 }
 
 type Config struct {
