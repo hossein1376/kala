@@ -1,16 +1,15 @@
 package api
 
 import (
-	"os"
-
 	"golang.org/x/exp/slog"
 	"kala/cmd/handlers"
+	"kala/internal/Logger"
+	"kala/internal/data"
 	"kala/internal/structure"
 )
 
 func RunServer() {
-	jsonHandler := slog.NewJSONHandler(os.Stdout, nil)
-	logger := slog.New(jsonHandler)
+	logger := Logger.Logger
 
 	cfg := newConfig()
 	client, err := openSqlDB(cfg)
@@ -24,7 +23,7 @@ func RunServer() {
 	app := structure.Application{
 		Config: cfg,
 		Logger: logger,
-		Client: client,
+		Models: data.NewModels(client),
 	}
 
 	router := handlers.NewHandler(app)

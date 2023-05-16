@@ -2,13 +2,13 @@ package structure
 
 import (
 	"golang.org/x/exp/slog"
-	"kala/internal/ent"
+	"kala/internal/data"
 )
 
 type Application struct {
 	Config Config
 	Logger *slog.Logger
-	Client *ent.Client
+	Models data.Models
 }
 
 type Config struct {
