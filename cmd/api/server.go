@@ -1,18 +1,12 @@
 package api
 
 import (
-	"database/sql"
-	"fmt"
 	"os"
 
 	"golang.org/x/exp/slog"
+	"kala/cmd/handlers"
+	"kala/internal/structure"
 )
-
-type application struct {
-	config config
-	logger *slog.Logger
-	sql    *sql.DB
-}
 
 func RunServer() {
 	jsonHandler := slog.NewJSONHandler(os.Stdout, nil)
@@ -27,11 +21,16 @@ func RunServer() {
 	defer db.Close()
 	logger.Info("database connection established")
 
-	app := application{
-		config: cfg,
-		logger: logger,
-		sql:    db,
+	app := structure.Application{
+		Config: cfg,
+		Logger: logger,
+		Sql:    db,
 	}
 
-	fmt.Println(app) // just to get it to compile for now..
+	router := handlers.NewHandler(app)
+	err = serve(app, router)
+	if err != nil {
+		logger.Error("failed to start server", slog.String("error", err.Error()))
+		return
+	}
 }

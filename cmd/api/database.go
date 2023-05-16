@@ -7,23 +7,16 @@ import (
 	"time"
 
 	_ "github.com/lib/pq"
+	"kala/internal/structure"
 )
 
-type sqlDB struct {
-	host     string
-	port     string
-	username string
-	password string
-	name     string
-}
-
-func openSqlDB(cfg config) (*sql.DB, error) {
+func openSqlDB(cfg structure.Config) (*sql.DB, error) {
 	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		cfg.sql.host,
-		cfg.sql.port,
-		cfg.sql.username,
-		cfg.sql.password,
-		cfg.sql.name)
+		cfg.Sql.Host,
+		cfg.Sql.Port,
+		cfg.Sql.Username,
+		cfg.Sql.Password,
+		cfg.Sql.Name)
 
 	db, err := sql.Open("postgres", dsn)
 	if err != nil {

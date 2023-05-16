@@ -3,16 +3,12 @@ package api
 import (
 	"flag"
 	"os"
+
+	"kala/internal/structure"
 )
 
-type config struct {
-	environment string
-	port        string
-	sql         sqlDB
-}
-
-func newConfig() config {
-	var cfg config
+func newConfig() structure.Config {
+	var cfg structure.Config
 
 	// getting settings from environment variables
 	env := os.Getenv("ENVIRONMENT")
@@ -26,14 +22,14 @@ func newConfig() config {
 
 	// getting settings from command line
 	// Note that flag arguments override environment variables, if provided
-	flag.StringVar(&cfg.environment, "env", env, "Service Environment")
-	flag.StringVar(&cfg.port, "port", port, "Service Port")
+	flag.StringVar(&cfg.Environment, "env", env, "Service Environment")
+	flag.StringVar(&cfg.Port, "port", port, "Service Port")
 
-	flag.StringVar(&cfg.sql.port, "sql-port", sqlPort, "SQL Database Port")
-	flag.StringVar(&cfg.sql.username, "sql-username", sqlUsername, "SQL Database Username")
-	flag.StringVar(&cfg.sql.host, "sql-host", sqlHost, "SQL Database Host")
-	flag.StringVar(&cfg.sql.password, "sql-password", sqlPassword, "SQL Database Password")
-	flag.StringVar(&cfg.sql.name, "sql-name", sqlName, "SQL Database Name")
+	flag.StringVar(&cfg.Sql.Port, "sql-port", sqlPort, "SQL Database Port")
+	flag.StringVar(&cfg.Sql.Username, "sql-username", sqlUsername, "SQL Database Username")
+	flag.StringVar(&cfg.Sql.Host, "sql-host", sqlHost, "SQL Database Host")
+	flag.StringVar(&cfg.Sql.Password, "sql-password", sqlPassword, "SQL Database Password")
+	flag.StringVar(&cfg.Sql.Name, "sql-name", sqlName, "SQL Database Name")
 
 	flag.Parse()
 	return cfg
