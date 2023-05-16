@@ -25,11 +25,16 @@ func NewHandler(application structure.Application) *chi.Mux {
 	r.Route("/api/v1", func(r chi.Router) {
 		// user routes
 		r.Route("/users", func(r chi.Router) {
-			r.Post("/", createNewUserHandler)
-			r.Get("/", getAllUsersHandler)
-			r.Get("/{id}", getUserByIDHandler)
-			r.Patch("/{id}", updateUserByIDHandler)
-			r.Delete("/{id}", deleteUserByIDHandler)
+			r.With().
+				Post("/", createNewUserHandler)
+			r.With().
+				Get("/", getAllUsersHandler)
+			r.With().
+				Get("/{id}", getUserByIDHandler)
+			r.With().
+				Patch("/{id}", updateUserByIDHandler)
+			r.With().
+				Delete("/{id}", deleteUserByIDHandler)
 		})
 
 		// todo routes
