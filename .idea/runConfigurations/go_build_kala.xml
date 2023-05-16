@@ -1,0 +1,25 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="go build kala" type="GoApplicationRunConfiguration" factoryName="Go Application" nameIsGenerated="true">
+    <module name="kala" />
+    <working_directory value="$PROJECT_DIR$" />
+    <envs>
+      <env name="ENVIRONMENT" value="dev" />
+      <env name="SERVER_PORT" value="8000" />
+      <env name="SQL_USERNAME" value="postgres" />
+      <env name="SQL_PASSWORD" value="123456" />
+      <env name="SQL_HOST" value="localhost" />
+      <env name="SQL_PORT" value="5432" />
+      <env name="SQL_NAME" value="kala" />
+    </envs>
+    <EXTENSION ID="software.aws.toolkits.jetbrains.core.execution.GoAwsConnectionRunConfigurationExtension">
+      <option name="credential" />
+      <option name="region" />
+      <option name="useCurrentConnection" value="false" />
+    </EXTENSION>
+    <kind value="PACKAGE" />
+    <package value="kala" />
+    <directory value="$PROJECT_DIR$" />
+    <filePath value="$PROJECT_DIR$/main.go" />
+    <method v="2" />
+  </configuration>
+</component>
