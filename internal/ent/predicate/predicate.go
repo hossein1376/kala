@@ -6,5 +6,47 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
+// Address is the predicate function for address builders.
+type Address func(*sql.Selector)
+
+// Attribute is the predicate function for attribute builders.
+type Attribute func(*sql.Selector)
+
+// AttributeValue is the predicate function for attributevalue builders.
+type AttributeValue func(*sql.Selector)
+
+// Brand is the predicate function for brand builders.
+type Brand func(*sql.Selector)
+
+// Category is the predicate function for category builders.
+type Category func(*sql.Selector)
+
+// Comment is the predicate function for comment builders.
+type Comment func(*sql.Selector)
+
+// Cons is the predicate function for cons builders.
+type Cons func(*sql.Selector)
+
+// Image is the predicate function for image builders.
+type Image func(*sql.Selector)
+
+// Logs is the predicate function for logs builders.
+type Logs func(*sql.Selector)
+
+// Order is the predicate function for order builders.
+type Order func(*sql.Selector)
+
+// Product is the predicate function for product builders.
+type Product func(*sql.Selector)
+
+// Pros is the predicate function for pros builders.
+type Pros func(*sql.Selector)
+
+// Seller is the predicate function for seller builders.
+type Seller func(*sql.Selector)
+
+// SubCategory is the predicate function for subcategory builders.
+type SubCategory func(*sql.Selector)
+
 // User is the predicate function for user builders.
 type User func(*sql.Selector)

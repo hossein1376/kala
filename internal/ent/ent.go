@@ -6,6 +6,20 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"kala/internal/ent/address"
+	"kala/internal/ent/attribute"
+	"kala/internal/ent/attributevalue"
+	"kala/internal/ent/brand"
+	"kala/internal/ent/category"
+	"kala/internal/ent/comment"
+	"kala/internal/ent/cons"
+	"kala/internal/ent/image"
+	"kala/internal/ent/logs"
+	"kala/internal/ent/order"
+	"kala/internal/ent/product"
+	"kala/internal/ent/pros"
+	"kala/internal/ent/seller"
+	"kala/internal/ent/subcategory"
 	"kala/internal/ent/user"
 	"reflect"
 	"sync"
@@ -73,7 +87,21 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			user.Table: user.ValidColumn,
+			address.Table:        address.ValidColumn,
+			attribute.Table:      attribute.ValidColumn,
+			attributevalue.Table: attributevalue.ValidColumn,
+			brand.Table:          brand.ValidColumn,
+			category.Table:       category.ValidColumn,
+			comment.Table:        comment.ValidColumn,
+			cons.Table:           cons.ValidColumn,
+			image.Table:          image.ValidColumn,
+			logs.Table:           logs.ValidColumn,
+			order.Table:          order.ValidColumn,
+			product.Table:        product.ValidColumn,
+			pros.Table:           pros.ValidColumn,
+			seller.Table:         seller.ValidColumn,
+			subcategory.Table:    subcategory.ValidColumn,
+			user.Table:           user.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

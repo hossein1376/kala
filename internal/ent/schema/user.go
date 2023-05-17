@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
 
@@ -21,11 +22,28 @@ func (User) Mixin() []ent.Mixin {
 func (User) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("username").Unique(),
-		field.String("password").Sensitive(),
+		field.Bytes("password").Sensitive(),
+		field.String("first_name").Optional(),
+		field.String("last_name").Optional(),
+		field.String("email").Optional(),
+		field.String("phone").Optional(),
 	}
 }
 
 // Edges of the User.
 func (User) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.To("comment", Comment.Type).
+			StorageKey(edge.Table("user_comments"),
+				edge.Columns("user", "comment"),
+				edge.Symbols("user_id", "comment_id")),
+		edge.To("image", Image.Type),
+		edge.To("seller", Seller.Type).
+			StorageKey(edge.Column("user_id")),
+		edge.To("order", Order.Type),
+		edge.To("logs", Logs.Type).
+			StorageKey(edge.Column("user")),
+		edge.To("address", Address.Type).
+			StorageKey(edge.Column("user")),
+	}
 }
