@@ -115,6 +115,12 @@ func (pu *ProductUpdate) SetAvailable(b bool) *ProductUpdate {
 	return pu
 }
 
+// SetStatus sets the "status" field.
+func (pu *ProductUpdate) SetStatus(b bool) *ProductUpdate {
+	pu.mutation.SetStatus(b)
+	return pu
+}
+
 // AddValueIDs adds the "values" edge to the AttributeValue entity by IDs.
 func (pu *ProductUpdate) AddValueIDs(ids ...int) *ProductUpdate {
 	pu.mutation.AddValueIDs(ids...)
@@ -410,6 +416,9 @@ func (pu *ProductUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := pu.mutation.Available(); ok {
 		_spec.SetField(product.FieldAvailable, field.TypeBool, value)
+	}
+	if value, ok := pu.mutation.Status(); ok {
+		_spec.SetField(product.FieldStatus, field.TypeBool, value)
 	}
 	if pu.mutation.ValuesCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -719,6 +728,12 @@ func (puo *ProductUpdateOne) AddQuantity(i int32) *ProductUpdateOne {
 // SetAvailable sets the "available" field.
 func (puo *ProductUpdateOne) SetAvailable(b bool) *ProductUpdateOne {
 	puo.mutation.SetAvailable(b)
+	return puo
+}
+
+// SetStatus sets the "status" field.
+func (puo *ProductUpdateOne) SetStatus(b bool) *ProductUpdateOne {
+	puo.mutation.SetStatus(b)
 	return puo
 }
 
@@ -1047,6 +1062,9 @@ func (puo *ProductUpdateOne) sqlSave(ctx context.Context) (_node *Product, err e
 	}
 	if value, ok := puo.mutation.Available(); ok {
 		_spec.SetField(product.FieldAvailable, field.TypeBool, value)
+	}
+	if value, ok := puo.mutation.Status(); ok {
+		_spec.SetField(product.FieldStatus, field.TypeBool, value)
 	}
 	if puo.mutation.ValuesCleared() {
 		edge := &sqlgraph.EdgeSpec{

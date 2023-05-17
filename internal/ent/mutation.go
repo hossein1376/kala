@@ -7232,6 +7232,7 @@ type ProductMutation struct {
 	quantity        *int32
 	addquantity     *int32
 	available       *bool
+	status          *bool
 	clearedFields   map[string]struct{}
 	values          map[int]struct{}
 	removedvalues   map[int]struct{}
@@ -7790,6 +7791,42 @@ func (m *ProductMutation) ResetAvailable() {
 	m.available = nil
 }
 
+// SetStatus sets the "status" field.
+func (m *ProductMutation) SetStatus(b bool) {
+	m.status = &b
+}
+
+// Status returns the value of the "status" field in the mutation.
+func (m *ProductMutation) Status() (r bool, exists bool) {
+	v := m.status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStatus returns the old "status" field's value of the Product entity.
+// If the Product object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProductMutation) OldStatus(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+	}
+	return oldValue.Status, nil
+}
+
+// ResetStatus resets all changes to the "status" field.
+func (m *ProductMutation) ResetStatus() {
+	m.status = nil
+}
+
 // AddValueIDs adds the "values" edge to the AttributeValue entity by ids.
 func (m *ProductMutation) AddValueIDs(ids ...int) {
 	if m.values == nil {
@@ -8079,7 +8116,7 @@ func (m *ProductMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ProductMutation) Fields() []string {
-	fields := make([]string, 0, 10)
+	fields := make([]string, 0, 11)
 	if m.create_time != nil {
 		fields = append(fields, product.FieldCreateTime)
 	}
@@ -8110,6 +8147,9 @@ func (m *ProductMutation) Fields() []string {
 	if m.available != nil {
 		fields = append(fields, product.FieldAvailable)
 	}
+	if m.status != nil {
+		fields = append(fields, product.FieldStatus)
+	}
 	return fields
 }
 
@@ -8138,6 +8178,8 @@ func (m *ProductMutation) Field(name string) (ent.Value, bool) {
 		return m.Quantity()
 	case product.FieldAvailable:
 		return m.Available()
+	case product.FieldStatus:
+		return m.Status()
 	}
 	return nil, false
 }
@@ -8167,6 +8209,8 @@ func (m *ProductMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldQuantity(ctx)
 	case product.FieldAvailable:
 		return m.OldAvailable(ctx)
+	case product.FieldStatus:
+		return m.OldStatus(ctx)
 	}
 	return nil, fmt.Errorf("unknown Product field %s", name)
 }
@@ -8245,6 +8289,13 @@ func (m *ProductMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetAvailable(v)
+		return nil
+	case product.FieldStatus:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStatus(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Product field %s", name)
@@ -8375,6 +8426,9 @@ func (m *ProductMutation) ResetField(name string) error {
 		return nil
 	case product.FieldAvailable:
 		m.ResetAvailable()
+		return nil
+	case product.FieldStatus:
+		m.ResetStatus()
 		return nil
 	}
 	return fmt.Errorf("unknown Product field %s", name)

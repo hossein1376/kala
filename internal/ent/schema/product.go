@@ -29,6 +29,7 @@ func (Product) Fields() []ent.Field {
 		field.Int32("price").Positive(),
 		field.Int32("quantity").Positive(),
 		field.Bool("available"),
+		field.Bool("status"),
 	}
 }
 

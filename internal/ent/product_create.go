@@ -101,6 +101,12 @@ func (pc *ProductCreate) SetAvailable(b bool) *ProductCreate {
 	return pc
 }
 
+// SetStatus sets the "status" field.
+func (pc *ProductCreate) SetStatus(b bool) *ProductCreate {
+	pc.mutation.SetStatus(b)
+	return pc
+}
+
 // AddValueIDs adds the "values" edge to the AttributeValue entity by IDs.
 func (pc *ProductCreate) AddValueIDs(ids ...int) *ProductCreate {
 	pc.mutation.AddValueIDs(ids...)
@@ -287,6 +293,9 @@ func (pc *ProductCreate) check() error {
 	if _, ok := pc.mutation.Available(); !ok {
 		return &ValidationError{Name: "available", err: errors.New(`ent: missing required field "Product.available"`)}
 	}
+	if _, ok := pc.mutation.Status(); !ok {
+		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Product.status"`)}
+	}
 	return nil
 }
 
@@ -352,6 +361,10 @@ func (pc *ProductCreate) createSpec() (*Product, *sqlgraph.CreateSpec) {
 	if value, ok := pc.mutation.Available(); ok {
 		_spec.SetField(product.FieldAvailable, field.TypeBool, value)
 		_node.Available = value
+	}
+	if value, ok := pc.mutation.Status(); ok {
+		_spec.SetField(product.FieldStatus, field.TypeBool, value)
+		_node.Status = value
 	}
 	if nodes := pc.mutation.ValuesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

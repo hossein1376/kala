@@ -38,7 +38,20 @@ func NewHandler(application cmd.Application) *chi.Mux {
 				Delete("/{id}", deleteUserByIDHandler)
 		})
 
-		// todo routes
+		// product routes
+		r.Route("/products", func(r chi.Router) {
+			r.With().
+				Post("/", createNewProductHandler)
+			r.With().
+				Get("/", getAllProductsHandler)
+			r.With().
+				Get("/{id}", getProductByIDHandler)
+			r.With().
+				Patch("/{id}", updateProductByIDHandler)
+			r.With().
+				Delete("/{id}", deleteProductByIDHandler)
+		})
+
 	})
 
 	return r

@@ -38,6 +38,8 @@ type Product struct {
 	Quantity int32 `json:"quantity,omitempty"`
 	// Available holds the value of the "available" field.
 	Available bool `json:"available,omitempty"`
+	// Status holds the value of the "status" field.
+	Status bool `json:"status,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ProductQuery when eager-loading is set.
 	Edges          ProductEdges `json:"edges"`
@@ -117,7 +119,7 @@ func (*Product) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case product.FieldAvailable:
+		case product.FieldAvailable, product.FieldStatus:
 			values[i] = new(sql.NullBool)
 		case product.FieldRating:
 			values[i] = new(sql.NullFloat64)
@@ -211,6 +213,12 @@ func (pr *Product) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field available", values[i])
 			} else if value.Valid {
 				pr.Available = value.Bool
+			}
+		case product.FieldStatus:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field status", values[i])
+			} else if value.Valid {
+				pr.Status = value.Bool
 			}
 		case product.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -316,6 +324,9 @@ func (pr *Product) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("available=")
 	builder.WriteString(fmt.Sprintf("%v", pr.Available))
+	builder.WriteString(", ")
+	builder.WriteString("status=")
+	builder.WriteString(fmt.Sprintf("%v", pr.Status))
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -5,11 +5,13 @@ import (
 )
 
 type Models struct {
-	User UserModel
+	User    UserModel
+	Product ProductModel
 }
 
 func NewModels(client *ent.Client) Models {
 	return Models{
-		User: UserModel{client: client},
+		User:    UserModel{client: client},
+		Product: ProductModel{client: client},
 	}
 }

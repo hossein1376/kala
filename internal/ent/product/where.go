@@ -105,6 +105,11 @@ func Available(v bool) predicate.Product {
 	return predicate.Product(sql.FieldEQ(FieldAvailable, v))
 }
 
+// Status applies equality check predicate on the "status" field. It's identical to StatusEQ.
+func Status(v bool) predicate.Product {
+	return predicate.Product(sql.FieldEQ(FieldStatus, v))
+}
+
 // CreateTimeEQ applies the EQ predicate on the "create_time" field.
 func CreateTimeEQ(v time.Time) predicate.Product {
 	return predicate.Product(sql.FieldEQ(FieldCreateTime, v))
@@ -548,6 +553,16 @@ func AvailableEQ(v bool) predicate.Product {
 // AvailableNEQ applies the NEQ predicate on the "available" field.
 func AvailableNEQ(v bool) predicate.Product {
 	return predicate.Product(sql.FieldNEQ(FieldAvailable, v))
+}
+
+// StatusEQ applies the EQ predicate on the "status" field.
+func StatusEQ(v bool) predicate.Product {
+	return predicate.Product(sql.FieldEQ(FieldStatus, v))
+}
+
+// StatusNEQ applies the NEQ predicate on the "status" field.
+func StatusNEQ(v bool) predicate.Product {
+	return predicate.Product(sql.FieldNEQ(FieldStatus, v))
 }
 
 // HasValues applies the HasEdge predicate on the "values" edge.

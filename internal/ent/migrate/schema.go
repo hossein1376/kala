@@ -250,6 +250,7 @@ var (
 		{Name: "price", Type: field.TypeInt32},
 		{Name: "quantity", Type: field.TypeInt32},
 		{Name: "available", Type: field.TypeBool},
+		{Name: "status", Type: field.TypeBool},
 		{Name: "brand_product", Type: field.TypeInt, Nullable: true},
 		{Name: "seller_product", Type: field.TypeInt, Nullable: true},
 	}
@@ -261,13 +262,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "products_brands_product",
-				Columns:    []*schema.Column{ProductsColumns[11]},
+				Columns:    []*schema.Column{ProductsColumns[12]},
 				RefColumns: []*schema.Column{BrandsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "products_sellers_product",
-				Columns:    []*schema.Column{ProductsColumns[12]},
+				Columns:    []*schema.Column{ProductsColumns[13]},
 				RefColumns: []*schema.Column{SellersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},

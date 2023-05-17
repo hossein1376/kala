@@ -34,6 +34,8 @@ const (
 	FieldQuantity = "quantity"
 	// FieldAvailable holds the string denoting the available field in the database.
 	FieldAvailable = "available"
+	// FieldStatus holds the string denoting the status field in the database.
+	FieldStatus = "status"
 	// EdgeValues holds the string denoting the values edge name in mutations.
 	EdgeValues = "values"
 	// EdgeComment holds the string denoting the comment edge name in mutations.
@@ -92,6 +94,7 @@ var Columns = []string{
 	FieldPrice,
 	FieldQuantity,
 	FieldAvailable,
+	FieldStatus,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "products"
@@ -202,6 +205,11 @@ func ByQuantity(opts ...sql.OrderTermOption) OrderOption {
 // ByAvailable orders the results by the available field.
 func ByAvailable(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldAvailable, opts...).ToFunc()
+}
+
+// ByStatus orders the results by the status field.
+func ByStatus(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldStatus, opts...).ToFunc()
 }
 
 // ByValuesCount orders the results by values count.

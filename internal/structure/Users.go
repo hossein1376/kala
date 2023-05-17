@@ -11,7 +11,7 @@ type User struct {
 	Password  Password.Password `json:"-"`
 	Email     string            `json:"email"`
 	Phone     string            `json:"phone"`
-	IsSeller  bool              `json:"is_seller"`
+	Role      string            `json:"role"`
 	Profile   []Image           `json:"profile"`
 	Addresses []Address         `json:"addresses"`
 	Orders    []Order           `json:"orders"`
