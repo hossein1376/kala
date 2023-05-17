@@ -33,6 +33,8 @@ const (
 	FieldPhone = "phone"
 	// FieldRole holds the string denoting the role field in the database.
 	FieldRole = "role"
+	// FieldStatus holds the string denoting the status field in the database.
+	FieldStatus = "status"
 	// EdgeComment holds the string denoting the comment edge name in mutations.
 	EdgeComment = "comment"
 	// EdgeImage holds the string denoting the image edge name in mutations.
@@ -101,6 +103,7 @@ var Columns = []string{
 	FieldEmail,
 	FieldPhone,
 	FieldRole,
+	FieldStatus,
 }
 
 var (
@@ -126,6 +129,8 @@ var (
 	DefaultUpdateTime func() time.Time
 	// UpdateDefaultUpdateTime holds the default value on update for the "update_time" field.
 	UpdateDefaultUpdateTime func() time.Time
+	// DefaultStatus holds the default value on creation for the "status" field.
+	DefaultStatus bool
 )
 
 // Role defines the type for the "role" enum field.
@@ -201,6 +206,11 @@ func ByPhone(opts ...sql.OrderTermOption) OrderOption {
 // ByRole orders the results by the role field.
 func ByRole(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldRole, opts...).ToFunc()
+}
+
+// ByStatus orders the results by the status field.
+func ByStatus(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldStatus, opts...).ToFunc()
 }
 
 // ByCommentCount orders the results by comment count.

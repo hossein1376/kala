@@ -7,6 +7,7 @@ import (
 	"kala/internal/structure"
 	"kala/pkg/Errors"
 	"kala/pkg/Json"
+	"kala/pkg/Password"
 )
 
 func createNewUserHandler(w http.ResponseWriter, r *http.Request) {
@@ -97,9 +98,94 @@ func getAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateUserByIDHandler(w http.ResponseWriter, r *http.Request) {
+	id := paramInt(r)
+	if id == 0 {
+		Errors.NotFoundResponse(w, r)
+		return
+	}
 
+	var input structure.UserUpdateRequest
+	err := Json.ReadJSON(w, r, &input)
+	if err != nil {
+		Errors.BadRequestResponse(w, r, err)
+		return
+	}
+
+	user, err := app.Models.User.GetSingleUserByID(id)
+	if err != nil {
+		switch {
+		case ent.IsNotFound(err):
+			Errors.NotFoundResponse(w, r)
+		default:
+			Errors.InternalServerErrorResponse(w, r, err)
+		}
+		return
+	}
+
+	if input.UserName != nil {
+		user.Username = *input.UserName
+	}
+	if input.FirstName != nil {
+		user.FirstName = *input.FirstName
+	}
+	if input.LastName != nil {
+		user.LastName = *input.LastName
+	}
+	if input.Email != nil {
+		user.Email = *input.Email
+	}
+	if input.Phone != nil {
+		user.Phone = *input.Phone
+	}
+	if input.Password != nil {
+		var p Password.Password
+		err = p.Set(*input.Password)
+		if err != nil {
+			Errors.InternalServerErrorResponse(w, r, err)
+			return
+		}
+		user.Password = []byte(p.Hash)
+	}
+
+	err = app.Models.User.UpdateUserByID(id, user)
+	if err != nil {
+		switch {
+		case ent.IsNotFound(err):
+			Errors.NotFoundResponse(w, r)
+		default:
+			Errors.InternalServerErrorResponse(w, r, err)
+		}
+		return
+	}
+
+	err = Json.WriteJSON(w, http.StatusOK, user, nil)
+	if err != nil {
+		Errors.InternalServerErrorResponse(w, r, err)
+		return
+	}
 }
 
 func deleteUserByIDHandler(w http.ResponseWriter, r *http.Request) {
+	id := paramInt(r)
+	if id == 0 {
+		Errors.NotFoundResponse(w, r)
+		return
+	}
 
+	err := app.Models.User.DeleteUserByID(id)
+	if err != nil {
+		switch {
+		case ent.IsNotFound(err):
+			Errors.NotFoundResponse(w, r)
+		default:
+			Errors.InternalServerErrorResponse(w, r, err)
+		}
+		return
+	}
+
+	err = Json.WriteJSON(w, http.StatusNoContent, nil, nil)
+	if err != nil {
+		Errors.InternalServerErrorResponse(w, r, err)
+		return
+	}
 }

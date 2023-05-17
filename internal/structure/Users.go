@@ -26,6 +26,15 @@ type UserRequest struct {
 	Phone     *string `json:"phone"`
 }
 
+type UserUpdateRequest struct {
+	UserName  *string `json:"username"`
+	Password  *string `json:"password"`
+	FirstName *string `json:"firstname"`
+	LastName  *string `json:"lastname"`
+	Email     *string `json:"email"`
+	Phone     *string `json:"phone"`
+}
+
 type UserResponse struct {
 	ID        int    `json:"id"`
 	FirstName string `json:"firstname"`

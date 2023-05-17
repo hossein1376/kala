@@ -31,6 +31,7 @@ func (User) Fields() []ent.Field {
 			Values("admin",
 				"seller",
 				"user").Default("user"),
+		field.Bool("status").Default(true),
 	}
 }
 

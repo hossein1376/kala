@@ -146,6 +146,20 @@ func (uu *UserUpdate) SetNillableRole(u *user.Role) *UserUpdate {
 	return uu
 }
 
+// SetStatus sets the "status" field.
+func (uu *UserUpdate) SetStatus(b bool) *UserUpdate {
+	uu.mutation.SetStatus(b)
+	return uu
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableStatus(b *bool) *UserUpdate {
+	if b != nil {
+		uu.SetStatus(*b)
+	}
+	return uu
+}
+
 // AddCommentIDs adds the "comment" edge to the Comment entity by IDs.
 func (uu *UserUpdate) AddCommentIDs(ids ...int) *UserUpdate {
 	uu.mutation.AddCommentIDs(ids...)
@@ -460,6 +474,9 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := uu.mutation.Role(); ok {
 		_spec.SetField(user.FieldRole, field.TypeEnum, value)
+	}
+	if value, ok := uu.mutation.Status(); ok {
+		_spec.SetField(user.FieldStatus, field.TypeBool, value)
 	}
 	if uu.mutation.CommentCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -863,6 +880,20 @@ func (uuo *UserUpdateOne) SetNillableRole(u *user.Role) *UserUpdateOne {
 	return uuo
 }
 
+// SetStatus sets the "status" field.
+func (uuo *UserUpdateOne) SetStatus(b bool) *UserUpdateOne {
+	uuo.mutation.SetStatus(b)
+	return uuo
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableStatus(b *bool) *UserUpdateOne {
+	if b != nil {
+		uuo.SetStatus(*b)
+	}
+	return uuo
+}
+
 // AddCommentIDs adds the "comment" edge to the Comment entity by IDs.
 func (uuo *UserUpdateOne) AddCommentIDs(ids ...int) *UserUpdateOne {
 	uuo.mutation.AddCommentIDs(ids...)
@@ -1207,6 +1238,9 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	}
 	if value, ok := uuo.mutation.Role(); ok {
 		_spec.SetField(user.FieldRole, field.TypeEnum, value)
+	}
+	if value, ok := uuo.mutation.Status(); ok {
+		_spec.SetField(user.FieldStatus, field.TypeBool, value)
 	}
 	if uuo.mutation.CommentCleared() {
 		edge := &sqlgraph.EdgeSpec{
