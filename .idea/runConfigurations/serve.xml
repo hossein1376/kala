@@ -1,7 +1,8 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="go build kala" type="GoApplicationRunConfiguration" factoryName="Go Application" nameIsGenerated="true">
+  <configuration default="false" name="serve" type="GoApplicationRunConfiguration" factoryName="Go Application">
     <module name="kala" />
     <working_directory value="$PROJECT_DIR$" />
+    <parameters value="-env dev" />
     <envs>
       <env name="ENVIRONMENT" value="dev" />
       <env name="SERVER_PORT" value="8000" />

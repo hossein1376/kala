@@ -1,6 +1,8 @@
 package api
 
 import (
+	"context"
+
 	"kala/cmd/handlers"
 	"kala/internal/data"
 	"kala/internal/structure"
@@ -20,6 +22,11 @@ func RunServer() {
 	}
 	defer client.Close()
 	logger.Info("database connection established")
+
+	if err = client.Schema.Create(context.Background()); err != nil {
+		logger.Error("failed creating schema resources: %v", slog.String("error", err.Error()))
+		return
+	}
 
 	app := structure.Application{
 		Config: cfg,
