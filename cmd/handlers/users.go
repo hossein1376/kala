@@ -40,6 +40,21 @@ func createNewUserHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO: validations
 
 	err = app.Models.User.CreateNewUser(user)
+	if err != nil {
+		switch {
+		case ent.IsConstraintError(err) || ent.IsValidationError(err):
+			Errors.BadRequestResponse(w, r, err)
+		default:
+			Errors.InternalServerErrorResponse(w, r, err)
+		}
+		return
+	}
+
+	err = Json.WriteJSON(w, http.StatusCreated, user, nil)
+	if err != nil {
+		Errors.InternalServerErrorResponse(w, r, err)
+		return
+	}
 }
 
 func getUserByIDHandler(w http.ResponseWriter, r *http.Request) {
