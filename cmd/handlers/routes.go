@@ -1,15 +1,15 @@
 package handlers
 
 import (
-	"kala/internal/structure"
+	"kala/cmd"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
 
-var app structure.Application
+var app cmd.Application
 
-func NewHandler(application structure.Application) *chi.Mux {
+func NewHandler(application cmd.Application) *chi.Mux {
 	// initialize the application state instance for the handlers package
 	app = application
 

@@ -132,16 +132,16 @@ func (uu *UserUpdate) ClearPhone() *UserUpdate {
 	return uu
 }
 
-// SetIsSeller sets the "is_seller" field.
-func (uu *UserUpdate) SetIsSeller(b bool) *UserUpdate {
-	uu.mutation.SetIsSeller(b)
+// SetRole sets the "role" field.
+func (uu *UserUpdate) SetRole(u user.Role) *UserUpdate {
+	uu.mutation.SetRole(u)
 	return uu
 }
 
-// SetNillableIsSeller sets the "is_seller" field if the given value is not nil.
-func (uu *UserUpdate) SetNillableIsSeller(b *bool) *UserUpdate {
-	if b != nil {
-		uu.SetIsSeller(*b)
+// SetNillableRole sets the "role" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableRole(u *user.Role) *UserUpdate {
+	if u != nil {
+		uu.SetRole(*u)
 	}
 	return uu
 }
@@ -403,7 +403,20 @@ func (uu *UserUpdate) defaults() {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (uu *UserUpdate) check() error {
+	if v, ok := uu.mutation.Role(); ok {
+		if err := user.RoleValidator(v); err != nil {
+			return &ValidationError{Name: "role", err: fmt.Errorf(`ent: validator failed for field "User.role": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := uu.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(user.Table, user.Columns, sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt))
 	if ps := uu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -445,8 +458,8 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if uu.mutation.PhoneCleared() {
 		_spec.ClearField(user.FieldPhone, field.TypeString)
 	}
-	if value, ok := uu.mutation.IsSeller(); ok {
-		_spec.SetField(user.FieldIsSeller, field.TypeBool, value)
+	if value, ok := uu.mutation.Role(); ok {
+		_spec.SetField(user.FieldRole, field.TypeEnum, value)
 	}
 	if uu.mutation.CommentCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -836,16 +849,16 @@ func (uuo *UserUpdateOne) ClearPhone() *UserUpdateOne {
 	return uuo
 }
 
-// SetIsSeller sets the "is_seller" field.
-func (uuo *UserUpdateOne) SetIsSeller(b bool) *UserUpdateOne {
-	uuo.mutation.SetIsSeller(b)
+// SetRole sets the "role" field.
+func (uuo *UserUpdateOne) SetRole(u user.Role) *UserUpdateOne {
+	uuo.mutation.SetRole(u)
 	return uuo
 }
 
-// SetNillableIsSeller sets the "is_seller" field if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillableIsSeller(b *bool) *UserUpdateOne {
-	if b != nil {
-		uuo.SetIsSeller(*b)
+// SetNillableRole sets the "role" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableRole(u *user.Role) *UserUpdateOne {
+	if u != nil {
+		uuo.SetRole(*u)
 	}
 	return uuo
 }
@@ -1120,7 +1133,20 @@ func (uuo *UserUpdateOne) defaults() {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (uuo *UserUpdateOne) check() error {
+	if v, ok := uuo.mutation.Role(); ok {
+		if err := user.RoleValidator(v); err != nil {
+			return &ValidationError{Name: "role", err: fmt.Errorf(`ent: validator failed for field "User.role": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) {
+	if err := uuo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(user.Table, user.Columns, sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt))
 	id, ok := uuo.mutation.ID()
 	if !ok {
@@ -1179,8 +1205,8 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	if uuo.mutation.PhoneCleared() {
 		_spec.ClearField(user.FieldPhone, field.TypeString)
 	}
-	if value, ok := uuo.mutation.IsSeller(); ok {
-		_spec.SetField(user.FieldIsSeller, field.TypeBool, value)
+	if value, ok := uuo.mutation.Role(); ok {
+		_spec.SetField(user.FieldRole, field.TypeEnum, value)
 	}
 	if uuo.mutation.CommentCleared() {
 		edge := &sqlgraph.EdgeSpec{

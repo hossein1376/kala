@@ -27,7 +27,10 @@ func (User) Fields() []ent.Field {
 		field.String("last_name").Optional(),
 		field.String("email").Optional(),
 		field.String("phone").Optional(),
-		field.Bool("is_seller").Default(false),
+		field.Enum("role").
+			Values("admin",
+				"seller",
+				"user").Default("user"),
 	}
 }
 

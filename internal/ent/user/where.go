@@ -95,11 +95,6 @@ func Phone(v string) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldPhone, v))
 }
 
-// IsSeller applies equality check predicate on the "is_seller" field. It's identical to IsSellerEQ.
-func IsSeller(v bool) predicate.User {
-	return predicate.User(sql.FieldEQ(FieldIsSeller, v))
-}
-
 // CreateTimeEQ applies the EQ predicate on the "create_time" field.
 func CreateTimeEQ(v time.Time) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldCreateTime, v))
@@ -585,14 +580,24 @@ func PhoneContainsFold(v string) predicate.User {
 	return predicate.User(sql.FieldContainsFold(FieldPhone, v))
 }
 
-// IsSellerEQ applies the EQ predicate on the "is_seller" field.
-func IsSellerEQ(v bool) predicate.User {
-	return predicate.User(sql.FieldEQ(FieldIsSeller, v))
+// RoleEQ applies the EQ predicate on the "role" field.
+func RoleEQ(v Role) predicate.User {
+	return predicate.User(sql.FieldEQ(FieldRole, v))
 }
 
-// IsSellerNEQ applies the NEQ predicate on the "is_seller" field.
-func IsSellerNEQ(v bool) predicate.User {
-	return predicate.User(sql.FieldNEQ(FieldIsSeller, v))
+// RoleNEQ applies the NEQ predicate on the "role" field.
+func RoleNEQ(v Role) predicate.User {
+	return predicate.User(sql.FieldNEQ(FieldRole, v))
+}
+
+// RoleIn applies the In predicate on the "role" field.
+func RoleIn(vs ...Role) predicate.User {
+	return predicate.User(sql.FieldIn(FieldRole, vs...))
+}
+
+// RoleNotIn applies the NotIn predicate on the "role" field.
+func RoleNotIn(vs ...Role) predicate.User {
+	return predicate.User(sql.FieldNotIn(FieldRole, vs...))
 }
 
 // HasComment applies the HasEdge predicate on the "comment" edge.

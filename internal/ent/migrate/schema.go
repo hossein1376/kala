@@ -353,7 +353,7 @@ var (
 		{Name: "last_name", Type: field.TypeString, Nullable: true},
 		{Name: "email", Type: field.TypeString, Nullable: true},
 		{Name: "phone", Type: field.TypeString, Nullable: true},
-		{Name: "is_seller", Type: field.TypeBool, Default: false},
+		{Name: "role", Type: field.TypeEnum, Enums: []string{"admin", "seller", "user"}, Default: "user"},
 	}
 	// UsersTable holds the schema information for the "users" table.
 	UsersTable = &schema.Table{

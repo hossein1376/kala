@@ -1,31 +1,35 @@
 package structure
 
+import (
+	"kala/pkg/Password"
+)
+
 type User struct {
-	Firstname string    `json:"firstname"`
-	Lastname  string    `json:"lastname"`
-	Username  string    `json:"username"`
-	Password  string    `json:"-"`
-	Email     string    `json:"email"`
-	Phone     string    `json:"phone"`
-	IsSeller  bool      `json:"is_seller"`
-	Profile   []Image   `json:"profile"`
-	Addresses []Address `json:"addresses"`
-	Orders    []Order   `json:"orders"`
+	FirstName string            `json:"firstname"`
+	LastName  string            `json:"lastname"`
+	Username  string            `json:"username"`
+	Password  Password.Password `json:"-"`
+	Email     string            `json:"email"`
+	Phone     string            `json:"phone"`
+	IsSeller  bool              `json:"is_seller"`
+	Profile   []Image           `json:"profile"`
+	Addresses []Address         `json:"addresses"`
+	Orders    []Order           `json:"orders"`
 }
 
 type UserRequest struct {
-	Firstname string `json:"firstname"`
-	Lastname  string `json:"lastname"`
-	Username  string `json:"username"`
-	Password  string `json:"password"`
-	Email     string `json:"email"`
-	Phone     string `json:"phone"`
+	UserName  string  `json:"username"`
+	Password  string  `json:"password"`
+	FirstName *string `json:"firstname"`
+	LastName  *string `json:"lastname"`
+	Email     *string `json:"email"`
+	Phone     *string `json:"phone"`
 }
 
 type UserResponse struct {
 	ID        int    `json:"id"`
-	Firstname string `json:"firstname"`
-	Lastname  string `json:"lastname"`
+	FirstName string `json:"firstname"`
+	LastName  string `json:"lastname"`
 	Username  string `json:"username"`
 	Email     string `json:"email"`
 	Phone     string `json:"phone"`

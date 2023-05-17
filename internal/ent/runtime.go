@@ -291,8 +291,4 @@ func init() {
 	user.DefaultUpdateTime = userDescUpdateTime.Default.(func() time.Time)
 	// user.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
 	user.UpdateDefaultUpdateTime = userDescUpdateTime.UpdateDefault.(func() time.Time)
-	// userDescIsSeller is the schema descriptor for is_seller field.
-	userDescIsSeller := userFields[6].Descriptor()
-	// user.DefaultIsSeller holds the default value on creation for the is_seller field.
-	user.DefaultIsSeller = userDescIsSeller.Default.(bool)
 }

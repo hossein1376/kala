@@ -4,11 +4,11 @@ import (
 	"flag"
 	"os"
 
-	"kala/internal/structure"
+	"kala/cmd"
 )
 
-func newConfig() structure.Config {
-	var cfg structure.Config
+func newConfig() cmd.Config {
+	var cfg cmd.Config
 
 	// getting settings from environment variables
 	env := os.Getenv("ENVIRONMENT")

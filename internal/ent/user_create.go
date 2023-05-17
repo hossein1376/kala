@@ -122,16 +122,16 @@ func (uc *UserCreate) SetNillablePhone(s *string) *UserCreate {
 	return uc
 }
 
-// SetIsSeller sets the "is_seller" field.
-func (uc *UserCreate) SetIsSeller(b bool) *UserCreate {
-	uc.mutation.SetIsSeller(b)
+// SetRole sets the "role" field.
+func (uc *UserCreate) SetRole(u user.Role) *UserCreate {
+	uc.mutation.SetRole(u)
 	return uc
 }
 
-// SetNillableIsSeller sets the "is_seller" field if the given value is not nil.
-func (uc *UserCreate) SetNillableIsSeller(b *bool) *UserCreate {
-	if b != nil {
-		uc.SetIsSeller(*b)
+// SetNillableRole sets the "role" field if the given value is not nil.
+func (uc *UserCreate) SetNillableRole(u *user.Role) *UserCreate {
+	if u != nil {
+		uc.SetRole(*u)
 	}
 	return uc
 }
@@ -269,9 +269,9 @@ func (uc *UserCreate) defaults() {
 		v := user.DefaultUpdateTime()
 		uc.mutation.SetUpdateTime(v)
 	}
-	if _, ok := uc.mutation.IsSeller(); !ok {
-		v := user.DefaultIsSeller
-		uc.mutation.SetIsSeller(v)
+	if _, ok := uc.mutation.Role(); !ok {
+		v := user.DefaultRole
+		uc.mutation.SetRole(v)
 	}
 }
 
@@ -289,8 +289,13 @@ func (uc *UserCreate) check() error {
 	if _, ok := uc.mutation.Password(); !ok {
 		return &ValidationError{Name: "password", err: errors.New(`ent: missing required field "User.password"`)}
 	}
-	if _, ok := uc.mutation.IsSeller(); !ok {
-		return &ValidationError{Name: "is_seller", err: errors.New(`ent: missing required field "User.is_seller"`)}
+	if _, ok := uc.mutation.Role(); !ok {
+		return &ValidationError{Name: "role", err: errors.New(`ent: missing required field "User.role"`)}
+	}
+	if v, ok := uc.mutation.Role(); ok {
+		if err := user.RoleValidator(v); err != nil {
+			return &ValidationError{Name: "role", err: fmt.Errorf(`ent: validator failed for field "User.role": %w`, err)}
+		}
 	}
 	return nil
 }
@@ -350,9 +355,9 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_spec.SetField(user.FieldPhone, field.TypeString, value)
 		_node.Phone = value
 	}
-	if value, ok := uc.mutation.IsSeller(); ok {
-		_spec.SetField(user.FieldIsSeller, field.TypeBool, value)
-		_node.IsSeller = value
+	if value, ok := uc.mutation.Role(); ok {
+		_spec.SetField(user.FieldRole, field.TypeEnum, value)
+		_node.Role = value
 	}
 	if nodes := uc.mutation.CommentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

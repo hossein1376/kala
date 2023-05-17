@@ -3,13 +3,13 @@ package api
 import (
 	"fmt"
 
+	"kala/cmd"
 	"kala/internal/ent"
-	"kala/internal/structure"
 
 	_ "github.com/lib/pq"
 )
 
-func openSqlDB(cfg structure.Config) (*ent.Client, error) {
+func openSqlDB(cfg cmd.Config) (*ent.Client, error) {
 	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		cfg.Sql.Host,
 		cfg.Sql.Port,

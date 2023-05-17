@@ -33,8 +33,8 @@ type User struct {
 	Email string `json:"email,omitempty"`
 	// Phone holds the value of the "phone" field.
 	Phone string `json:"phone,omitempty"`
-	// IsSeller holds the value of the "is_seller" field.
-	IsSeller bool `json:"is_seller,omitempty"`
+	// Role holds the value of the "role" field.
+	Role user.Role `json:"role,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the UserQuery when eager-loading is set.
 	Edges        UserEdges `json:"edges"`
@@ -121,11 +121,9 @@ func (*User) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case user.FieldPassword:
 			values[i] = new([]byte)
-		case user.FieldIsSeller:
-			values[i] = new(sql.NullBool)
 		case user.FieldID:
 			values[i] = new(sql.NullInt64)
-		case user.FieldUsername, user.FieldFirstName, user.FieldLastName, user.FieldEmail, user.FieldPhone:
+		case user.FieldUsername, user.FieldFirstName, user.FieldLastName, user.FieldEmail, user.FieldPhone, user.FieldRole:
 			values[i] = new(sql.NullString)
 		case user.FieldCreateTime, user.FieldUpdateTime:
 			values[i] = new(sql.NullTime)
@@ -198,11 +196,11 @@ func (u *User) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				u.Phone = value.String
 			}
-		case user.FieldIsSeller:
-			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field is_seller", values[i])
+		case user.FieldRole:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field role", values[i])
 			} else if value.Valid {
-				u.IsSeller = value.Bool
+				u.Role = user.Role(value.String)
 			}
 		default:
 			u.selectValues.Set(columns[i], values[i])
@@ -293,8 +291,8 @@ func (u *User) String() string {
 	builder.WriteString("phone=")
 	builder.WriteString(u.Phone)
 	builder.WriteString(", ")
-	builder.WriteString("is_seller=")
-	builder.WriteString(fmt.Sprintf("%v", u.IsSeller))
+	builder.WriteString("role=")
+	builder.WriteString(fmt.Sprintf("%v", u.Role))
 	builder.WriteByte(')')
 	return builder.String()
 }

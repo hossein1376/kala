@@ -10581,7 +10581,7 @@ type UserMutation struct {
 	last_name      *string
 	email          *string
 	phone          *string
-	is_seller      *bool
+	role           *user.Role
 	clearedFields  map[string]struct{}
 	comment        map[int]struct{}
 	removedcomment map[int]struct{}
@@ -11044,40 +11044,40 @@ func (m *UserMutation) ResetPhone() {
 	delete(m.clearedFields, user.FieldPhone)
 }
 
-// SetIsSeller sets the "is_seller" field.
-func (m *UserMutation) SetIsSeller(b bool) {
-	m.is_seller = &b
+// SetRole sets the "role" field.
+func (m *UserMutation) SetRole(u user.Role) {
+	m.role = &u
 }
 
-// IsSeller returns the value of the "is_seller" field in the mutation.
-func (m *UserMutation) IsSeller() (r bool, exists bool) {
-	v := m.is_seller
+// Role returns the value of the "role" field in the mutation.
+func (m *UserMutation) Role() (r user.Role, exists bool) {
+	v := m.role
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldIsSeller returns the old "is_seller" field's value of the User entity.
+// OldRole returns the old "role" field's value of the User entity.
 // If the User object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserMutation) OldIsSeller(ctx context.Context) (v bool, err error) {
+func (m *UserMutation) OldRole(ctx context.Context) (v user.Role, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldIsSeller is only allowed on UpdateOne operations")
+		return v, errors.New("OldRole is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldIsSeller requires an ID field in the mutation")
+		return v, errors.New("OldRole requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldIsSeller: %w", err)
+		return v, fmt.Errorf("querying old value for OldRole: %w", err)
 	}
-	return oldValue.IsSeller, nil
+	return oldValue.Role, nil
 }
 
-// ResetIsSeller resets all changes to the "is_seller" field.
-func (m *UserMutation) ResetIsSeller() {
-	m.is_seller = nil
+// ResetRole resets all changes to the "role" field.
+func (m *UserMutation) ResetRole() {
+	m.role = nil
 }
 
 // AddCommentIDs adds the "comment" edge to the Comment entity by ids.
@@ -11463,8 +11463,8 @@ func (m *UserMutation) Fields() []string {
 	if m.phone != nil {
 		fields = append(fields, user.FieldPhone)
 	}
-	if m.is_seller != nil {
-		fields = append(fields, user.FieldIsSeller)
+	if m.role != nil {
+		fields = append(fields, user.FieldRole)
 	}
 	return fields
 }
@@ -11490,8 +11490,8 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 		return m.Email()
 	case user.FieldPhone:
 		return m.Phone()
-	case user.FieldIsSeller:
-		return m.IsSeller()
+	case user.FieldRole:
+		return m.Role()
 	}
 	return nil, false
 }
@@ -11517,8 +11517,8 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldEmail(ctx)
 	case user.FieldPhone:
 		return m.OldPhone(ctx)
-	case user.FieldIsSeller:
-		return m.OldIsSeller(ctx)
+	case user.FieldRole:
+		return m.OldRole(ctx)
 	}
 	return nil, fmt.Errorf("unknown User field %s", name)
 }
@@ -11584,12 +11584,12 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetPhone(v)
 		return nil
-	case user.FieldIsSeller:
-		v, ok := value.(bool)
+	case user.FieldRole:
+		v, ok := value.(user.Role)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetIsSeller(v)
+		m.SetRole(v)
 		return nil
 	}
 	return fmt.Errorf("unknown User field %s", name)
@@ -11691,8 +11691,8 @@ func (m *UserMutation) ResetField(name string) error {
 	case user.FieldPhone:
 		m.ResetPhone()
 		return nil
-	case user.FieldIsSeller:
-		m.ResetIsSeller()
+	case user.FieldRole:
+		m.ResetRole()
 		return nil
 	}
 	return fmt.Errorf("unknown User field %s", name)

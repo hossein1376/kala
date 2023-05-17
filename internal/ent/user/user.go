@@ -3,6 +3,7 @@
 package user
 
 import (
+	"fmt"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -30,8 +31,8 @@ const (
 	FieldEmail = "email"
 	// FieldPhone holds the string denoting the phone field in the database.
 	FieldPhone = "phone"
-	// FieldIsSeller holds the string denoting the is_seller field in the database.
-	FieldIsSeller = "is_seller"
+	// FieldRole holds the string denoting the role field in the database.
+	FieldRole = "role"
 	// EdgeComment holds the string denoting the comment edge name in mutations.
 	EdgeComment = "comment"
 	// EdgeImage holds the string denoting the image edge name in mutations.
@@ -99,7 +100,7 @@ var Columns = []string{
 	FieldLastName,
 	FieldEmail,
 	FieldPhone,
-	FieldIsSeller,
+	FieldRole,
 }
 
 var (
@@ -125,9 +126,34 @@ var (
 	DefaultUpdateTime func() time.Time
 	// UpdateDefaultUpdateTime holds the default value on update for the "update_time" field.
 	UpdateDefaultUpdateTime func() time.Time
-	// DefaultIsSeller holds the default value on creation for the "is_seller" field.
-	DefaultIsSeller bool
 )
+
+// Role defines the type for the "role" enum field.
+type Role string
+
+// RoleUser is the default value of the Role enum.
+const DefaultRole = RoleUser
+
+// Role values.
+const (
+	RoleAdmin  Role = "admin"
+	RoleSeller Role = "seller"
+	RoleUser   Role = "user"
+)
+
+func (r Role) String() string {
+	return string(r)
+}
+
+// RoleValidator is a validator for the "role" field enum values. It is called by the builders before save.
+func RoleValidator(r Role) error {
+	switch r {
+	case RoleAdmin, RoleSeller, RoleUser:
+		return nil
+	default:
+		return fmt.Errorf("user: invalid enum value for role field: %q", r)
+	}
+}
 
 // OrderOption defines the ordering options for the User queries.
 type OrderOption func(*sql.Selector)
@@ -172,9 +198,9 @@ func ByPhone(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPhone, opts...).ToFunc()
 }
 
-// ByIsSeller orders the results by the is_seller field.
-func ByIsSeller(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldIsSeller, opts...).ToFunc()
+// ByRole orders the results by the role field.
+func ByRole(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldRole, opts...).ToFunc()
 }
 
 // ByCommentCount orders the results by comment count.

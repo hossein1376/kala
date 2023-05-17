@@ -1,4 +1,4 @@
-package structure
+package cmd
 
 import (
 	"kala/internal/data"

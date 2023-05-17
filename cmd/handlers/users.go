@@ -4,12 +4,42 @@ import (
 	"net/http"
 
 	"kala/internal/ent"
+	"kala/internal/structure"
 	"kala/pkg/Errors"
 	"kala/pkg/Json"
 )
 
 func createNewUserHandler(w http.ResponseWriter, r *http.Request) {
+	var input structure.UserRequest
+	err := Json.ReadJSON(w, r, &input)
+	if err != nil {
+		Errors.BadRequestResponse(w, r, err)
+	}
 
+	var user structure.User
+	user.Username = input.UserName
+	if input.FirstName != nil {
+		user.FirstName = *input.FirstName
+	}
+	if input.LastName != nil {
+		user.LastName = *input.LastName
+	}
+	if input.Email != nil {
+		user.Email = *input.Email
+	}
+	if input.Phone != nil {
+		user.Phone = *input.Phone
+	}
+
+	err = user.Password.Set(input.Password)
+	if err != nil {
+		Errors.InternalServerErrorResponse(w, r, err)
+		return
+	}
+
+	// TODO: validations
+
+	err = app.Models.User.CreateNewUser(user)
 }
 
 func getUserByIDHandler(w http.ResponseWriter, r *http.Request) {

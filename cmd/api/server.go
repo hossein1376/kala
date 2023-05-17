@@ -2,42 +2,59 @@ package api
 
 import (
 	"context"
+	"errors"
+	"fmt"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
-	"kala/cmd/handlers"
-	"kala/internal/data"
-	"kala/internal/structure"
-	"kala/pkg/Logger"
+	"kala/cmd"
 
+	"github.com/go-chi/chi/v5"
 	"golang.org/x/exp/slog"
 )
 
-func RunServer() {
-	logger := Logger.Logger
+func serve(app cmd.Application, router *chi.Mux) error {
+	server := &http.Server{
+		Addr:         fmt.Sprintf(":%s", app.Config.Port),
+		Handler:      router,
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 30 * time.Second,
+	}
 
-	cfg := newConfig()
-	client, err := openSqlDB(cfg)
+	shutdownError := make(chan error)
+	go func() {
+		quit := make(chan os.Signal, 1)
+		signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+		sig := <-quit
+
+		app.Logger.Info("shutting down server",
+			slog.String("signal", sig.String()))
+
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+
+		shutdownError <- server.Shutdown(ctx)
+	}()
+
+	app.Logger.Info("starting server",
+		slog.String("addr", server.Addr),
+		//slog.String("version", app.config.version),
+		slog.String("env", app.Config.Environment))
+
+	err := server.ListenAndServe()
+	if !errors.Is(err, http.ErrServerClosed) {
+		return err
+	}
+
+	err = <-shutdownError
 	if err != nil {
-		logger.Error("failed to open sql connection", slog.String("error", err.Error()))
-		return
-	}
-	defer client.Close()
-	logger.Info("database connection established")
-
-	if err = client.Schema.Create(context.Background()); err != nil {
-		logger.Error("failed creating schema resources: %v", slog.String("error", err.Error()))
-		return
+		return err
 	}
 
-	app := structure.Application{
-		Config: cfg,
-		Logger: logger,
-		Models: data.NewModels(client),
-	}
-
-	router := handlers.NewHandler(app)
-	err = serve(app, router)
-	if err != nil {
-		logger.Error("failed to start server", slog.String("error", err.Error()))
-		return
-	}
+	app.Logger.Info("stopped server",
+		slog.String("addr", server.Addr))
+	return nil
 }
