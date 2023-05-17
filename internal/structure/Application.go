@@ -1,8 +1,9 @@
 package structure
 
 import (
-	"golang.org/x/exp/slog"
 	"kala/internal/data"
+
+	"golang.org/x/exp/slog"
 )
 
 type Application struct {

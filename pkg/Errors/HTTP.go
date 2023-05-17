@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"net/http"
 
+	"kala/pkg/Json"
+	"kala/pkg/Logger"
+
 	"golang.org/x/exp/slog"
-	"kala/internal/Json"
-	"kala/internal/Logger"
 )
 
 // logError logs the error details to the standard logger

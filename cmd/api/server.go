@@ -1,11 +1,12 @@
 package api
 
 import (
-	"golang.org/x/exp/slog"
 	"kala/cmd/handlers"
-	"kala/internal/Logger"
 	"kala/internal/data"
 	"kala/internal/structure"
+	"kala/pkg/Logger"
+
+	"golang.org/x/exp/slog"
 )
 
 func RunServer() {

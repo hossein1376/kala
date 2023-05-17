@@ -1,9 +1,10 @@
 package handlers
 
 import (
+	"kala/internal/structure"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"kala/internal/structure"
 )
 
 var app structure.Application

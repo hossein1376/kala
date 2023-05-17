@@ -3,9 +3,10 @@ package api
 import (
 	"fmt"
 
-	_ "github.com/lib/pq"
 	"kala/internal/ent"
 	"kala/internal/structure"
+
+	_ "github.com/lib/pq"
 )
 
 func openSqlDB(cfg structure.Config) (*ent.Client, error) {

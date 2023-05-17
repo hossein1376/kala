@@ -10,9 +10,10 @@ import (
 	"syscall"
 	"time"
 
+	"kala/internal/structure"
+
 	"github.com/go-chi/chi/v5"
 	"golang.org/x/exp/slog"
-	"kala/internal/structure"
 )
 
 func serve(app structure.Application, router *chi.Mux) error {

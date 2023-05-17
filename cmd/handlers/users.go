@@ -3,9 +3,9 @@ package handlers
 import (
 	"net/http"
 
-	"kala/internal/Errors"
-	"kala/internal/Json"
 	"kala/internal/ent"
+	"kala/pkg/Errors"
+	"kala/pkg/Json"
 )
 
 func createNewUserHandler(w http.ResponseWriter, r *http.Request) {
