@@ -122,6 +122,20 @@ func (uc *UserCreate) SetNillablePhone(s *string) *UserCreate {
 	return uc
 }
 
+// SetIsSeller sets the "is_seller" field.
+func (uc *UserCreate) SetIsSeller(b bool) *UserCreate {
+	uc.mutation.SetIsSeller(b)
+	return uc
+}
+
+// SetNillableIsSeller sets the "is_seller" field if the given value is not nil.
+func (uc *UserCreate) SetNillableIsSeller(b *bool) *UserCreate {
+	if b != nil {
+		uc.SetIsSeller(*b)
+	}
+	return uc
+}
+
 // AddCommentIDs adds the "comment" edge to the Comment entity by IDs.
 func (uc *UserCreate) AddCommentIDs(ids ...int) *UserCreate {
 	uc.mutation.AddCommentIDs(ids...)
@@ -255,6 +269,10 @@ func (uc *UserCreate) defaults() {
 		v := user.DefaultUpdateTime()
 		uc.mutation.SetUpdateTime(v)
 	}
+	if _, ok := uc.mutation.IsSeller(); !ok {
+		v := user.DefaultIsSeller
+		uc.mutation.SetIsSeller(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -270,6 +288,9 @@ func (uc *UserCreate) check() error {
 	}
 	if _, ok := uc.mutation.Password(); !ok {
 		return &ValidationError{Name: "password", err: errors.New(`ent: missing required field "User.password"`)}
+	}
+	if _, ok := uc.mutation.IsSeller(); !ok {
+		return &ValidationError{Name: "is_seller", err: errors.New(`ent: missing required field "User.is_seller"`)}
 	}
 	return nil
 }
@@ -328,6 +349,10 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	if value, ok := uc.mutation.Phone(); ok {
 		_spec.SetField(user.FieldPhone, field.TypeString, value)
 		_node.Phone = value
+	}
+	if value, ok := uc.mutation.IsSeller(); ok {
+		_spec.SetField(user.FieldIsSeller, field.TypeBool, value)
+		_node.IsSeller = value
 	}
 	if nodes := uc.mutation.CommentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

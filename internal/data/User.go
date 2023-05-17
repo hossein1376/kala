@@ -4,10 +4,15 @@ import (
 	"context"
 
 	"kala/internal/ent"
+	"kala/internal/structure"
 )
 
 type UserModel struct {
 	client *ent.Client
+}
+
+func (u *UserModel) CreateNewUser(user structure.UserRequest) {
+
 }
 
 func (u *UserModel) GetSingleUserByID(id int) (*ent.User, error) {

@@ -132,6 +132,20 @@ func (uu *UserUpdate) ClearPhone() *UserUpdate {
 	return uu
 }
 
+// SetIsSeller sets the "is_seller" field.
+func (uu *UserUpdate) SetIsSeller(b bool) *UserUpdate {
+	uu.mutation.SetIsSeller(b)
+	return uu
+}
+
+// SetNillableIsSeller sets the "is_seller" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableIsSeller(b *bool) *UserUpdate {
+	if b != nil {
+		uu.SetIsSeller(*b)
+	}
+	return uu
+}
+
 // AddCommentIDs adds the "comment" edge to the Comment entity by IDs.
 func (uu *UserUpdate) AddCommentIDs(ids ...int) *UserUpdate {
 	uu.mutation.AddCommentIDs(ids...)
@@ -430,6 +444,9 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if uu.mutation.PhoneCleared() {
 		_spec.ClearField(user.FieldPhone, field.TypeString)
+	}
+	if value, ok := uu.mutation.IsSeller(); ok {
+		_spec.SetField(user.FieldIsSeller, field.TypeBool, value)
 	}
 	if uu.mutation.CommentCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -819,6 +836,20 @@ func (uuo *UserUpdateOne) ClearPhone() *UserUpdateOne {
 	return uuo
 }
 
+// SetIsSeller sets the "is_seller" field.
+func (uuo *UserUpdateOne) SetIsSeller(b bool) *UserUpdateOne {
+	uuo.mutation.SetIsSeller(b)
+	return uuo
+}
+
+// SetNillableIsSeller sets the "is_seller" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableIsSeller(b *bool) *UserUpdateOne {
+	if b != nil {
+		uuo.SetIsSeller(*b)
+	}
+	return uuo
+}
+
 // AddCommentIDs adds the "comment" edge to the Comment entity by IDs.
 func (uuo *UserUpdateOne) AddCommentIDs(ids ...int) *UserUpdateOne {
 	uuo.mutation.AddCommentIDs(ids...)
@@ -1147,6 +1178,9 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	}
 	if uuo.mutation.PhoneCleared() {
 		_spec.ClearField(user.FieldPhone, field.TypeString)
+	}
+	if value, ok := uuo.mutation.IsSeller(); ok {
+		_spec.SetField(user.FieldIsSeller, field.TypeBool, value)
 	}
 	if uuo.mutation.CommentCleared() {
 		edge := &sqlgraph.EdgeSpec{

@@ -22,6 +22,8 @@ const (
 	FieldCoordinates = "coordinates"
 	// EdgeUser holds the string denoting the user edge name in mutations.
 	EdgeUser = "user"
+	// EdgeSeller holds the string denoting the seller edge name in mutations.
+	EdgeSeller = "seller"
 	// Table holds the table name of the address in the database.
 	Table = "addresses"
 	// UserTable is the table that holds the user relation/edge.
@@ -31,6 +33,13 @@ const (
 	UserInverseTable = "users"
 	// UserColumn is the table column denoting the user relation/edge.
 	UserColumn = "user"
+	// SellerTable is the table that holds the seller relation/edge.
+	SellerTable = "addresses"
+	// SellerInverseTable is the table name for the Seller entity.
+	// It exists in this package in order to avoid circular dependency with the "seller" package.
+	SellerInverseTable = "sellers"
+	// SellerColumn is the table column denoting the seller relation/edge.
+	SellerColumn = "seller_address"
 )
 
 // Columns holds all SQL columns for address fields.
@@ -45,6 +54,7 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "addresses"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
+	"seller_address",
 	"user",
 }
 
@@ -108,10 +118,24 @@ func ByUserField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newUserStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// BySellerField orders the results by seller field.
+func BySellerField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSellerStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newUserStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(UserInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, UserTable, UserColumn),
+	)
+}
+func newSellerStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SellerInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, SellerTable, SellerColumn),
 	)
 }

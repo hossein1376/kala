@@ -26,10 +26,14 @@ const (
 	FieldRating = "rating"
 	// FieldRatingCount holds the string denoting the rating_count field in the database.
 	FieldRatingCount = "rating_count"
+	// FieldPhone holds the string denoting the phone field in the database.
+	FieldPhone = "phone"
 	// EdgeProduct holds the string denoting the product edge name in mutations.
 	EdgeProduct = "product"
 	// EdgeCategory holds the string denoting the category edge name in mutations.
 	EdgeCategory = "category"
+	// EdgeAddress holds the string denoting the address edge name in mutations.
+	EdgeAddress = "address"
 	// EdgeUser holds the string denoting the user edge name in mutations.
 	EdgeUser = "user"
 	// Table holds the table name of the seller in the database.
@@ -46,6 +50,13 @@ const (
 	// CategoryInverseTable is the table name for the Category entity.
 	// It exists in this package in order to avoid circular dependency with the "category" package.
 	CategoryInverseTable = "categories"
+	// AddressTable is the table that holds the address relation/edge.
+	AddressTable = "addresses"
+	// AddressInverseTable is the table name for the Address entity.
+	// It exists in this package in order to avoid circular dependency with the "address" package.
+	AddressInverseTable = "addresses"
+	// AddressColumn is the table column denoting the address relation/edge.
+	AddressColumn = "seller_address"
 	// UserTable is the table that holds the user relation/edge.
 	UserTable = "sellers"
 	// UserInverseTable is the table name for the User entity.
@@ -64,6 +75,7 @@ var Columns = []string{
 	FieldDescription,
 	FieldRating,
 	FieldRatingCount,
+	FieldPhone,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "sellers"
@@ -106,6 +118,8 @@ var (
 	RatingValidator func(float64) error
 	// RatingCountValidator is a validator for the "rating_count" field. It is called by the builders before save.
 	RatingCountValidator func(int32) error
+	// PhoneValidator is a validator for the "phone" field. It is called by the builders before save.
+	PhoneValidator func(string) error
 )
 
 // OrderOption defines the ordering options for the Seller queries.
@@ -146,6 +160,11 @@ func ByRatingCount(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldRatingCount, opts...).ToFunc()
 }
 
+// ByPhone orders the results by the phone field.
+func ByPhone(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPhone, opts...).ToFunc()
+}
+
 // ByProductCount orders the results by product count.
 func ByProductCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -174,6 +193,20 @@ func ByCategory(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByAddressCount orders the results by address count.
+func ByAddressCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newAddressStep(), opts...)
+	}
+}
+
+// ByAddress orders the results by address terms.
+func ByAddress(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newAddressStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByUserField orders the results by user field.
 func ByUserField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -192,6 +225,13 @@ func newCategoryStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(CategoryInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, false, CategoryTable, CategoryPrimaryKey...),
+	)
+}
+func newAddressStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(AddressInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, AddressTable, AddressColumn),
 	)
 }
 func newUserStep() *sqlgraph.Step {

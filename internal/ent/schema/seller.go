@@ -25,6 +25,7 @@ func (Seller) Fields() []ent.Field {
 		field.String("description").Optional(),
 		field.Float("rating").Range(0, 5),
 		field.Int32("rating_count").Positive(),
+		field.String("phone").NotEmpty(),
 	}
 }
 
@@ -33,6 +34,7 @@ func (Seller) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("product", Product.Type),
 		edge.To("category", Category.Type),
+		edge.To("address", Address.Type),
 
 		edge.From("user", User.Type).
 			Ref("seller").

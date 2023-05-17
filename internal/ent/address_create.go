@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"kala/internal/ent/address"
+	"kala/internal/ent/seller"
 	"kala/internal/ent/user"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -61,6 +62,25 @@ func (ac *AddressCreate) SetNillableUserID(id *int) *AddressCreate {
 // SetUser sets the "user" edge to the User entity.
 func (ac *AddressCreate) SetUser(u *User) *AddressCreate {
 	return ac.SetUserID(u.ID)
+}
+
+// SetSellerID sets the "seller" edge to the Seller entity by ID.
+func (ac *AddressCreate) SetSellerID(id int) *AddressCreate {
+	ac.mutation.SetSellerID(id)
+	return ac
+}
+
+// SetNillableSellerID sets the "seller" edge to the Seller entity by ID if the given value is not nil.
+func (ac *AddressCreate) SetNillableSellerID(id *int) *AddressCreate {
+	if id != nil {
+		ac = ac.SetSellerID(*id)
+	}
+	return ac
+}
+
+// SetSeller sets the "seller" edge to the Seller entity.
+func (ac *AddressCreate) SetSeller(s *Seller) *AddressCreate {
+	return ac.SetSellerID(s.ID)
 }
 
 // Mutation returns the AddressMutation object of the builder.
@@ -186,6 +206,23 @@ func (ac *AddressCreate) createSpec() (*Address, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.user = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.SellerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   address.SellerTable,
+			Columns: []string{address.SellerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(seller.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.seller_address = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

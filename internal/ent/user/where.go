@@ -95,6 +95,11 @@ func Phone(v string) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldPhone, v))
 }
 
+// IsSeller applies equality check predicate on the "is_seller" field. It's identical to IsSellerEQ.
+func IsSeller(v bool) predicate.User {
+	return predicate.User(sql.FieldEQ(FieldIsSeller, v))
+}
+
 // CreateTimeEQ applies the EQ predicate on the "create_time" field.
 func CreateTimeEQ(v time.Time) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldCreateTime, v))
@@ -578,6 +583,16 @@ func PhoneEqualFold(v string) predicate.User {
 // PhoneContainsFold applies the ContainsFold predicate on the "phone" field.
 func PhoneContainsFold(v string) predicate.User {
 	return predicate.User(sql.FieldContainsFold(FieldPhone, v))
+}
+
+// IsSellerEQ applies the EQ predicate on the "is_seller" field.
+func IsSellerEQ(v bool) predicate.User {
+	return predicate.User(sql.FieldEQ(FieldIsSeller, v))
+}
+
+// IsSellerNEQ applies the NEQ predicate on the "is_seller" field.
+func IsSellerNEQ(v bool) predicate.User {
+	return predicate.User(sql.FieldNEQ(FieldIsSeller, v))
 }
 
 // HasComment applies the HasEdge predicate on the "comment" edge.

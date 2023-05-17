@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"kala/internal/ent/address"
 	"kala/internal/ent/category"
 	"kala/internal/ent/predicate"
 	"kala/internal/ent/product"
@@ -89,6 +90,12 @@ func (su *SellerUpdate) AddRatingCount(i int32) *SellerUpdate {
 	return su
 }
 
+// SetPhone sets the "phone" field.
+func (su *SellerUpdate) SetPhone(s string) *SellerUpdate {
+	su.mutation.SetPhone(s)
+	return su
+}
+
 // AddProductIDs adds the "product" edge to the Product entity by IDs.
 func (su *SellerUpdate) AddProductIDs(ids ...int) *SellerUpdate {
 	su.mutation.AddProductIDs(ids...)
@@ -117,6 +124,21 @@ func (su *SellerUpdate) AddCategory(c ...*Category) *SellerUpdate {
 		ids[i] = c[i].ID
 	}
 	return su.AddCategoryIDs(ids...)
+}
+
+// AddAddresIDs adds the "address" edge to the Address entity by IDs.
+func (su *SellerUpdate) AddAddresIDs(ids ...int) *SellerUpdate {
+	su.mutation.AddAddresIDs(ids...)
+	return su
+}
+
+// AddAddress adds the "address" edges to the Address entity.
+func (su *SellerUpdate) AddAddress(a ...*Address) *SellerUpdate {
+	ids := make([]int, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return su.AddAddresIDs(ids...)
 }
 
 // SetUserID sets the "user" edge to the User entity by ID.
@@ -185,6 +207,27 @@ func (su *SellerUpdate) RemoveCategory(c ...*Category) *SellerUpdate {
 	return su.RemoveCategoryIDs(ids...)
 }
 
+// ClearAddress clears all "address" edges to the Address entity.
+func (su *SellerUpdate) ClearAddress() *SellerUpdate {
+	su.mutation.ClearAddress()
+	return su
+}
+
+// RemoveAddresIDs removes the "address" edge to Address entities by IDs.
+func (su *SellerUpdate) RemoveAddresIDs(ids ...int) *SellerUpdate {
+	su.mutation.RemoveAddresIDs(ids...)
+	return su
+}
+
+// RemoveAddress removes "address" edges to Address entities.
+func (su *SellerUpdate) RemoveAddress(a ...*Address) *SellerUpdate {
+	ids := make([]int, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return su.RemoveAddresIDs(ids...)
+}
+
 // ClearUser clears the "user" edge to the User entity.
 func (su *SellerUpdate) ClearUser() *SellerUpdate {
 	su.mutation.ClearUser()
@@ -244,6 +287,11 @@ func (su *SellerUpdate) check() error {
 			return &ValidationError{Name: "rating_count", err: fmt.Errorf(`ent: validator failed for field "Seller.rating_count": %w`, err)}
 		}
 	}
+	if v, ok := su.mutation.Phone(); ok {
+		if err := seller.PhoneValidator(v); err != nil {
+			return &ValidationError{Name: "phone", err: fmt.Errorf(`ent: validator failed for field "Seller.phone": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -282,6 +330,9 @@ func (su *SellerUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := su.mutation.AddedRatingCount(); ok {
 		_spec.AddField(seller.FieldRatingCount, field.TypeInt32, value)
+	}
+	if value, ok := su.mutation.Phone(); ok {
+		_spec.SetField(seller.FieldPhone, field.TypeString, value)
 	}
 	if su.mutation.ProductCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -366,6 +417,51 @@ func (su *SellerUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if su.mutation.AddressCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   seller.AddressTable,
+			Columns: []string{seller.AddressColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.RemovedAddressIDs(); len(nodes) > 0 && !su.mutation.AddressCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   seller.AddressTable,
+			Columns: []string{seller.AddressColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.AddressIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   seller.AddressTable,
+			Columns: []string{seller.AddressColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -480,6 +576,12 @@ func (suo *SellerUpdateOne) AddRatingCount(i int32) *SellerUpdateOne {
 	return suo
 }
 
+// SetPhone sets the "phone" field.
+func (suo *SellerUpdateOne) SetPhone(s string) *SellerUpdateOne {
+	suo.mutation.SetPhone(s)
+	return suo
+}
+
 // AddProductIDs adds the "product" edge to the Product entity by IDs.
 func (suo *SellerUpdateOne) AddProductIDs(ids ...int) *SellerUpdateOne {
 	suo.mutation.AddProductIDs(ids...)
@@ -508,6 +610,21 @@ func (suo *SellerUpdateOne) AddCategory(c ...*Category) *SellerUpdateOne {
 		ids[i] = c[i].ID
 	}
 	return suo.AddCategoryIDs(ids...)
+}
+
+// AddAddresIDs adds the "address" edge to the Address entity by IDs.
+func (suo *SellerUpdateOne) AddAddresIDs(ids ...int) *SellerUpdateOne {
+	suo.mutation.AddAddresIDs(ids...)
+	return suo
+}
+
+// AddAddress adds the "address" edges to the Address entity.
+func (suo *SellerUpdateOne) AddAddress(a ...*Address) *SellerUpdateOne {
+	ids := make([]int, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return suo.AddAddresIDs(ids...)
 }
 
 // SetUserID sets the "user" edge to the User entity by ID.
@@ -574,6 +691,27 @@ func (suo *SellerUpdateOne) RemoveCategory(c ...*Category) *SellerUpdateOne {
 		ids[i] = c[i].ID
 	}
 	return suo.RemoveCategoryIDs(ids...)
+}
+
+// ClearAddress clears all "address" edges to the Address entity.
+func (suo *SellerUpdateOne) ClearAddress() *SellerUpdateOne {
+	suo.mutation.ClearAddress()
+	return suo
+}
+
+// RemoveAddresIDs removes the "address" edge to Address entities by IDs.
+func (suo *SellerUpdateOne) RemoveAddresIDs(ids ...int) *SellerUpdateOne {
+	suo.mutation.RemoveAddresIDs(ids...)
+	return suo
+}
+
+// RemoveAddress removes "address" edges to Address entities.
+func (suo *SellerUpdateOne) RemoveAddress(a ...*Address) *SellerUpdateOne {
+	ids := make([]int, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return suo.RemoveAddresIDs(ids...)
 }
 
 // ClearUser clears the "user" edge to the User entity.
@@ -648,6 +786,11 @@ func (suo *SellerUpdateOne) check() error {
 			return &ValidationError{Name: "rating_count", err: fmt.Errorf(`ent: validator failed for field "Seller.rating_count": %w`, err)}
 		}
 	}
+	if v, ok := suo.mutation.Phone(); ok {
+		if err := seller.PhoneValidator(v); err != nil {
+			return &ValidationError{Name: "phone", err: fmt.Errorf(`ent: validator failed for field "Seller.phone": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -703,6 +846,9 @@ func (suo *SellerUpdateOne) sqlSave(ctx context.Context) (_node *Seller, err err
 	}
 	if value, ok := suo.mutation.AddedRatingCount(); ok {
 		_spec.AddField(seller.FieldRatingCount, field.TypeInt32, value)
+	}
+	if value, ok := suo.mutation.Phone(); ok {
+		_spec.SetField(seller.FieldPhone, field.TypeString, value)
 	}
 	if suo.mutation.ProductCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -787,6 +933,51 @@ func (suo *SellerUpdateOne) sqlSave(ctx context.Context) (_node *Seller, err err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if suo.mutation.AddressCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   seller.AddressTable,
+			Columns: []string{seller.AddressColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.RemovedAddressIDs(); len(nodes) > 0 && !suo.mutation.AddressCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   seller.AddressTable,
+			Columns: []string{seller.AddressColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.AddressIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   seller.AddressTable,
+			Columns: []string{seller.AddressColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

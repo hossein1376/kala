@@ -15,6 +15,7 @@ var (
 		{Name: "zip_code", Type: field.TypeString},
 		{Name: "phone", Type: field.TypeString},
 		{Name: "coordinates", Type: field.TypeString},
+		{Name: "seller_address", Type: field.TypeInt, Nullable: true},
 		{Name: "user", Type: field.TypeInt, Nullable: true},
 	}
 	// AddressesTable holds the schema information for the "addresses" table.
@@ -24,8 +25,14 @@ var (
 		PrimaryKey: []*schema.Column{AddressesColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "addresses_users_address",
+				Symbol:     "addresses_sellers_address",
 				Columns:    []*schema.Column{AddressesColumns[5]},
+				RefColumns: []*schema.Column{SellersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "addresses_users_address",
+				Columns:    []*schema.Column{AddressesColumns[6]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -295,6 +302,7 @@ var (
 		{Name: "description", Type: field.TypeString, Nullable: true},
 		{Name: "rating", Type: field.TypeFloat64},
 		{Name: "rating_count", Type: field.TypeInt32},
+		{Name: "phone", Type: field.TypeString},
 		{Name: "user_id", Type: field.TypeInt, Nullable: true},
 	}
 	// SellersTable holds the schema information for the "sellers" table.
@@ -305,7 +313,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "sellers_users_seller",
-				Columns:    []*schema.Column{SellersColumns[7]},
+				Columns:    []*schema.Column{SellersColumns[8]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -345,6 +353,7 @@ var (
 		{Name: "last_name", Type: field.TypeString, Nullable: true},
 		{Name: "email", Type: field.TypeString, Nullable: true},
 		{Name: "phone", Type: field.TypeString, Nullable: true},
+		{Name: "is_seller", Type: field.TypeBool, Default: false},
 	}
 	// UsersTable holds the schema information for the "users" table.
 	UsersTable = &schema.Table{
@@ -503,7 +512,8 @@ var (
 )
 
 func init() {
-	AddressesTable.ForeignKeys[0].RefTable = UsersTable
+	AddressesTable.ForeignKeys[0].RefTable = SellersTable
+	AddressesTable.ForeignKeys[1].RefTable = UsersTable
 	AttributeValuesTable.ForeignKeys[0].RefTable = AttributesTable
 	AttributeValuesTable.ForeignKeys[1].RefTable = ProductsTable
 	ConsTable.ForeignKeys[0].RefTable = CommentsTable

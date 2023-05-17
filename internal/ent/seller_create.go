@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"kala/internal/ent/address"
 	"kala/internal/ent/category"
 	"kala/internal/ent/product"
 	"kala/internal/ent/seller"
@@ -83,6 +84,12 @@ func (sc *SellerCreate) SetRatingCount(i int32) *SellerCreate {
 	return sc
 }
 
+// SetPhone sets the "phone" field.
+func (sc *SellerCreate) SetPhone(s string) *SellerCreate {
+	sc.mutation.SetPhone(s)
+	return sc
+}
+
 // AddProductIDs adds the "product" edge to the Product entity by IDs.
 func (sc *SellerCreate) AddProductIDs(ids ...int) *SellerCreate {
 	sc.mutation.AddProductIDs(ids...)
@@ -111,6 +118,21 @@ func (sc *SellerCreate) AddCategory(c ...*Category) *SellerCreate {
 		ids[i] = c[i].ID
 	}
 	return sc.AddCategoryIDs(ids...)
+}
+
+// AddAddresIDs adds the "address" edge to the Address entity by IDs.
+func (sc *SellerCreate) AddAddresIDs(ids ...int) *SellerCreate {
+	sc.mutation.AddAddresIDs(ids...)
+	return sc
+}
+
+// AddAddress adds the "address" edges to the Address entity.
+func (sc *SellerCreate) AddAddress(a ...*Address) *SellerCreate {
+	ids := make([]int, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return sc.AddAddresIDs(ids...)
 }
 
 // SetUserID sets the "user" edge to the User entity by ID.
@@ -209,6 +231,14 @@ func (sc *SellerCreate) check() error {
 			return &ValidationError{Name: "rating_count", err: fmt.Errorf(`ent: validator failed for field "Seller.rating_count": %w`, err)}
 		}
 	}
+	if _, ok := sc.mutation.Phone(); !ok {
+		return &ValidationError{Name: "phone", err: errors.New(`ent: missing required field "Seller.phone"`)}
+	}
+	if v, ok := sc.mutation.Phone(); ok {
+		if err := seller.PhoneValidator(v); err != nil {
+			return &ValidationError{Name: "phone", err: fmt.Errorf(`ent: validator failed for field "Seller.phone": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -259,6 +289,10 @@ func (sc *SellerCreate) createSpec() (*Seller, *sqlgraph.CreateSpec) {
 		_spec.SetField(seller.FieldRatingCount, field.TypeInt32, value)
 		_node.RatingCount = value
 	}
+	if value, ok := sc.mutation.Phone(); ok {
+		_spec.SetField(seller.FieldPhone, field.TypeString, value)
+		_node.Phone = value
+	}
 	if nodes := sc.mutation.ProductIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -284,6 +318,22 @@ func (sc *SellerCreate) createSpec() (*Seller, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := sc.mutation.AddressIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   seller.AddressTable,
+			Columns: []string{seller.AddressColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

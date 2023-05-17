@@ -422,6 +422,22 @@ func (c *AddressClient) QueryUser(a *Address) *UserQuery {
 	return query
 }
 
+// QuerySeller queries the seller edge of a Address.
+func (c *AddressClient) QuerySeller(a *Address) *SellerQuery {
+	query := (&SellerClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(address.Table, address.FieldID, id),
+			sqlgraph.To(seller.Table, seller.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, address.SellerTable, address.SellerColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *AddressClient) Hooks() []Hook {
 	return c.hooks.Address
@@ -2311,6 +2327,22 @@ func (c *SellerClient) QueryCategory(s *Seller) *CategoryQuery {
 			sqlgraph.From(seller.Table, seller.FieldID, id),
 			sqlgraph.To(category.Table, category.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, seller.CategoryTable, seller.CategoryPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAddress queries the address edge of a Seller.
+func (c *SellerClient) QueryAddress(s *Seller) *AddressQuery {
+	query := (&AddressClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(seller.Table, seller.FieldID, id),
+			sqlgraph.To(address.Table, address.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, seller.AddressTable, seller.AddressColumn),
 		)
 		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
 		return fromV, nil

@@ -30,6 +30,8 @@ type Seller struct {
 	Rating float64 `json:"rating,omitempty"`
 	// RatingCount holds the value of the "rating_count" field.
 	RatingCount int32 `json:"rating_count,omitempty"`
+	// Phone holds the value of the "phone" field.
+	Phone string `json:"phone,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the SellerQuery when eager-loading is set.
 	Edges        SellerEdges `json:"edges"`
@@ -43,11 +45,13 @@ type SellerEdges struct {
 	Product []*Product `json:"product,omitempty"`
 	// Category holds the value of the category edge.
 	Category []*Category `json:"category,omitempty"`
+	// Address holds the value of the address edge.
+	Address []*Address `json:"address,omitempty"`
 	// User holds the value of the user edge.
 	User *User `json:"user,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [4]bool
 }
 
 // ProductOrErr returns the Product value or an error if the edge
@@ -68,10 +72,19 @@ func (e SellerEdges) CategoryOrErr() ([]*Category, error) {
 	return nil, &NotLoadedError{edge: "category"}
 }
 
+// AddressOrErr returns the Address value or an error if the edge
+// was not loaded in eager-loading.
+func (e SellerEdges) AddressOrErr() ([]*Address, error) {
+	if e.loadedTypes[2] {
+		return e.Address, nil
+	}
+	return nil, &NotLoadedError{edge: "address"}
+}
+
 // UserOrErr returns the User value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e SellerEdges) UserOrErr() (*User, error) {
-	if e.loadedTypes[2] {
+	if e.loadedTypes[3] {
 		if e.User == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: user.Label}
@@ -90,7 +103,7 @@ func (*Seller) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullFloat64)
 		case seller.FieldID, seller.FieldRatingCount:
 			values[i] = new(sql.NullInt64)
-		case seller.FieldName, seller.FieldDescription:
+		case seller.FieldName, seller.FieldDescription, seller.FieldPhone:
 			values[i] = new(sql.NullString)
 		case seller.FieldCreateTime, seller.FieldUpdateTime:
 			values[i] = new(sql.NullTime)
@@ -153,6 +166,12 @@ func (s *Seller) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				s.RatingCount = int32(value.Int64)
 			}
+		case seller.FieldPhone:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field phone", values[i])
+			} else if value.Valid {
+				s.Phone = value.String
+			}
 		case seller.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field user_id", value)
@@ -181,6 +200,11 @@ func (s *Seller) QueryProduct() *ProductQuery {
 // QueryCategory queries the "category" edge of the Seller entity.
 func (s *Seller) QueryCategory() *CategoryQuery {
 	return NewSellerClient(s.config).QueryCategory(s)
+}
+
+// QueryAddress queries the "address" edge of the Seller entity.
+func (s *Seller) QueryAddress() *AddressQuery {
+	return NewSellerClient(s.config).QueryAddress(s)
 }
 
 // QueryUser queries the "user" edge of the Seller entity.
@@ -228,6 +252,9 @@ func (s *Seller) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("rating_count=")
 	builder.WriteString(fmt.Sprintf("%v", s.RatingCount))
+	builder.WriteString(", ")
+	builder.WriteString("phone=")
+	builder.WriteString(s.Phone)
 	builder.WriteByte(')')
 	return builder.String()
 }

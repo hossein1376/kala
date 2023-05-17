@@ -357,6 +357,29 @@ func HasUserWith(preds ...predicate.User) predicate.Address {
 	})
 }
 
+// HasSeller applies the HasEdge predicate on the "seller" edge.
+func HasSeller() predicate.Address {
+	return predicate.Address(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, SellerTable, SellerColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasSellerWith applies the HasEdge predicate on the "seller" edge with a given conditions (other predicates).
+func HasSellerWith(preds ...predicate.Seller) predicate.Address {
+	return predicate.Address(func(s *sql.Selector) {
+		step := newSellerStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Address) predicate.Address {
 	return predicate.Address(func(s *sql.Selector) {

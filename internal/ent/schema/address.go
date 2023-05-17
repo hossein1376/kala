@@ -27,5 +27,8 @@ func (Address) Edges() []ent.Edge {
 		edge.From("user", User.Type).
 			Ref("address").
 			Unique(),
+		edge.From("seller", Seller.Type).
+			Ref("address").
+			Unique(),
 	}
 }

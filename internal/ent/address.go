@@ -5,6 +5,7 @@ package ent
 import (
 	"fmt"
 	"kala/internal/ent/address"
+	"kala/internal/ent/seller"
 	"kala/internal/ent/user"
 	"strings"
 
@@ -27,18 +28,21 @@ type Address struct {
 	Coordinates string `json:"coordinates,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the AddressQuery when eager-loading is set.
-	Edges        AddressEdges `json:"edges"`
-	user         *int
-	selectValues sql.SelectValues
+	Edges          AddressEdges `json:"edges"`
+	seller_address *int
+	user           *int
+	selectValues   sql.SelectValues
 }
 
 // AddressEdges holds the relations/edges for other nodes in the graph.
 type AddressEdges struct {
 	// User holds the value of the user edge.
 	User *User `json:"user,omitempty"`
+	// Seller holds the value of the seller edge.
+	Seller *Seller `json:"seller,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // UserOrErr returns the User value or an error if the edge
@@ -54,6 +58,19 @@ func (e AddressEdges) UserOrErr() (*User, error) {
 	return nil, &NotLoadedError{edge: "user"}
 }
 
+// SellerOrErr returns the Seller value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e AddressEdges) SellerOrErr() (*Seller, error) {
+	if e.loadedTypes[1] {
+		if e.Seller == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: seller.Label}
+		}
+		return e.Seller, nil
+	}
+	return nil, &NotLoadedError{edge: "seller"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Address) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -63,7 +80,9 @@ func (*Address) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case address.FieldAddress, address.FieldZipCode, address.FieldPhone, address.FieldCoordinates:
 			values[i] = new(sql.NullString)
-		case address.ForeignKeys[0]: // user
+		case address.ForeignKeys[0]: // seller_address
+			values[i] = new(sql.NullInt64)
+		case address.ForeignKeys[1]: // user
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -112,6 +131,13 @@ func (a *Address) assignValues(columns []string, values []any) error {
 			}
 		case address.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field seller_address", value)
+			} else if value.Valid {
+				a.seller_address = new(int)
+				*a.seller_address = int(value.Int64)
+			}
+		case address.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field user", value)
 			} else if value.Valid {
 				a.user = new(int)
@@ -133,6 +159,11 @@ func (a *Address) Value(name string) (ent.Value, error) {
 // QueryUser queries the "user" edge of the Address entity.
 func (a *Address) QueryUser() *UserQuery {
 	return NewAddressClient(a.config).QueryUser(a)
+}
+
+// QuerySeller queries the "seller" edge of the Address entity.
+func (a *Address) QuerySeller() *SellerQuery {
+	return NewAddressClient(a.config).QuerySeller(a)
 }
 
 // Update returns a builder for updating this Address.

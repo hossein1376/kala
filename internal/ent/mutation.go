@@ -68,6 +68,8 @@ type AddressMutation struct {
 	clearedFields map[string]struct{}
 	user          *int
 	cleareduser   bool
+	seller        *int
+	clearedseller bool
 	done          bool
 	oldValue      func(context.Context) (*Address, error)
 	predicates    []predicate.Address
@@ -354,6 +356,45 @@ func (m *AddressMutation) ResetUser() {
 	m.cleareduser = false
 }
 
+// SetSellerID sets the "seller" edge to the Seller entity by id.
+func (m *AddressMutation) SetSellerID(id int) {
+	m.seller = &id
+}
+
+// ClearSeller clears the "seller" edge to the Seller entity.
+func (m *AddressMutation) ClearSeller() {
+	m.clearedseller = true
+}
+
+// SellerCleared reports if the "seller" edge to the Seller entity was cleared.
+func (m *AddressMutation) SellerCleared() bool {
+	return m.clearedseller
+}
+
+// SellerID returns the "seller" edge ID in the mutation.
+func (m *AddressMutation) SellerID() (id int, exists bool) {
+	if m.seller != nil {
+		return *m.seller, true
+	}
+	return
+}
+
+// SellerIDs returns the "seller" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// SellerID instead. It exists only for internal usage by the builders.
+func (m *AddressMutation) SellerIDs() (ids []int) {
+	if id := m.seller; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetSeller resets all changes to the "seller" edge.
+func (m *AddressMutation) ResetSeller() {
+	m.seller = nil
+	m.clearedseller = false
+}
+
 // Where appends a list predicates to the AddressMutation builder.
 func (m *AddressMutation) Where(ps ...predicate.Address) {
 	m.predicates = append(m.predicates, ps...)
@@ -538,9 +579,12 @@ func (m *AddressMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *AddressMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.user != nil {
 		edges = append(edges, address.EdgeUser)
+	}
+	if m.seller != nil {
+		edges = append(edges, address.EdgeSeller)
 	}
 	return edges
 }
@@ -553,13 +597,17 @@ func (m *AddressMutation) AddedIDs(name string) []ent.Value {
 		if id := m.user; id != nil {
 			return []ent.Value{*id}
 		}
+	case address.EdgeSeller:
+		if id := m.seller; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *AddressMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	return edges
 }
 
@@ -571,9 +619,12 @@ func (m *AddressMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *AddressMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.cleareduser {
 		edges = append(edges, address.EdgeUser)
+	}
+	if m.clearedseller {
+		edges = append(edges, address.EdgeSeller)
 	}
 	return edges
 }
@@ -584,6 +635,8 @@ func (m *AddressMutation) EdgeCleared(name string) bool {
 	switch name {
 	case address.EdgeUser:
 		return m.cleareduser
+	case address.EdgeSeller:
+		return m.clearedseller
 	}
 	return false
 }
@@ -595,6 +648,9 @@ func (m *AddressMutation) ClearEdge(name string) error {
 	case address.EdgeUser:
 		m.ClearUser()
 		return nil
+	case address.EdgeSeller:
+		m.ClearSeller()
+		return nil
 	}
 	return fmt.Errorf("unknown Address unique edge %s", name)
 }
@@ -605,6 +661,9 @@ func (m *AddressMutation) ResetEdge(name string) error {
 	switch name {
 	case address.EdgeUser:
 		m.ResetUser()
+		return nil
+	case address.EdgeSeller:
+		m.ResetSeller()
 		return nil
 	}
 	return fmt.Errorf("unknown Address edge %s", name)
@@ -8908,6 +8967,7 @@ type SellerMutation struct {
 	addrating       *float64
 	rating_count    *int32
 	addrating_count *int32
+	phone           *string
 	clearedFields   map[string]struct{}
 	product         map[int]struct{}
 	removedproduct  map[int]struct{}
@@ -8915,6 +8975,9 @@ type SellerMutation struct {
 	category        map[int]struct{}
 	removedcategory map[int]struct{}
 	clearedcategory bool
+	address         map[int]struct{}
+	removedaddress  map[int]struct{}
+	clearedaddress  bool
 	user            *int
 	cleareduser     bool
 	done            bool
@@ -9289,6 +9352,42 @@ func (m *SellerMutation) ResetRatingCount() {
 	m.addrating_count = nil
 }
 
+// SetPhone sets the "phone" field.
+func (m *SellerMutation) SetPhone(s string) {
+	m.phone = &s
+}
+
+// Phone returns the value of the "phone" field in the mutation.
+func (m *SellerMutation) Phone() (r string, exists bool) {
+	v := m.phone
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPhone returns the old "phone" field's value of the Seller entity.
+// If the Seller object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SellerMutation) OldPhone(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPhone is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPhone requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPhone: %w", err)
+	}
+	return oldValue.Phone, nil
+}
+
+// ResetPhone resets all changes to the "phone" field.
+func (m *SellerMutation) ResetPhone() {
+	m.phone = nil
+}
+
 // AddProductIDs adds the "product" edge to the Product entity by ids.
 func (m *SellerMutation) AddProductIDs(ids ...int) {
 	if m.product == nil {
@@ -9397,6 +9496,60 @@ func (m *SellerMutation) ResetCategory() {
 	m.removedcategory = nil
 }
 
+// AddAddresIDs adds the "address" edge to the Address entity by ids.
+func (m *SellerMutation) AddAddresIDs(ids ...int) {
+	if m.address == nil {
+		m.address = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.address[ids[i]] = struct{}{}
+	}
+}
+
+// ClearAddress clears the "address" edge to the Address entity.
+func (m *SellerMutation) ClearAddress() {
+	m.clearedaddress = true
+}
+
+// AddressCleared reports if the "address" edge to the Address entity was cleared.
+func (m *SellerMutation) AddressCleared() bool {
+	return m.clearedaddress
+}
+
+// RemoveAddresIDs removes the "address" edge to the Address entity by IDs.
+func (m *SellerMutation) RemoveAddresIDs(ids ...int) {
+	if m.removedaddress == nil {
+		m.removedaddress = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.address, ids[i])
+		m.removedaddress[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedAddress returns the removed IDs of the "address" edge to the Address entity.
+func (m *SellerMutation) RemovedAddressIDs() (ids []int) {
+	for id := range m.removedaddress {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// AddressIDs returns the "address" edge IDs in the mutation.
+func (m *SellerMutation) AddressIDs() (ids []int) {
+	for id := range m.address {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetAddress resets all changes to the "address" edge.
+func (m *SellerMutation) ResetAddress() {
+	m.address = nil
+	m.clearedaddress = false
+	m.removedaddress = nil
+}
+
 // SetUserID sets the "user" edge to the User entity by id.
 func (m *SellerMutation) SetUserID(id int) {
 	m.user = &id
@@ -9470,7 +9623,7 @@ func (m *SellerMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *SellerMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
 	if m.create_time != nil {
 		fields = append(fields, seller.FieldCreateTime)
 	}
@@ -9488,6 +9641,9 @@ func (m *SellerMutation) Fields() []string {
 	}
 	if m.rating_count != nil {
 		fields = append(fields, seller.FieldRatingCount)
+	}
+	if m.phone != nil {
+		fields = append(fields, seller.FieldPhone)
 	}
 	return fields
 }
@@ -9509,6 +9665,8 @@ func (m *SellerMutation) Field(name string) (ent.Value, bool) {
 		return m.Rating()
 	case seller.FieldRatingCount:
 		return m.RatingCount()
+	case seller.FieldPhone:
+		return m.Phone()
 	}
 	return nil, false
 }
@@ -9530,6 +9688,8 @@ func (m *SellerMutation) OldField(ctx context.Context, name string) (ent.Value, 
 		return m.OldRating(ctx)
 	case seller.FieldRatingCount:
 		return m.OldRatingCount(ctx)
+	case seller.FieldPhone:
+		return m.OldPhone(ctx)
 	}
 	return nil, fmt.Errorf("unknown Seller field %s", name)
 }
@@ -9580,6 +9740,13 @@ func (m *SellerMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetRatingCount(v)
+		return nil
+	case seller.FieldPhone:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPhone(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Seller field %s", name)
@@ -9684,18 +9851,24 @@ func (m *SellerMutation) ResetField(name string) error {
 	case seller.FieldRatingCount:
 		m.ResetRatingCount()
 		return nil
+	case seller.FieldPhone:
+		m.ResetPhone()
+		return nil
 	}
 	return fmt.Errorf("unknown Seller field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *SellerMutation) AddedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.product != nil {
 		edges = append(edges, seller.EdgeProduct)
 	}
 	if m.category != nil {
 		edges = append(edges, seller.EdgeCategory)
+	}
+	if m.address != nil {
+		edges = append(edges, seller.EdgeAddress)
 	}
 	if m.user != nil {
 		edges = append(edges, seller.EdgeUser)
@@ -9719,6 +9892,12 @@ func (m *SellerMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case seller.EdgeAddress:
+		ids := make([]ent.Value, 0, len(m.address))
+		for id := range m.address {
+			ids = append(ids, id)
+		}
+		return ids
 	case seller.EdgeUser:
 		if id := m.user; id != nil {
 			return []ent.Value{*id}
@@ -9729,12 +9908,15 @@ func (m *SellerMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *SellerMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.removedproduct != nil {
 		edges = append(edges, seller.EdgeProduct)
 	}
 	if m.removedcategory != nil {
 		edges = append(edges, seller.EdgeCategory)
+	}
+	if m.removedaddress != nil {
+		edges = append(edges, seller.EdgeAddress)
 	}
 	return edges
 }
@@ -9755,18 +9937,27 @@ func (m *SellerMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case seller.EdgeAddress:
+		ids := make([]ent.Value, 0, len(m.removedaddress))
+		for id := range m.removedaddress {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *SellerMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.clearedproduct {
 		edges = append(edges, seller.EdgeProduct)
 	}
 	if m.clearedcategory {
 		edges = append(edges, seller.EdgeCategory)
+	}
+	if m.clearedaddress {
+		edges = append(edges, seller.EdgeAddress)
 	}
 	if m.cleareduser {
 		edges = append(edges, seller.EdgeUser)
@@ -9782,6 +9973,8 @@ func (m *SellerMutation) EdgeCleared(name string) bool {
 		return m.clearedproduct
 	case seller.EdgeCategory:
 		return m.clearedcategory
+	case seller.EdgeAddress:
+		return m.clearedaddress
 	case seller.EdgeUser:
 		return m.cleareduser
 	}
@@ -9808,6 +10001,9 @@ func (m *SellerMutation) ResetEdge(name string) error {
 		return nil
 	case seller.EdgeCategory:
 		m.ResetCategory()
+		return nil
+	case seller.EdgeAddress:
+		m.ResetAddress()
 		return nil
 	case seller.EdgeUser:
 		m.ResetUser()
@@ -10385,6 +10581,7 @@ type UserMutation struct {
 	last_name      *string
 	email          *string
 	phone          *string
+	is_seller      *bool
 	clearedFields  map[string]struct{}
 	comment        map[int]struct{}
 	removedcomment map[int]struct{}
@@ -10847,6 +11044,42 @@ func (m *UserMutation) ResetPhone() {
 	delete(m.clearedFields, user.FieldPhone)
 }
 
+// SetIsSeller sets the "is_seller" field.
+func (m *UserMutation) SetIsSeller(b bool) {
+	m.is_seller = &b
+}
+
+// IsSeller returns the value of the "is_seller" field in the mutation.
+func (m *UserMutation) IsSeller() (r bool, exists bool) {
+	v := m.is_seller
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIsSeller returns the old "is_seller" field's value of the User entity.
+// If the User object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserMutation) OldIsSeller(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIsSeller is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIsSeller requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIsSeller: %w", err)
+	}
+	return oldValue.IsSeller, nil
+}
+
+// ResetIsSeller resets all changes to the "is_seller" field.
+func (m *UserMutation) ResetIsSeller() {
+	m.is_seller = nil
+}
+
 // AddCommentIDs adds the "comment" edge to the Comment entity by ids.
 func (m *UserMutation) AddCommentIDs(ids ...int) {
 	if m.comment == nil {
@@ -11205,7 +11438,7 @@ func (m *UserMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UserMutation) Fields() []string {
-	fields := make([]string, 0, 8)
+	fields := make([]string, 0, 9)
 	if m.create_time != nil {
 		fields = append(fields, user.FieldCreateTime)
 	}
@@ -11229,6 +11462,9 @@ func (m *UserMutation) Fields() []string {
 	}
 	if m.phone != nil {
 		fields = append(fields, user.FieldPhone)
+	}
+	if m.is_seller != nil {
+		fields = append(fields, user.FieldIsSeller)
 	}
 	return fields
 }
@@ -11254,6 +11490,8 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 		return m.Email()
 	case user.FieldPhone:
 		return m.Phone()
+	case user.FieldIsSeller:
+		return m.IsSeller()
 	}
 	return nil, false
 }
@@ -11279,6 +11517,8 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldEmail(ctx)
 	case user.FieldPhone:
 		return m.OldPhone(ctx)
+	case user.FieldIsSeller:
+		return m.OldIsSeller(ctx)
 	}
 	return nil, fmt.Errorf("unknown User field %s", name)
 }
@@ -11343,6 +11583,13 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetPhone(v)
+		return nil
+	case user.FieldIsSeller:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIsSeller(v)
 		return nil
 	}
 	return fmt.Errorf("unknown User field %s", name)
@@ -11443,6 +11690,9 @@ func (m *UserMutation) ResetField(name string) error {
 		return nil
 	case user.FieldPhone:
 		m.ResetPhone()
+		return nil
+	case user.FieldIsSeller:
+		m.ResetIsSeller()
 		return nil
 	}
 	return fmt.Errorf("unknown User field %s", name)

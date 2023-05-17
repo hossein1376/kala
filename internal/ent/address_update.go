@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"kala/internal/ent/address"
 	"kala/internal/ent/predicate"
+	"kala/internal/ent/seller"
 	"kala/internal/ent/user"
 
 	"entgo.io/ent/dialect/sql"
@@ -71,6 +72,25 @@ func (au *AddressUpdate) SetUser(u *User) *AddressUpdate {
 	return au.SetUserID(u.ID)
 }
 
+// SetSellerID sets the "seller" edge to the Seller entity by ID.
+func (au *AddressUpdate) SetSellerID(id int) *AddressUpdate {
+	au.mutation.SetSellerID(id)
+	return au
+}
+
+// SetNillableSellerID sets the "seller" edge to the Seller entity by ID if the given value is not nil.
+func (au *AddressUpdate) SetNillableSellerID(id *int) *AddressUpdate {
+	if id != nil {
+		au = au.SetSellerID(*id)
+	}
+	return au
+}
+
+// SetSeller sets the "seller" edge to the Seller entity.
+func (au *AddressUpdate) SetSeller(s *Seller) *AddressUpdate {
+	return au.SetSellerID(s.ID)
+}
+
 // Mutation returns the AddressMutation object of the builder.
 func (au *AddressUpdate) Mutation() *AddressMutation {
 	return au.mutation
@@ -79,6 +99,12 @@ func (au *AddressUpdate) Mutation() *AddressMutation {
 // ClearUser clears the "user" edge to the User entity.
 func (au *AddressUpdate) ClearUser() *AddressUpdate {
 	au.mutation.ClearUser()
+	return au
+}
+
+// ClearSeller clears the "seller" edge to the Seller entity.
+func (au *AddressUpdate) ClearSeller() *AddressUpdate {
+	au.mutation.ClearSeller()
 	return au
 }
 
@@ -187,6 +213,35 @@ func (au *AddressUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if au.mutation.SellerCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   address.SellerTable,
+			Columns: []string{address.SellerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(seller.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.SellerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   address.SellerTable,
+			Columns: []string{address.SellerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(seller.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, au.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{address.Label}
@@ -250,6 +305,25 @@ func (auo *AddressUpdateOne) SetUser(u *User) *AddressUpdateOne {
 	return auo.SetUserID(u.ID)
 }
 
+// SetSellerID sets the "seller" edge to the Seller entity by ID.
+func (auo *AddressUpdateOne) SetSellerID(id int) *AddressUpdateOne {
+	auo.mutation.SetSellerID(id)
+	return auo
+}
+
+// SetNillableSellerID sets the "seller" edge to the Seller entity by ID if the given value is not nil.
+func (auo *AddressUpdateOne) SetNillableSellerID(id *int) *AddressUpdateOne {
+	if id != nil {
+		auo = auo.SetSellerID(*id)
+	}
+	return auo
+}
+
+// SetSeller sets the "seller" edge to the Seller entity.
+func (auo *AddressUpdateOne) SetSeller(s *Seller) *AddressUpdateOne {
+	return auo.SetSellerID(s.ID)
+}
+
 // Mutation returns the AddressMutation object of the builder.
 func (auo *AddressUpdateOne) Mutation() *AddressMutation {
 	return auo.mutation
@@ -258,6 +332,12 @@ func (auo *AddressUpdateOne) Mutation() *AddressMutation {
 // ClearUser clears the "user" edge to the User entity.
 func (auo *AddressUpdateOne) ClearUser() *AddressUpdateOne {
 	auo.mutation.ClearUser()
+	return auo
+}
+
+// ClearSeller clears the "seller" edge to the Seller entity.
+func (auo *AddressUpdateOne) ClearSeller() *AddressUpdateOne {
+	auo.mutation.ClearSeller()
 	return auo
 }
 
@@ -389,6 +469,35 @@ func (auo *AddressUpdateOne) sqlSave(ctx context.Context) (_node *Address, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.SellerCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   address.SellerTable,
+			Columns: []string{address.SellerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(seller.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.SellerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   address.SellerTable,
+			Columns: []string{address.SellerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(seller.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

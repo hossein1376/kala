@@ -30,6 +30,8 @@ const (
 	FieldEmail = "email"
 	// FieldPhone holds the string denoting the phone field in the database.
 	FieldPhone = "phone"
+	// FieldIsSeller holds the string denoting the is_seller field in the database.
+	FieldIsSeller = "is_seller"
 	// EdgeComment holds the string denoting the comment edge name in mutations.
 	EdgeComment = "comment"
 	// EdgeImage holds the string denoting the image edge name in mutations.
@@ -97,6 +99,7 @@ var Columns = []string{
 	FieldLastName,
 	FieldEmail,
 	FieldPhone,
+	FieldIsSeller,
 }
 
 var (
@@ -122,6 +125,8 @@ var (
 	DefaultUpdateTime func() time.Time
 	// UpdateDefaultUpdateTime holds the default value on update for the "update_time" field.
 	UpdateDefaultUpdateTime func() time.Time
+	// DefaultIsSeller holds the default value on creation for the "is_seller" field.
+	DefaultIsSeller bool
 )
 
 // OrderOption defines the ordering options for the User queries.
@@ -165,6 +170,11 @@ func ByEmail(opts ...sql.OrderTermOption) OrderOption {
 // ByPhone orders the results by the phone field.
 func ByPhone(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPhone, opts...).ToFunc()
+}
+
+// ByIsSeller orders the results by the is_seller field.
+func ByIsSeller(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldIsSeller, opts...).ToFunc()
 }
 
 // ByCommentCount orders the results by comment count.

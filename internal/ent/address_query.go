@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"kala/internal/ent/address"
 	"kala/internal/ent/predicate"
+	"kala/internal/ent/seller"
 	"kala/internal/ent/user"
 	"math"
 
@@ -23,6 +24,7 @@ type AddressQuery struct {
 	inters     []Interceptor
 	predicates []predicate.Address
 	withUser   *UserQuery
+	withSeller *SellerQuery
 	withFKs    bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -75,6 +77,28 @@ func (aq *AddressQuery) QueryUser() *UserQuery {
 			sqlgraph.From(address.Table, address.FieldID, selector),
 			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, address.UserTable, address.UserColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QuerySeller chains the current query on the "seller" edge.
+func (aq *AddressQuery) QuerySeller() *SellerQuery {
+	query := (&SellerClient{config: aq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(address.Table, address.FieldID, selector),
+			sqlgraph.To(seller.Table, seller.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, address.SellerTable, address.SellerColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -275,6 +299,7 @@ func (aq *AddressQuery) Clone() *AddressQuery {
 		inters:     append([]Interceptor{}, aq.inters...),
 		predicates: append([]predicate.Address{}, aq.predicates...),
 		withUser:   aq.withUser.Clone(),
+		withSeller: aq.withSeller.Clone(),
 		// clone intermediate query.
 		sql:  aq.sql.Clone(),
 		path: aq.path,
@@ -289,6 +314,17 @@ func (aq *AddressQuery) WithUser(opts ...func(*UserQuery)) *AddressQuery {
 		opt(query)
 	}
 	aq.withUser = query
+	return aq
+}
+
+// WithSeller tells the query-builder to eager-load the nodes that are connected to
+// the "seller" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AddressQuery) WithSeller(opts ...func(*SellerQuery)) *AddressQuery {
+	query := (&SellerClient{config: aq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withSeller = query
 	return aq
 }
 
@@ -371,11 +407,12 @@ func (aq *AddressQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Addr
 		nodes       = []*Address{}
 		withFKs     = aq.withFKs
 		_spec       = aq.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [2]bool{
 			aq.withUser != nil,
+			aq.withSeller != nil,
 		}
 	)
-	if aq.withUser != nil {
+	if aq.withUser != nil || aq.withSeller != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -402,6 +439,12 @@ func (aq *AddressQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Addr
 	if query := aq.withUser; query != nil {
 		if err := aq.loadUser(ctx, query, nodes, nil,
 			func(n *Address, e *User) { n.Edges.User = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := aq.withSeller; query != nil {
+		if err := aq.loadSeller(ctx, query, nodes, nil,
+			func(n *Address, e *Seller) { n.Edges.Seller = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -433,6 +476,38 @@ func (aq *AddressQuery) loadUser(ctx context.Context, query *UserQuery, nodes []
 		nodes, ok := nodeids[n.ID]
 		if !ok {
 			return fmt.Errorf(`unexpected foreign-key "user" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (aq *AddressQuery) loadSeller(ctx context.Context, query *SellerQuery, nodes []*Address, init func(*Address), assign func(*Address, *Seller)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*Address)
+	for i := range nodes {
+		if nodes[i].seller_address == nil {
+			continue
+		}
+		fk := *nodes[i].seller_address
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(seller.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "seller_address" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
