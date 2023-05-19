@@ -58,11 +58,15 @@ type ProductEdges struct {
 	Image []*Image `json:"image,omitempty"`
 	// Order holds the value of the order edge.
 	Order []*Order `json:"order,omitempty"`
+	// Category holds the value of the category edge.
+	Category []*Category `json:"category,omitempty"`
+	// SubCategory holds the value of the sub_category edge.
+	SubCategory []*SubCategory `json:"sub_category,omitempty"`
 	// Brand holds the value of the brand edge.
 	Brand *Brand `json:"brand,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [5]bool
+	loadedTypes [7]bool
 }
 
 // ValuesOrErr returns the Values value or an error if the edge
@@ -101,10 +105,28 @@ func (e ProductEdges) OrderOrErr() ([]*Order, error) {
 	return nil, &NotLoadedError{edge: "order"}
 }
 
+// CategoryOrErr returns the Category value or an error if the edge
+// was not loaded in eager-loading.
+func (e ProductEdges) CategoryOrErr() ([]*Category, error) {
+	if e.loadedTypes[4] {
+		return e.Category, nil
+	}
+	return nil, &NotLoadedError{edge: "category"}
+}
+
+// SubCategoryOrErr returns the SubCategory value or an error if the edge
+// was not loaded in eager-loading.
+func (e ProductEdges) SubCategoryOrErr() ([]*SubCategory, error) {
+	if e.loadedTypes[5] {
+		return e.SubCategory, nil
+	}
+	return nil, &NotLoadedError{edge: "sub_category"}
+}
+
 // BrandOrErr returns the Brand value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e ProductEdges) BrandOrErr() (*Brand, error) {
-	if e.loadedTypes[4] {
+	if e.loadedTypes[6] {
 		if e.Brand == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: brand.Label}
@@ -265,6 +287,16 @@ func (pr *Product) QueryImage() *ImageQuery {
 // QueryOrder queries the "order" edge of the Product entity.
 func (pr *Product) QueryOrder() *OrderQuery {
 	return NewProductClient(pr.config).QueryOrder(pr)
+}
+
+// QueryCategory queries the "category" edge of the Product entity.
+func (pr *Product) QueryCategory() *CategoryQuery {
+	return NewProductClient(pr.config).QueryCategory(pr)
+}
+
+// QuerySubCategory queries the "sub_category" edge of the Product entity.
+func (pr *Product) QuerySubCategory() *SubCategoryQuery {
+	return NewProductClient(pr.config).QuerySubCategory(pr)
 }
 
 // QueryBrand queries the "brand" edge of the Product entity.

@@ -41,6 +41,8 @@ func (Product) Edges() []ent.Edge {
 			StorageKey(edge.Table("product_comments")),
 		edge.To("image", Image.Type),
 		edge.To("order", Order.Type),
+		edge.To("category", Category.Type),
+		edge.To("sub_category", SubCategory.Type),
 
 		edge.From("brand", Brand.Type).
 			Ref("product").

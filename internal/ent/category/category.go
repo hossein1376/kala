@@ -24,6 +24,8 @@ const (
 	FieldDescription = "description"
 	// EdgeSubCategory holds the string denoting the sub_category edge name in mutations.
 	EdgeSubCategory = "sub_category"
+	// EdgeProduct holds the string denoting the product edge name in mutations.
+	EdgeProduct = "product"
 	// EdgeBrand holds the string denoting the brand edge name in mutations.
 	EdgeBrand = "brand"
 	// EdgeSeller holds the string denoting the seller edge name in mutations.
@@ -37,6 +39,11 @@ const (
 	SubCategoryInverseTable = "sub_categories"
 	// SubCategoryColumn is the table column denoting the sub_category relation/edge.
 	SubCategoryColumn = "category"
+	// ProductTable is the table that holds the product relation/edge. The primary key declared below.
+	ProductTable = "product_category"
+	// ProductInverseTable is the table name for the Product entity.
+	// It exists in this package in order to avoid circular dependency with the "product" package.
+	ProductInverseTable = "products"
 	// BrandTable is the table that holds the brand relation/edge. The primary key declared below.
 	BrandTable = "brand_category"
 	// BrandInverseTable is the table name for the Brand entity.
@@ -59,6 +66,9 @@ var Columns = []string{
 }
 
 var (
+	// ProductPrimaryKey and ProductColumn2 are the table columns denoting the
+	// primary key for the product relation (M2M).
+	ProductPrimaryKey = []string{"product_id", "category_id"}
 	// BrandPrimaryKey and BrandColumn2 are the table columns denoting the
 	// primary key for the brand relation (M2M).
 	BrandPrimaryKey = []string{"brand_id", "category_id"}
@@ -132,6 +142,20 @@ func BySubCategory(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByProductCount orders the results by product count.
+func ByProductCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newProductStep(), opts...)
+	}
+}
+
+// ByProduct orders the results by product terms.
+func ByProduct(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newProductStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByBrandCount orders the results by brand count.
 func ByBrandCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -164,6 +188,13 @@ func newSubCategoryStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(SubCategoryInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, SubCategoryTable, SubCategoryColumn),
+	)
+}
+func newProductStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ProductInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, ProductTable, ProductPrimaryKey...),
 	)
 }
 func newBrandStep() *sqlgraph.Step {

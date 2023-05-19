@@ -22,10 +22,17 @@ const (
 	FieldName = "name"
 	// FieldDescription holds the string denoting the description field in the database.
 	FieldDescription = "description"
+	// EdgeProduct holds the string denoting the product edge name in mutations.
+	EdgeProduct = "product"
 	// EdgeCategory holds the string denoting the category edge name in mutations.
 	EdgeCategory = "category"
 	// Table holds the table name of the subcategory in the database.
 	Table = "sub_categories"
+	// ProductTable is the table that holds the product relation/edge. The primary key declared below.
+	ProductTable = "product_sub_category"
+	// ProductInverseTable is the table name for the Product entity.
+	// It exists in this package in order to avoid circular dependency with the "product" package.
+	ProductInverseTable = "products"
 	// CategoryTable is the table that holds the category relation/edge.
 	CategoryTable = "sub_categories"
 	// CategoryInverseTable is the table name for the Category entity.
@@ -49,6 +56,12 @@ var Columns = []string{
 var ForeignKeys = []string{
 	"category",
 }
+
+var (
+	// ProductPrimaryKey and ProductColumn2 are the table columns denoting the
+	// primary key for the product relation (M2M).
+	ProductPrimaryKey = []string{"product_id", "sub_category_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -106,11 +119,32 @@ func ByDescription(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDescription, opts...).ToFunc()
 }
 
+// ByProductCount orders the results by product count.
+func ByProductCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newProductStep(), opts...)
+	}
+}
+
+// ByProduct orders the results by product terms.
+func ByProduct(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newProductStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByCategoryField orders the results by category field.
 func ByCategoryField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newCategoryStep(), sql.OrderByField(field, opts...))
 	}
+}
+func newProductStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ProductInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, ProductTable, ProductPrimaryKey...),
+	)
 }
 func newCategoryStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(

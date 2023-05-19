@@ -1022,6 +1022,22 @@ func (c *CategoryClient) QuerySubCategory(ca *Category) *SubCategoryQuery {
 	return query
 }
 
+// QueryProduct queries the product edge of a Category.
+func (c *CategoryClient) QueryProduct(ca *Category) *ProductQuery {
+	query := (&ProductClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ca.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(category.Table, category.FieldID, id),
+			sqlgraph.To(product.Table, product.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, category.ProductTable, category.ProductPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(ca.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryBrand queries the brand edge of a Category.
 func (c *CategoryClient) QueryBrand(ca *Category) *BrandQuery {
 	query := (&BrandClient{config: c.config}).Query()
@@ -2034,6 +2050,38 @@ func (c *ProductClient) QueryOrder(pr *Product) *OrderQuery {
 	return query
 }
 
+// QueryCategory queries the category edge of a Product.
+func (c *ProductClient) QueryCategory(pr *Product) *CategoryQuery {
+	query := (&CategoryClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := pr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(product.Table, product.FieldID, id),
+			sqlgraph.To(category.Table, category.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, product.CategoryTable, product.CategoryPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySubCategory queries the sub_category edge of a Product.
+func (c *ProductClient) QuerySubCategory(pr *Product) *SubCategoryQuery {
+	query := (&SubCategoryClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := pr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(product.Table, product.FieldID, id),
+			sqlgraph.To(subcategory.Table, subcategory.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, product.SubCategoryTable, product.SubCategoryPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryBrand queries the brand edge of a Product.
 func (c *ProductClient) QueryBrand(pr *Product) *BrandQuery {
 	query := (&BrandClient{config: c.config}).Query()
@@ -2482,6 +2530,22 @@ func (c *SubCategoryClient) GetX(ctx context.Context, id int) *SubCategory {
 		panic(err)
 	}
 	return obj
+}
+
+// QueryProduct queries the product edge of a SubCategory.
+func (c *SubCategoryClient) QueryProduct(sc *SubCategory) *ProductQuery {
+	query := (&ProductClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := sc.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(subcategory.Table, subcategory.FieldID, id),
+			sqlgraph.To(product.Table, product.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, subcategory.ProductTable, subcategory.ProductPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(sc.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
 }
 
 // QueryCategory queries the category edge of a SubCategory.

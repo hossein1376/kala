@@ -1,5 +1,6 @@
 package schema
 
+import "C"
 import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
@@ -32,6 +33,7 @@ func (Category) Edges() []ent.Edge {
 		edge.To("sub_category", SubCategory.Type).
 			StorageKey(edge.Column("category")),
 
+		edge.From("product", Product.Type).Ref("category"),
 		edge.From("brand", Brand.Type).Ref("category"),
 		edge.From("seller", Seller.Type).Ref("category"),
 	}

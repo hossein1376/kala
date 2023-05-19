@@ -438,6 +438,56 @@ var (
 			},
 		},
 	}
+	// ProductCategoryColumns holds the columns for the "product_category" table.
+	ProductCategoryColumns = []*schema.Column{
+		{Name: "product_id", Type: field.TypeInt},
+		{Name: "category_id", Type: field.TypeInt},
+	}
+	// ProductCategoryTable holds the schema information for the "product_category" table.
+	ProductCategoryTable = &schema.Table{
+		Name:       "product_category",
+		Columns:    ProductCategoryColumns,
+		PrimaryKey: []*schema.Column{ProductCategoryColumns[0], ProductCategoryColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "product_category_product_id",
+				Columns:    []*schema.Column{ProductCategoryColumns[0]},
+				RefColumns: []*schema.Column{ProductsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "product_category_category_id",
+				Columns:    []*schema.Column{ProductCategoryColumns[1]},
+				RefColumns: []*schema.Column{CategoriesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// ProductSubCategoryColumns holds the columns for the "product_sub_category" table.
+	ProductSubCategoryColumns = []*schema.Column{
+		{Name: "product_id", Type: field.TypeInt},
+		{Name: "sub_category_id", Type: field.TypeInt},
+	}
+	// ProductSubCategoryTable holds the schema information for the "product_sub_category" table.
+	ProductSubCategoryTable = &schema.Table{
+		Name:       "product_sub_category",
+		Columns:    ProductSubCategoryColumns,
+		PrimaryKey: []*schema.Column{ProductSubCategoryColumns[0], ProductSubCategoryColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "product_sub_category_product_id",
+				Columns:    []*schema.Column{ProductSubCategoryColumns[0]},
+				RefColumns: []*schema.Column{ProductsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "product_sub_category_sub_category_id",
+				Columns:    []*schema.Column{ProductSubCategoryColumns[1]},
+				RefColumns: []*schema.Column{SubCategoriesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// SellerCategoryColumns holds the columns for the "seller_category" table.
 	SellerCategoryColumns = []*schema.Column{
 		{Name: "seller_id", Type: field.TypeInt},
@@ -508,6 +558,8 @@ var (
 		BrandCategoryTable,
 		ProductCommentsTable,
 		ProductOrderTable,
+		ProductCategoryTable,
+		ProductSubCategoryTable,
 		SellerCategoryTable,
 		UserCommentsTable,
 	}
@@ -536,6 +588,10 @@ func init() {
 	ProductCommentsTable.ForeignKeys[1].RefTable = CommentsTable
 	ProductOrderTable.ForeignKeys[0].RefTable = ProductsTable
 	ProductOrderTable.ForeignKeys[1].RefTable = OrdersTable
+	ProductCategoryTable.ForeignKeys[0].RefTable = ProductsTable
+	ProductCategoryTable.ForeignKeys[1].RefTable = CategoriesTable
+	ProductSubCategoryTable.ForeignKeys[0].RefTable = ProductsTable
+	ProductSubCategoryTable.ForeignKeys[1].RefTable = SubCategoriesTable
 	SellerCategoryTable.ForeignKeys[0].RefTable = SellersTable
 	SellerCategoryTable.ForeignKeys[1].RefTable = CategoriesTable
 	UserCommentsTable.ForeignKeys[0].RefTable = UsersTable

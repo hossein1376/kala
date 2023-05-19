@@ -35,17 +35,28 @@ type SubCategory struct {
 
 // SubCategoryEdges holds the relations/edges for other nodes in the graph.
 type SubCategoryEdges struct {
+	// Product holds the value of the product edge.
+	Product []*Product `json:"product,omitempty"`
 	// Category holds the value of the category edge.
 	Category *Category `json:"category,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
+}
+
+// ProductOrErr returns the Product value or an error if the edge
+// was not loaded in eager-loading.
+func (e SubCategoryEdges) ProductOrErr() ([]*Product, error) {
+	if e.loadedTypes[0] {
+		return e.Product, nil
+	}
+	return nil, &NotLoadedError{edge: "product"}
 }
 
 // CategoryOrErr returns the Category value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e SubCategoryEdges) CategoryOrErr() (*Category, error) {
-	if e.loadedTypes[0] {
+	if e.loadedTypes[1] {
 		if e.Category == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: category.Label}
@@ -131,6 +142,11 @@ func (sc *SubCategory) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (sc *SubCategory) Value(name string) (ent.Value, error) {
 	return sc.selectValues.Get(name)
+}
+
+// QueryProduct queries the "product" edge of the SubCategory entity.
+func (sc *SubCategory) QueryProduct() *ProductQuery {
+	return NewSubCategoryClient(sc.config).QueryProduct(sc)
 }
 
 // QueryCategory queries the "category" edge of the SubCategory entity.

@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"kala/internal/ent/brand"
 	"kala/internal/ent/category"
+	"kala/internal/ent/product"
 	"kala/internal/ent/seller"
 	"kala/internal/ent/subcategory"
 	"time"
@@ -76,6 +77,21 @@ func (cc *CategoryCreate) AddSubCategory(s ...*SubCategory) *CategoryCreate {
 		ids[i] = s[i].ID
 	}
 	return cc.AddSubCategoryIDs(ids...)
+}
+
+// AddProductIDs adds the "product" edge to the Product entity by IDs.
+func (cc *CategoryCreate) AddProductIDs(ids ...int) *CategoryCreate {
+	cc.mutation.AddProductIDs(ids...)
+	return cc
+}
+
+// AddProduct adds the "product" edges to the Product entity.
+func (cc *CategoryCreate) AddProduct(p ...*Product) *CategoryCreate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return cc.AddProductIDs(ids...)
 }
 
 // AddBrandIDs adds the "brand" edge to the Brand entity by IDs.
@@ -228,6 +244,22 @@ func (cc *CategoryCreate) createSpec() (*Category, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(subcategory.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := cc.mutation.ProductIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   category.ProductTable,
+			Columns: category.ProductPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

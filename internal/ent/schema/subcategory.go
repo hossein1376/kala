@@ -29,6 +29,8 @@ func (SubCategory) Fields() []ent.Field {
 // Edges of the SubCategory.
 func (SubCategory) Edges() []ent.Edge {
 	return []ent.Edge{
+		edge.From("product", Product.Type).
+			Ref("sub_category"),
 		edge.From("category", Category.Type).
 			Ref("sub_category").
 			Unique(),

@@ -8,10 +8,12 @@ import (
 	"fmt"
 	"kala/internal/ent/attributevalue"
 	"kala/internal/ent/brand"
+	"kala/internal/ent/category"
 	"kala/internal/ent/comment"
 	"kala/internal/ent/image"
 	"kala/internal/ent/order"
 	"kala/internal/ent/product"
+	"kala/internal/ent/subcategory"
 	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -165,6 +167,36 @@ func (pc *ProductCreate) AddOrder(o ...*Order) *ProductCreate {
 		ids[i] = o[i].ID
 	}
 	return pc.AddOrderIDs(ids...)
+}
+
+// AddCategoryIDs adds the "category" edge to the Category entity by IDs.
+func (pc *ProductCreate) AddCategoryIDs(ids ...int) *ProductCreate {
+	pc.mutation.AddCategoryIDs(ids...)
+	return pc
+}
+
+// AddCategory adds the "category" edges to the Category entity.
+func (pc *ProductCreate) AddCategory(c ...*Category) *ProductCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return pc.AddCategoryIDs(ids...)
+}
+
+// AddSubCategoryIDs adds the "sub_category" edge to the SubCategory entity by IDs.
+func (pc *ProductCreate) AddSubCategoryIDs(ids ...int) *ProductCreate {
+	pc.mutation.AddSubCategoryIDs(ids...)
+	return pc
+}
+
+// AddSubCategory adds the "sub_category" edges to the SubCategory entity.
+func (pc *ProductCreate) AddSubCategory(s ...*SubCategory) *ProductCreate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return pc.AddSubCategoryIDs(ids...)
 }
 
 // SetBrandID sets the "brand" edge to the Brand entity by ID.
@@ -423,6 +455,38 @@ func (pc *ProductCreate) createSpec() (*Product, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := pc.mutation.CategoryIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   product.CategoryTable,
+			Columns: product.CategoryPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := pc.mutation.SubCategoryIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   product.SubCategoryTable,
+			Columns: product.SubCategoryPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(subcategory.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

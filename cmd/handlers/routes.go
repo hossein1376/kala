@@ -26,30 +26,20 @@ func NewHandler(application cmd.Application) *chi.Mux {
 	r.Route("/api/v1", func(r chi.Router) {
 		// user routes
 		r.Route("/users", func(r chi.Router) {
-			r.With().
-				Post("/", createNewUserHandler)
-			r.With().
-				Get("/", getAllUsersHandler)
-			r.With().
-				Get("/{id}", getUserByIDHandler)
-			r.With().
-				Patch("/{id}", updateUserByIDHandler)
-			r.With().
-				Delete("/{id}", deleteUserByIDHandler)
+			r.Post("/", createNewUserHandler)
+			r.Get("/", getAllUsersHandler)
+			r.Get("/{id}", getUserByIDHandler)
+			r.Patch("/{id}", updateUserByIDHandler)
+			r.Delete("/{id}", deleteUserByIDHandler)
 		})
 
 		// product routes
 		r.Route("/products", func(r chi.Router) {
-			r.With().
-				Post("/", createNewProductHandler)
-			r.With().
-				Get("/", getAllProductsHandler)
-			r.With().
-				Get("/{id}", getProductByIDHandler)
-			r.With().
-				Patch("/{id}", updateProductByIDHandler)
-			r.With().
-				Delete("/{id}", deleteProductByIDHandler)
+			r.Post("/", createNewProductHandler)
+			r.Get("/", getAllProductsHandler)
+			r.Get("/{id}", getProductByIDHandler)
+			r.Patch("/{id}", updateProductByIDHandler)
+			r.Delete("/{id}", deleteProductByIDHandler)
 		})
 
 	})

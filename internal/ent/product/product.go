@@ -44,6 +44,10 @@ const (
 	EdgeImage = "image"
 	// EdgeOrder holds the string denoting the order edge name in mutations.
 	EdgeOrder = "order"
+	// EdgeCategory holds the string denoting the category edge name in mutations.
+	EdgeCategory = "category"
+	// EdgeSubCategory holds the string denoting the sub_category edge name in mutations.
+	EdgeSubCategory = "sub_category"
 	// EdgeBrand holds the string denoting the brand edge name in mutations.
 	EdgeBrand = "brand"
 	// Table holds the table name of the product in the database.
@@ -72,6 +76,16 @@ const (
 	// OrderInverseTable is the table name for the Order entity.
 	// It exists in this package in order to avoid circular dependency with the "order" package.
 	OrderInverseTable = "orders"
+	// CategoryTable is the table that holds the category relation/edge. The primary key declared below.
+	CategoryTable = "product_category"
+	// CategoryInverseTable is the table name for the Category entity.
+	// It exists in this package in order to avoid circular dependency with the "category" package.
+	CategoryInverseTable = "categories"
+	// SubCategoryTable is the table that holds the sub_category relation/edge. The primary key declared below.
+	SubCategoryTable = "product_sub_category"
+	// SubCategoryInverseTable is the table name for the SubCategory entity.
+	// It exists in this package in order to avoid circular dependency with the "subcategory" package.
+	SubCategoryInverseTable = "sub_categories"
 	// BrandTable is the table that holds the brand relation/edge.
 	BrandTable = "products"
 	// BrandInverseTable is the table name for the Brand entity.
@@ -111,6 +125,12 @@ var (
 	// OrderPrimaryKey and OrderColumn2 are the table columns denoting the
 	// primary key for the order relation (M2M).
 	OrderPrimaryKey = []string{"product_id", "order_id"}
+	// CategoryPrimaryKey and CategoryColumn2 are the table columns denoting the
+	// primary key for the category relation (M2M).
+	CategoryPrimaryKey = []string{"product_id", "category_id"}
+	// SubCategoryPrimaryKey and SubCategoryColumn2 are the table columns denoting the
+	// primary key for the sub_category relation (M2M).
+	SubCategoryPrimaryKey = []string{"product_id", "sub_category_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -268,6 +288,34 @@ func ByOrder(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByCategoryCount orders the results by category count.
+func ByCategoryCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newCategoryStep(), opts...)
+	}
+}
+
+// ByCategory orders the results by category terms.
+func ByCategory(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCategoryStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// BySubCategoryCount orders the results by sub_category count.
+func BySubCategoryCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newSubCategoryStep(), opts...)
+	}
+}
+
+// BySubCategory orders the results by sub_category terms.
+func BySubCategory(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSubCategoryStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByBrandField orders the results by brand field.
 func ByBrandField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -300,6 +348,20 @@ func newOrderStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(OrderInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, false, OrderTable, OrderPrimaryKey...),
+	)
+}
+func newCategoryStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CategoryInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, CategoryTable, CategoryPrimaryKey...),
+	)
+}
+func newSubCategoryStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SubCategoryInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, SubCategoryTable, SubCategoryPrimaryKey...),
 	)
 }
 func newBrandStep() *sqlgraph.Step {

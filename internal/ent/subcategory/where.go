@@ -285,6 +285,29 @@ func DescriptionContainsFold(v string) predicate.SubCategory {
 	return predicate.SubCategory(sql.FieldContainsFold(FieldDescription, v))
 }
 
+// HasProduct applies the HasEdge predicate on the "product" edge.
+func HasProduct() predicate.SubCategory {
+	return predicate.SubCategory(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, ProductTable, ProductPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasProductWith applies the HasEdge predicate on the "product" edge with a given conditions (other predicates).
+func HasProductWith(preds ...predicate.Product) predicate.SubCategory {
+	return predicate.SubCategory(func(s *sql.Selector) {
+		step := newProductStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasCategory applies the HasEdge predicate on the "category" edge.
 func HasCategory() predicate.SubCategory {
 	return predicate.SubCategory(func(s *sql.Selector) {
