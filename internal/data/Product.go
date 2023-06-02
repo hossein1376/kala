@@ -15,7 +15,7 @@ type ProductModel struct {
 }
 
 func (p *ProductModel) CreateNewProduct(product structure.Product) (*ent.Product, error) {
-	prod, err := p.client.Product.Create().
+	return p.client.Product.Create().
 		SetName(product.Name).
 		SetPrice(product.Price).
 		SetStatus(product.Status).
@@ -31,7 +31,6 @@ func (p *ProductModel) CreateNewProduct(product structure.Product) (*ent.Product
 		SetCreateTime(time.Now()).
 		SetUpdateTime(time.Now()).
 		Save(context.Background())
-	return prod, err
 }
 
 func (p *ProductModel) GetSingleProductByID(id int) (*ent.Product, error) {
