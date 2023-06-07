@@ -2,7 +2,7 @@ trigger:
 - main
 
 pool:
-  vmImage: golang:latest
+  vmImage: ubuntu:latest
 
 steps:
 - task: Go@0
