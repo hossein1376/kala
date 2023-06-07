@@ -2,7 +2,7 @@ trigger:
 - main
 
 pool:
-  vmImage: golang:1.20.5-bullseye
+  vmImage: golang:latest
 
 steps:
 - task: Go@0
