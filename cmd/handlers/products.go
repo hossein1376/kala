@@ -9,7 +9,7 @@ import (
 	"kala/pkg/Json"
 )
 
-func createNewProductHandler(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) createNewProductHandler(w http.ResponseWriter, r *http.Request) {
 	var input structure.Product
 	err := Json.ReadJSON(w, r, &input)
 	if err != nil {
@@ -17,7 +17,7 @@ func createNewProductHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	product, err := app.Models.Product.CreateNewProduct(input)
+	product, err := h.app.Models.Product.CreateNewProduct(input)
 	if err != nil {
 		switch {
 		case ent.IsConstraintError(err) || ent.IsValidationError(err):
@@ -35,14 +35,14 @@ func createNewProductHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getProductByIDHandler(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) getProductByIDHandler(w http.ResponseWriter, r *http.Request) {
 	id := paramInt(r, "id")
 	if id == 0 {
 		Errors.NotFoundResponse(w, r)
 		return
 	}
 
-	product, err := app.Models.Product.GetSingleProductByID(id)
+	product, err := h.app.Models.Product.GetSingleProductByID(id)
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
@@ -61,8 +61,8 @@ func getProductByIDHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getAllProductsHandler(w http.ResponseWriter, r *http.Request) {
-	products, err := app.Models.Product.GetAllProducts()
+func (h *Handler) getAllProductsHandler(w http.ResponseWriter, r *http.Request) {
+	products, err := h.app.Models.Product.GetAllProducts()
 	if err != nil {
 		Errors.InternalServerErrorResponse(w, r, err)
 		return
@@ -75,7 +75,7 @@ func getAllProductsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func updateProductByIDHandler(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) updateProductByIDHandler(w http.ResponseWriter, r *http.Request) {
 	id := paramInt(r, "id")
 	if id == 0 {
 		Errors.NotFoundResponse(w, r)
@@ -89,7 +89,7 @@ func updateProductByIDHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	product, err := app.Models.Product.GetSingleProductByID(id)
+	product, err := h.app.Models.Product.GetSingleProductByID(id)
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
@@ -137,17 +137,32 @@ func updateProductByIDHandler(w http.ResponseWriter, r *http.Request) {
 		product.Edges.Brand = input.Brand
 	}
 
-	err = app.Models.Product.UpdateProductByID(product, id)
+	err = h.app.Models.Product.UpdateProductByID(product, id)
+	if err != nil {
+		switch {
+		case ent.IsConstraintError(err) || ent.IsValidationError(err):
+			Errors.BadRequestResponse(w, r, err)
+		default:
+			Errors.InternalServerErrorResponse(w, r, err)
+		}
+		return
+	}
+
+	err = Json.WriteJSON(w, http.StatusNoContent, product, nil)
+	if err != nil {
+		Errors.InternalServerErrorResponse(w, r, err)
+		return
+	}
 }
 
-func deleteProductByIDHandler(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) deleteProductByIDHandler(w http.ResponseWriter, r *http.Request) {
 	id := paramInt(r, "id")
 	if id == 0 {
 		Errors.NotFoundResponse(w, r)
 		return
 	}
 
-	err := app.Models.Product.DeleteProductByID(id)
+	err := h.app.Models.Product.DeleteProductByID(id)
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):

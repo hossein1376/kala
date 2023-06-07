@@ -5,7 +5,19 @@ import (
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
+
+	"kala/cmd"
 )
+
+type Handler struct {
+	app cmd.Application
+}
+
+func NewHandlers(app cmd.Application) Handler {
+	return Handler{
+		app: app,
+	}
+}
 
 // paramInt extracts ID as an integer value from the URL parameter.
 func paramInt(r *http.Request, name string) int {

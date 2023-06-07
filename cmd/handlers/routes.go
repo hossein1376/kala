@@ -1,18 +1,11 @@
 package handlers
 
 import (
-	"kala/cmd"
-
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
 
-var app cmd.Application
-
-func NewHandler(application cmd.Application) *chi.Mux {
-	// initialize the application state instance for the handlers package
-	app = application
-
+func (h *Handler) Router() *chi.Mux {
 	// create new router
 	r := chi.NewRouter()
 
@@ -20,62 +13,62 @@ func NewHandler(application cmd.Application) *chi.Mux {
 	r.Use(middleware.Logger, middleware.Recoverer)
 
 	// custom middlewares
-	r.Use(logger)
+	r.Use(h.logger)
 
 	// routes
-	r.Get("/", homeHandler)
+	r.Get("/", h.homeHandler)
 	r.Route("/api/v1", func(r chi.Router) {
 		// user routes
 		r.Route("/users", func(r chi.Router) {
-			r.Post("/", createNewUserHandler)
-			r.Get("/", getAllUsersHandler)
-			r.Get("/{id}", getUserByIDHandler)
-			r.Patch("/{id}", updateUserByIDHandler)
-			r.Delete("/{id}", deleteUserByIDHandler)
+			r.Post("/", h.createNewUserHandler)
+			r.Get("/", h.getAllUsersHandler)
+			r.Get("/{id}", h.getUserByIDHandler)
+			r.Patch("/{id}", h.updateUserByIDHandler)
+			r.Delete("/{id}", h.deleteUserByIDHandler)
 		})
 
 		// product routes
 		r.Route("/products", func(r chi.Router) {
-			r.Post("/", createNewProductHandler)
-			r.Get("/", getAllProductsHandler)
-			r.Get("/{id}", getProductByIDHandler)
-			r.Patch("/{id}", updateProductByIDHandler)
-			r.Delete("/{id}", deleteProductByIDHandler)
+			r.Post("/", h.createNewProductHandler)
+			r.Get("/", h.getAllProductsHandler)
+			r.Get("/{id}", h.getProductByIDHandler)
+			r.Patch("/{id}", h.updateProductByIDHandler)
+			r.Delete("/{id}", h.deleteProductByIDHandler)
 		})
 
 		// category routes
 		r.Route("/categories", func(r chi.Router) {
-			r.Post("/", createNewCategoryHandler)
-			r.Get("/", getAllCategoriesHandler)
-			r.Get("/{id}", getCategoryByIDHandler)
+			r.Post("/", h.createNewCategoryHandler)
+			r.Get("/", h.getAllCategoriesHandler)
+			r.Get("/{id}", h.getCategoryByIDHandler)
 		})
 
 		// brand routes
 		r.Route("/brands", func(r chi.Router) {
-			r.Post("/", createNewBrandHandler)
-			r.Get("/", getAllBrandsHandler)
-			r.Get("/{id}", getBrandByIDHandler)
+			r.Post("/", h.createNewBrandHandler)
+			r.Get("/", h.getAllBrandsHandler)
+			r.Get("/{id}", h.getBrandByIDHandler)
 		})
 
 		// comment routes
 		r.Route("/comments", func(r chi.Router) {
-			r.Post("/{id}", createNewProductCommentHandler)
-			r.Get("/{id}", getAllProductCommentsHandler)
-			r.Get("/{id}/{commentID}", getProductCommentByIDHandler)
+			r.Post("/{id}", h.createNewProductCommentHandler)
+			r.Get("/{id}", h.getAllProductCommentsHandler)
+			r.Get("/{id}/{commentID}", h.getProductCommentByIDHandler)
 		})
 
 		// seller routes
 		r.Route("/sellers", func(r chi.Router) {
-			r.Post("/", createNewSellerHandler)
-			r.Get("/", getAllSellersHandler)
-			r.Get("/{id}", getSellerByIDHandler)
+			r.Post("/", h.createNewSellerHandler)
+			r.Get("/", h.getAllSellersHandler)
+			r.Get("/{id}", h.getSellerByIDHandler)
 		})
 
 		// address routes
 		r.Route("/addresses", func(r chi.Router) {
-			r.Post("/", createNewAddressHandler)
-			r.Get("/", getAllAddressesHandler)
-			r.Get("/{id}", getAddressByIDHandler)
+			r.Post("/", h.createNewAddressHandler)
+			r.Get("/", h.getAllAddressesHandler)
+			r.Get("/{id}", h.getAddressByIDHandler)
 		})
 
 	})

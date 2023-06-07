@@ -4,14 +4,14 @@ import (
 	"net/http"
 )
 
-func createNewCategoryHandler(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) createNewCategoryHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func getAllCategoriesHandler(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) getAllCategoriesHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func getCategoryByIDHandler(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) getCategoryByIDHandler(w http.ResponseWriter, r *http.Request) {
 
 }

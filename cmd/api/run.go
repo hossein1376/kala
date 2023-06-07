@@ -34,7 +34,8 @@ func RunServer() {
 		Models: data.NewModels(client),
 	}
 
-	router := handlers.NewHandler(app)
+	handler := handlers.NewHandlers(app)
+	router := handler.Router()
 	err = serve(app, router)
 	if err != nil {
 		logger.Error("failed to start server", slog.String("error", err.Error()))

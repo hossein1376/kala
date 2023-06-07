@@ -10,7 +10,7 @@ import (
 	"kala/pkg/Password"
 )
 
-func createNewUserHandler(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) createNewUserHandler(w http.ResponseWriter, r *http.Request) {
 	var input structure.UserRequest
 	err := Json.ReadJSON(w, r, &input)
 	if err != nil {
@@ -40,7 +40,7 @@ func createNewUserHandler(w http.ResponseWriter, r *http.Request) {
 
 	// TODO: validations
 
-	err = app.Models.User.CreateNewUser(user)
+	err = h.app.Models.User.CreateNewUser(user)
 	if err != nil {
 		switch {
 		case ent.IsConstraintError(err) || ent.IsValidationError(err):
@@ -58,14 +58,14 @@ func createNewUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getUserByIDHandler(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) getUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 	id := paramInt(r, "id")
 	if id == 0 {
 		Errors.NotFoundResponse(w, r)
 		return
 	}
 
-	user, err := app.Models.User.GetSingleUserByID(id)
+	user, err := h.app.Models.User.GetSingleUserByID(id)
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
@@ -84,8 +84,8 @@ func getUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getAllUsersHandler(w http.ResponseWriter, r *http.Request) {
-	users, err := app.Models.User.GetAllUsers()
+func (h *Handler) getAllUsersHandler(w http.ResponseWriter, r *http.Request) {
+	users, err := h.app.Models.User.GetAllUsers()
 	if err != nil {
 		Errors.InternalServerErrorResponse(w, r, err)
 		return
@@ -97,7 +97,7 @@ func getAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func updateUserByIDHandler(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 	id := paramInt(r, "id")
 	if id == 0 {
 		Errors.NotFoundResponse(w, r)
@@ -111,7 +111,7 @@ func updateUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := app.Models.User.GetSingleUserByID(id)
+	user, err := h.app.Models.User.GetSingleUserByID(id)
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
@@ -147,7 +147,7 @@ func updateUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 		user.Password = []byte(p.Hash)
 	}
 
-	err = app.Models.User.UpdateUserByID(id, user)
+	err = h.app.Models.User.UpdateUserByID(id, user)
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
@@ -165,14 +165,14 @@ func updateUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func deleteUserByIDHandler(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) deleteUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 	id := paramInt(r, "id")
 	if id == 0 {
 		Errors.NotFoundResponse(w, r)
 		return
 	}
 
-	err := app.Models.User.DeleteUserByID(id)
+	err := h.app.Models.User.DeleteUserByID(id)
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):

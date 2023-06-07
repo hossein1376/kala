@@ -4,14 +4,14 @@ import (
 	"net/http"
 )
 
-func createNewProductCommentHandler(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) createNewProductCommentHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func getAllProductCommentsHandler(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) getAllProductCommentsHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func getProductCommentByIDHandler(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) getProductCommentByIDHandler(w http.ResponseWriter, r *http.Request) {
 
 }
