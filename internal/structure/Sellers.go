@@ -7,3 +7,8 @@ type Seller struct {
 	Rating      float64    `json:"rating"`
 	RatingCount int32      `json:"rating_count"`
 }
+
+type NewSeller struct {
+	Name   string `json:"name"`
+	UserID int    `json:"user_id"`
+}

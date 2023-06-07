@@ -59,7 +59,7 @@ func createNewUserHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func getUserByIDHandler(w http.ResponseWriter, r *http.Request) {
-	id := paramInt(r)
+	id := paramInt(r, "id")
 	if id == 0 {
 		Errors.NotFoundResponse(w, r)
 		return
@@ -98,7 +98,7 @@ func getAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateUserByIDHandler(w http.ResponseWriter, r *http.Request) {
-	id := paramInt(r)
+	id := paramInt(r, "id")
 	if id == 0 {
 		Errors.NotFoundResponse(w, r)
 		return
@@ -166,7 +166,7 @@ func updateUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func deleteUserByIDHandler(w http.ResponseWriter, r *http.Request) {
-	id := paramInt(r)
+	id := paramInt(r, "id")
 	if id == 0 {
 		Errors.NotFoundResponse(w, r)
 		return
