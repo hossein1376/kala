@@ -5,16 +5,14 @@ import (
 
 	"kala/internal/ent"
 	"kala/internal/structure"
-	"kala/pkg/Errors"
-	"kala/pkg/Json"
 	"kala/pkg/Password"
 )
 
 func (h *Handler) createNewUserHandler(w http.ResponseWriter, r *http.Request) {
 	var input structure.UserRequest
-	err := Json.ReadJSON(w, r, &input)
+	err := h.json.ReadJSON(w, r, &input)
 	if err != nil {
-		Errors.BadRequestResponse(w, r, err)
+		h.error.BadRequestResponse(w, r, err)
 	}
 
 	var user structure.User
@@ -32,9 +30,9 @@ func (h *Handler) createNewUserHandler(w http.ResponseWriter, r *http.Request) {
 		user.Phone = *input.Phone
 	}
 
-	err = user.Password.Set(input.Password)
+	err = user.Password.ArgonSet(input.Password)
 	if err != nil {
-		Errors.InternalServerErrorResponse(w, r, err)
+		h.error.InternalServerErrorResponse(w, r, err)
 		return
 	}
 
@@ -44,16 +42,16 @@ func (h *Handler) createNewUserHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		switch {
 		case ent.IsConstraintError(err) || ent.IsValidationError(err):
-			Errors.BadRequestResponse(w, r, err)
+			h.error.BadRequestResponse(w, r, err)
 		default:
-			Errors.InternalServerErrorResponse(w, r, err)
+			h.error.InternalServerErrorResponse(w, r, err)
 		}
 		return
 	}
 
-	err = Json.WriteJSON(w, http.StatusCreated, user, nil)
+	err = h.json.WriteJSON(w, http.StatusCreated, user, nil)
 	if err != nil {
-		Errors.InternalServerErrorResponse(w, r, err)
+		h.error.InternalServerErrorResponse(w, r, err)
 		return
 	}
 }
@@ -61,7 +59,7 @@ func (h *Handler) createNewUserHandler(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) getUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 	id := paramInt(r, "id")
 	if id == 0 {
-		Errors.NotFoundResponse(w, r)
+		h.error.NotFoundResponse(w, r)
 		return
 	}
 
@@ -69,17 +67,17 @@ func (h *Handler) getUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
-			Errors.NotFoundResponse(w, r)
+			h.error.NotFoundResponse(w, r)
 			return
 		default:
-			Errors.InternalServerErrorResponse(w, r, err)
+			h.error.InternalServerErrorResponse(w, r, err)
 			return
 		}
 	}
 
-	err = Json.WriteJSON(w, http.StatusOK, user, nil)
+	err = h.json.WriteJSON(w, http.StatusOK, user, nil)
 	if err != nil {
-		Errors.InternalServerErrorResponse(w, r, err)
+		h.error.InternalServerErrorResponse(w, r, err)
 		return
 	}
 }
@@ -87,12 +85,12 @@ func (h *Handler) getUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) getAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 	users, err := h.app.Models.User.GetAllUsers()
 	if err != nil {
-		Errors.InternalServerErrorResponse(w, r, err)
+		h.error.InternalServerErrorResponse(w, r, err)
 		return
 	}
-	err = Json.WriteJSON(w, http.StatusOK, users, nil)
+	err = h.json.WriteJSON(w, http.StatusOK, users, nil)
 	if err != nil {
-		Errors.InternalServerErrorResponse(w, r, err)
+		h.error.InternalServerErrorResponse(w, r, err)
 		return
 	}
 }
@@ -100,14 +98,14 @@ func (h *Handler) getAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 	id := paramInt(r, "id")
 	if id == 0 {
-		Errors.NotFoundResponse(w, r)
+		h.error.NotFoundResponse(w, r)
 		return
 	}
 
 	var input structure.UserUpdateRequest
-	err := Json.ReadJSON(w, r, &input)
+	err := h.json.ReadJSON(w, r, &input)
 	if err != nil {
-		Errors.BadRequestResponse(w, r, err)
+		h.error.BadRequestResponse(w, r, err)
 		return
 	}
 
@@ -115,9 +113,9 @@ func (h *Handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
-			Errors.NotFoundResponse(w, r)
+			h.error.NotFoundResponse(w, r)
 		default:
-			Errors.InternalServerErrorResponse(w, r, err)
+			h.error.InternalServerErrorResponse(w, r, err)
 		}
 		return
 	}
@@ -139,9 +137,9 @@ func (h *Handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 	}
 	if input.Password != nil {
 		var p Password.Password
-		err = p.Set(*input.Password)
+		err = p.ArgonSet(*input.Password)
 		if err != nil {
-			Errors.InternalServerErrorResponse(w, r, err)
+			h.error.InternalServerErrorResponse(w, r, err)
 			return
 		}
 		user.Password = []byte(p.Hash)
@@ -151,16 +149,16 @@ func (h *Handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
-			Errors.NotFoundResponse(w, r)
+			h.error.NotFoundResponse(w, r)
 		default:
-			Errors.InternalServerErrorResponse(w, r, err)
+			h.error.InternalServerErrorResponse(w, r, err)
 		}
 		return
 	}
 
-	err = Json.WriteJSON(w, http.StatusOK, user, nil)
+	err = h.json.WriteJSON(w, http.StatusOK, user, nil)
 	if err != nil {
-		Errors.InternalServerErrorResponse(w, r, err)
+		h.error.InternalServerErrorResponse(w, r, err)
 		return
 	}
 }
@@ -168,7 +166,7 @@ func (h *Handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 func (h *Handler) deleteUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 	id := paramInt(r, "id")
 	if id == 0 {
-		Errors.NotFoundResponse(w, r)
+		h.error.NotFoundResponse(w, r)
 		return
 	}
 
@@ -176,16 +174,16 @@ func (h *Handler) deleteUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
-			Errors.NotFoundResponse(w, r)
+			h.error.NotFoundResponse(w, r)
 		default:
-			Errors.InternalServerErrorResponse(w, r, err)
+			h.error.InternalServerErrorResponse(w, r, err)
 		}
 		return
 	}
 
-	err = Json.WriteJSON(w, http.StatusNoContent, nil, nil)
+	err = h.json.WriteJSON(w, http.StatusNoContent, nil, nil)
 	if err != nil {
-		Errors.InternalServerErrorResponse(w, r, err)
+		h.error.InternalServerErrorResponse(w, r, err)
 		return
 	}
 }

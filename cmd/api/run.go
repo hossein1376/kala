@@ -12,7 +12,7 @@ import (
 )
 
 func RunServer() {
-	logger := Logger.Logger
+	logger := Logger.NewJsonLogger()
 
 	cfg := newConfig()
 	client, err := openSqlDB(cfg)
@@ -28,7 +28,7 @@ func RunServer() {
 		return
 	}
 
-	app := cmd.Application{
+	app := &cmd.Application{
 		Config: cfg,
 		Logger: logger,
 		Models: data.NewModels(client),

@@ -7,15 +7,21 @@ import (
 	"github.com/go-chi/chi/v5"
 
 	"kala/cmd"
+	"kala/pkg/Errors"
+	"kala/pkg/Json"
 )
 
 type Handler struct {
-	app cmd.Application
+	app   *cmd.Application
+	error *Errors.Errors
+	json  Json.Json
 }
 
-func NewHandlers(app cmd.Application) Handler {
+func NewHandlers(app *cmd.Application) Handler {
 	return Handler{
-		app: app,
+		app:   app,
+		json:  Json.NewJson(),
+		error: Errors.NewErrors(app.Logger),
 	}
 }
 

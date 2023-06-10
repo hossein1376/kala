@@ -9,8 +9,8 @@ type Models struct {
 	Product ProductModel
 }
 
-func NewModels(client *ent.Client) Models {
-	return Models{
+func NewModels(client *ent.Client) *Models {
+	return &Models{
 		User:    UserModel{client: client},
 		Product: ProductModel{client: client},
 	}

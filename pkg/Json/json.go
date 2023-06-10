@@ -10,13 +10,17 @@ import (
 	"time"
 )
 
-func WriteJSON(w http.ResponseWriter, status int, data any, headers http.Header) error {
+type Json struct{}
+
+func NewJson() Json {
+	return Json{}
+}
+
+func (Json) WriteJSON(w http.ResponseWriter, status int, data any, headers http.Header) error {
 	js, err := json.Marshal(data)
 	if err != nil {
 		return err
 	}
-
-	js = append(js, '\n')
 
 	for key, value := range headers {
 		w.Header()[key] = value
@@ -30,7 +34,7 @@ func WriteJSON(w http.ResponseWriter, status int, data any, headers http.Header)
 	return err
 }
 
-func ReadJSON(w http.ResponseWriter, r *http.Request, dst any) error {
+func (Json) ReadJSON(w http.ResponseWriter, r *http.Request, dst any) error {
 	maxBytes := 1_048_576
 	r.Body = http.MaxBytesReader(w, r.Body, int64(maxBytes))
 	dec := json.NewDecoder(r.Body)
@@ -66,7 +70,7 @@ func ReadJSON(w http.ResponseWriter, r *http.Request, dst any) error {
 			return fmt.Errorf("body must not be larger than %d bytes", maxBytes)
 
 		case errors.As(err, &invalidUnmarshalError):
-			panic(err)
+			return err
 
 		default:
 			return err

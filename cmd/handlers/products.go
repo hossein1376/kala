@@ -5,15 +5,13 @@ import (
 
 	"kala/internal/ent"
 	"kala/internal/structure"
-	"kala/pkg/Errors"
-	"kala/pkg/Json"
 )
 
 func (h *Handler) createNewProductHandler(w http.ResponseWriter, r *http.Request) {
 	var input structure.Product
-	err := Json.ReadJSON(w, r, &input)
+	err := h.json.ReadJSON(w, r, &input)
 	if err != nil {
-		Errors.BadRequestResponse(w, r, err)
+		h.error.BadRequestResponse(w, r, err)
 		return
 	}
 
@@ -21,16 +19,16 @@ func (h *Handler) createNewProductHandler(w http.ResponseWriter, r *http.Request
 	if err != nil {
 		switch {
 		case ent.IsConstraintError(err) || ent.IsValidationError(err):
-			Errors.BadRequestResponse(w, r, err)
+			h.error.BadRequestResponse(w, r, err)
 		default:
-			Errors.InternalServerErrorResponse(w, r, err)
+			h.error.InternalServerErrorResponse(w, r, err)
 		}
 		return
 	}
 
-	err = Json.WriteJSON(w, http.StatusCreated, product, nil)
+	err = h.json.WriteJSON(w, http.StatusCreated, product, nil)
 	if err != nil {
-		Errors.InternalServerErrorResponse(w, r, err)
+		h.error.InternalServerErrorResponse(w, r, err)
 		return
 	}
 }
@@ -38,7 +36,7 @@ func (h *Handler) createNewProductHandler(w http.ResponseWriter, r *http.Request
 func (h *Handler) getProductByIDHandler(w http.ResponseWriter, r *http.Request) {
 	id := paramInt(r, "id")
 	if id == 0 {
-		Errors.NotFoundResponse(w, r)
+		h.error.NotFoundResponse(w, r)
 		return
 	}
 
@@ -46,17 +44,17 @@ func (h *Handler) getProductByIDHandler(w http.ResponseWriter, r *http.Request) 
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
-			Errors.NotFoundResponse(w, r)
+			h.error.NotFoundResponse(w, r)
 			return
 		default:
-			Errors.InternalServerErrorResponse(w, r, err)
+			h.error.InternalServerErrorResponse(w, r, err)
 			return
 		}
 	}
 
-	err = Json.WriteJSON(w, http.StatusOK, product, nil)
+	err = h.json.WriteJSON(w, http.StatusOK, product, nil)
 	if err != nil {
-		Errors.InternalServerErrorResponse(w, r, err)
+		h.error.InternalServerErrorResponse(w, r, err)
 		return
 	}
 }
@@ -64,13 +62,13 @@ func (h *Handler) getProductByIDHandler(w http.ResponseWriter, r *http.Request) 
 func (h *Handler) getAllProductsHandler(w http.ResponseWriter, r *http.Request) {
 	products, err := h.app.Models.Product.GetAllProducts()
 	if err != nil {
-		Errors.InternalServerErrorResponse(w, r, err)
+		h.error.InternalServerErrorResponse(w, r, err)
 		return
 	}
 
-	err = Json.WriteJSON(w, http.StatusOK, products, nil)
+	err = h.json.WriteJSON(w, http.StatusOK, products, nil)
 	if err != nil {
-		Errors.InternalServerErrorResponse(w, r, err)
+		h.error.InternalServerErrorResponse(w, r, err)
 		return
 	}
 }
@@ -78,14 +76,14 @@ func (h *Handler) getAllProductsHandler(w http.ResponseWriter, r *http.Request) 
 func (h *Handler) updateProductByIDHandler(w http.ResponseWriter, r *http.Request) {
 	id := paramInt(r, "id")
 	if id == 0 {
-		Errors.NotFoundResponse(w, r)
+		h.error.NotFoundResponse(w, r)
 		return
 	}
 
 	var input structure.ProductUpdate
-	err := Json.ReadJSON(w, r, &input)
+	err := h.json.ReadJSON(w, r, &input)
 	if err != nil {
-		Errors.BadRequestResponse(w, r, err)
+		h.error.BadRequestResponse(w, r, err)
 		return
 	}
 
@@ -93,9 +91,9 @@ func (h *Handler) updateProductByIDHandler(w http.ResponseWriter, r *http.Reques
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
-			Errors.NotFoundResponse(w, r)
+			h.error.NotFoundResponse(w, r)
 		default:
-			Errors.InternalServerErrorResponse(w, r, err)
+			h.error.InternalServerErrorResponse(w, r, err)
 		}
 		return
 	}
@@ -141,16 +139,16 @@ func (h *Handler) updateProductByIDHandler(w http.ResponseWriter, r *http.Reques
 	if err != nil {
 		switch {
 		case ent.IsConstraintError(err) || ent.IsValidationError(err):
-			Errors.BadRequestResponse(w, r, err)
+			h.error.BadRequestResponse(w, r, err)
 		default:
-			Errors.InternalServerErrorResponse(w, r, err)
+			h.error.InternalServerErrorResponse(w, r, err)
 		}
 		return
 	}
 
-	err = Json.WriteJSON(w, http.StatusNoContent, product, nil)
+	err = h.json.WriteJSON(w, http.StatusNoContent, product, nil)
 	if err != nil {
-		Errors.InternalServerErrorResponse(w, r, err)
+		h.error.InternalServerErrorResponse(w, r, err)
 		return
 	}
 }
@@ -158,7 +156,7 @@ func (h *Handler) updateProductByIDHandler(w http.ResponseWriter, r *http.Reques
 func (h *Handler) deleteProductByIDHandler(w http.ResponseWriter, r *http.Request) {
 	id := paramInt(r, "id")
 	if id == 0 {
-		Errors.NotFoundResponse(w, r)
+		h.error.NotFoundResponse(w, r)
 		return
 	}
 
@@ -166,16 +164,16 @@ func (h *Handler) deleteProductByIDHandler(w http.ResponseWriter, r *http.Reques
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
-			Errors.NotFoundResponse(w, r)
+			h.error.NotFoundResponse(w, r)
 		default:
-			Errors.InternalServerErrorResponse(w, r, err)
+			h.error.InternalServerErrorResponse(w, r, err)
 		}
 		return
 	}
 
-	err = Json.WriteJSON(w, http.StatusOK, nil, nil)
+	err = h.json.WriteJSON(w, http.StatusOK, nil, nil)
 	if err != nil {
-		Errors.InternalServerErrorResponse(w, r, err)
+		h.error.InternalServerErrorResponse(w, r, err)
 		return
 	}
 

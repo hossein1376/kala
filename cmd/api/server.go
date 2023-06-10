@@ -16,7 +16,7 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-func serve(app cmd.Application, router *chi.Mux) error {
+func serve(app *cmd.Application, router *chi.Mux) error {
 	server := &http.Server{
 		Addr:         fmt.Sprintf(":%s", app.Config.Port),
 		Handler:      router,

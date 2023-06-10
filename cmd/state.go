@@ -9,7 +9,7 @@ import (
 type Application struct {
 	Config Config
 	Logger *slog.Logger
-	Models data.Models
+	Models *data.Models
 }
 
 type Config struct {
