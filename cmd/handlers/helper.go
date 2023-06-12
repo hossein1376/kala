@@ -4,11 +4,11 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/go-chi/chi/v5"
-
 	"kala/cmd"
 	"kala/pkg/Errors"
 	"kala/pkg/Json"
+
+	"github.com/go-chi/chi/v5"
 )
 
 type Handler struct {

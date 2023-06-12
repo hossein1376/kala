@@ -9,7 +9,7 @@ import (
 
 func (h *Handler) createNewProductHandler(w http.ResponseWriter, r *http.Request) {
 	var input structure.Product
-	err := h.json.ReadJSON(w, r, &input)
+	err := h.json.ReadJSONiter(w, r, &input)
 	if err != nil {
 		h.error.BadRequestResponse(w, r, err)
 		return
@@ -26,7 +26,7 @@ func (h *Handler) createNewProductHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	err = h.json.WriteJSON(w, http.StatusCreated, product, nil)
+	err = h.json.WriteJSONiter(w, http.StatusCreated, product, nil)
 	if err != nil {
 		h.error.InternalServerErrorResponse(w, r, err)
 		return
@@ -52,7 +52,7 @@ func (h *Handler) getProductByIDHandler(w http.ResponseWriter, r *http.Request) 
 		}
 	}
 
-	err = h.json.WriteJSON(w, http.StatusOK, product, nil)
+	err = h.json.WriteJSONiter(w, http.StatusOK, product, nil)
 	if err != nil {
 		h.error.InternalServerErrorResponse(w, r, err)
 		return
@@ -66,7 +66,7 @@ func (h *Handler) getAllProductsHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	err = h.json.WriteJSON(w, http.StatusOK, products, nil)
+	err = h.json.WriteJSONiter(w, http.StatusOK, products, nil)
 	if err != nil {
 		h.error.InternalServerErrorResponse(w, r, err)
 		return
@@ -81,7 +81,7 @@ func (h *Handler) updateProductByIDHandler(w http.ResponseWriter, r *http.Reques
 	}
 
 	var input structure.ProductUpdate
-	err := h.json.ReadJSON(w, r, &input)
+	err := h.json.ReadJSONiter(w, r, &input)
 	if err != nil {
 		h.error.BadRequestResponse(w, r, err)
 		return
@@ -146,7 +146,7 @@ func (h *Handler) updateProductByIDHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	err = h.json.WriteJSON(w, http.StatusNoContent, product, nil)
+	err = h.json.WriteJSONiter(w, http.StatusNoContent, product, nil)
 	if err != nil {
 		h.error.InternalServerErrorResponse(w, r, err)
 		return
@@ -171,7 +171,7 @@ func (h *Handler) deleteProductByIDHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	err = h.json.WriteJSON(w, http.StatusOK, nil, nil)
+	err = h.json.WriteJSONiter(w, http.StatusOK, nil, nil)
 	if err != nil {
 		h.error.InternalServerErrorResponse(w, r, err)
 		return

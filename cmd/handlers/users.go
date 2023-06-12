@@ -10,7 +10,7 @@ import (
 
 func (h *Handler) createNewUserHandler(w http.ResponseWriter, r *http.Request) {
 	var input structure.UserRequest
-	err := h.json.ReadJSON(w, r, &input)
+	err := h.json.ReadJSONiter(w, r, &input)
 	if err != nil {
 		h.error.BadRequestResponse(w, r, err)
 	}
@@ -49,7 +49,7 @@ func (h *Handler) createNewUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.json.WriteJSON(w, http.StatusCreated, user, nil)
+	err = h.json.WriteJSONiter(w, http.StatusCreated, user, nil)
 	if err != nil {
 		h.error.InternalServerErrorResponse(w, r, err)
 		return
@@ -75,7 +75,7 @@ func (h *Handler) getUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	err = h.json.WriteJSON(w, http.StatusOK, user, nil)
+	err = h.json.WriteJSONiter(w, http.StatusOK, user, nil)
 	if err != nil {
 		h.error.InternalServerErrorResponse(w, r, err)
 		return
@@ -88,7 +88,7 @@ func (h *Handler) getAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 		h.error.InternalServerErrorResponse(w, r, err)
 		return
 	}
-	err = h.json.WriteJSON(w, http.StatusOK, users, nil)
+	err = h.json.WriteJSONiter(w, http.StatusOK, users, nil)
 	if err != nil {
 		h.error.InternalServerErrorResponse(w, r, err)
 		return
@@ -103,7 +103,7 @@ func (h *Handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 	}
 
 	var input structure.UserUpdateRequest
-	err := h.json.ReadJSON(w, r, &input)
+	err := h.json.ReadJSONiter(w, r, &input)
 	if err != nil {
 		h.error.BadRequestResponse(w, r, err)
 		return
@@ -156,7 +156,7 @@ func (h *Handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	err = h.json.WriteJSON(w, http.StatusOK, user, nil)
+	err = h.json.WriteJSONiter(w, http.StatusOK, user, nil)
 	if err != nil {
 		h.error.InternalServerErrorResponse(w, r, err)
 		return
@@ -181,7 +181,7 @@ func (h *Handler) deleteUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	err = h.json.WriteJSON(w, http.StatusNoContent, nil, nil)
+	err = h.json.WriteJSONiter(w, http.StatusNoContent, nil, nil)
 	if err != nil {
 		h.error.InternalServerErrorResponse(w, r, err)
 		return
