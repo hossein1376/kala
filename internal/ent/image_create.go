@@ -7,9 +7,11 @@ import (
 	"errors"
 	"fmt"
 	"kala/internal/ent/brand"
+	"kala/internal/ent/category"
 	"kala/internal/ent/comment"
 	"kala/internal/ent/image"
 	"kala/internal/ent/product"
+	"kala/internal/ent/subcategory"
 	"kala/internal/ent/user"
 	"time"
 
@@ -74,80 +76,94 @@ func (ic *ImageCreate) SetUploadedAt(t time.Time) *ImageCreate {
 	return ic
 }
 
-// SetUserID sets the "user" edge to the User entity by ID.
-func (ic *ImageCreate) SetUserID(id int) *ImageCreate {
-	ic.mutation.SetUserID(id)
+// AddUserIDs adds the "user" edge to the User entity by IDs.
+func (ic *ImageCreate) AddUserIDs(ids ...int) *ImageCreate {
+	ic.mutation.AddUserIDs(ids...)
 	return ic
 }
 
-// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
-func (ic *ImageCreate) SetNillableUserID(id *int) *ImageCreate {
-	if id != nil {
-		ic = ic.SetUserID(*id)
+// AddUser adds the "user" edges to the User entity.
+func (ic *ImageCreate) AddUser(u ...*User) *ImageCreate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
 	}
+	return ic.AddUserIDs(ids...)
+}
+
+// AddCommentIDs adds the "comment" edge to the Comment entity by IDs.
+func (ic *ImageCreate) AddCommentIDs(ids ...int) *ImageCreate {
+	ic.mutation.AddCommentIDs(ids...)
 	return ic
 }
 
-// SetUser sets the "user" edge to the User entity.
-func (ic *ImageCreate) SetUser(u *User) *ImageCreate {
-	return ic.SetUserID(u.ID)
-}
-
-// SetCommentID sets the "comment" edge to the Comment entity by ID.
-func (ic *ImageCreate) SetCommentID(id int) *ImageCreate {
-	ic.mutation.SetCommentID(id)
-	return ic
-}
-
-// SetNillableCommentID sets the "comment" edge to the Comment entity by ID if the given value is not nil.
-func (ic *ImageCreate) SetNillableCommentID(id *int) *ImageCreate {
-	if id != nil {
-		ic = ic.SetCommentID(*id)
+// AddComment adds the "comment" edges to the Comment entity.
+func (ic *ImageCreate) AddComment(c ...*Comment) *ImageCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
 	}
+	return ic.AddCommentIDs(ids...)
+}
+
+// AddBrandIDs adds the "brand" edge to the Brand entity by IDs.
+func (ic *ImageCreate) AddBrandIDs(ids ...int) *ImageCreate {
+	ic.mutation.AddBrandIDs(ids...)
 	return ic
 }
 
-// SetComment sets the "comment" edge to the Comment entity.
-func (ic *ImageCreate) SetComment(c *Comment) *ImageCreate {
-	return ic.SetCommentID(c.ID)
-}
-
-// SetBrandID sets the "brand" edge to the Brand entity by ID.
-func (ic *ImageCreate) SetBrandID(id int) *ImageCreate {
-	ic.mutation.SetBrandID(id)
-	return ic
-}
-
-// SetNillableBrandID sets the "brand" edge to the Brand entity by ID if the given value is not nil.
-func (ic *ImageCreate) SetNillableBrandID(id *int) *ImageCreate {
-	if id != nil {
-		ic = ic.SetBrandID(*id)
+// AddBrand adds the "brand" edges to the Brand entity.
+func (ic *ImageCreate) AddBrand(b ...*Brand) *ImageCreate {
+	ids := make([]int, len(b))
+	for i := range b {
+		ids[i] = b[i].ID
 	}
+	return ic.AddBrandIDs(ids...)
+}
+
+// AddProductIDs adds the "product" edge to the Product entity by IDs.
+func (ic *ImageCreate) AddProductIDs(ids ...int) *ImageCreate {
+	ic.mutation.AddProductIDs(ids...)
 	return ic
 }
 
-// SetBrand sets the "brand" edge to the Brand entity.
-func (ic *ImageCreate) SetBrand(b *Brand) *ImageCreate {
-	return ic.SetBrandID(b.ID)
-}
-
-// SetProductID sets the "product" edge to the Product entity by ID.
-func (ic *ImageCreate) SetProductID(id int) *ImageCreate {
-	ic.mutation.SetProductID(id)
-	return ic
-}
-
-// SetNillableProductID sets the "product" edge to the Product entity by ID if the given value is not nil.
-func (ic *ImageCreate) SetNillableProductID(id *int) *ImageCreate {
-	if id != nil {
-		ic = ic.SetProductID(*id)
+// AddProduct adds the "product" edges to the Product entity.
+func (ic *ImageCreate) AddProduct(p ...*Product) *ImageCreate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
 	}
+	return ic.AddProductIDs(ids...)
+}
+
+// AddCategoryIDs adds the "category" edge to the Category entity by IDs.
+func (ic *ImageCreate) AddCategoryIDs(ids ...int) *ImageCreate {
+	ic.mutation.AddCategoryIDs(ids...)
 	return ic
 }
 
-// SetProduct sets the "product" edge to the Product entity.
-func (ic *ImageCreate) SetProduct(p *Product) *ImageCreate {
-	return ic.SetProductID(p.ID)
+// AddCategory adds the "category" edges to the Category entity.
+func (ic *ImageCreate) AddCategory(c ...*Category) *ImageCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return ic.AddCategoryIDs(ids...)
+}
+
+// AddSubCategoryIDs adds the "sub_category" edge to the SubCategory entity by IDs.
+func (ic *ImageCreate) AddSubCategoryIDs(ids ...int) *ImageCreate {
+	ic.mutation.AddSubCategoryIDs(ids...)
+	return ic
+}
+
+// AddSubCategory adds the "sub_category" edges to the SubCategory entity.
+func (ic *ImageCreate) AddSubCategory(s ...*SubCategory) *ImageCreate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return ic.AddSubCategoryIDs(ids...)
 }
 
 // Mutation returns the ImageMutation object of the builder.
@@ -283,7 +299,7 @@ func (ic *ImageCreate) createSpec() (*Image, *sqlgraph.CreateSpec) {
 	}
 	if nodes := ic.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
 			Table:   image.UserTable,
 			Columns: []string{image.UserColumn},
@@ -295,12 +311,11 @@ func (ic *ImageCreate) createSpec() (*Image, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.user_image = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := ic.mutation.CommentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
 			Table:   image.CommentTable,
 			Columns: []string{image.CommentColumn},
@@ -312,12 +327,11 @@ func (ic *ImageCreate) createSpec() (*Image, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.comment_image = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := ic.mutation.BrandIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
 			Table:   image.BrandTable,
 			Columns: []string{image.BrandColumn},
@@ -329,12 +343,11 @@ func (ic *ImageCreate) createSpec() (*Image, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.brand_image = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := ic.mutation.ProductIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
 			Table:   image.ProductTable,
 			Columns: []string{image.ProductColumn},
@@ -346,7 +359,38 @@ func (ic *ImageCreate) createSpec() (*Image, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.product_image = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ic.mutation.CategoryIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   image.CategoryTable,
+			Columns: []string{image.CategoryColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ic.mutation.SubCategoryIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   image.SubCategoryTable,
+			Columns: []string{image.SubCategoryColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(subcategory.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

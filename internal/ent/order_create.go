@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"kala/internal/ent/order"
 	"kala/internal/ent/product"
+	"kala/internal/ent/seller"
 	"kala/internal/ent/user"
 	"time"
 
@@ -48,6 +49,25 @@ func (oc *OrderCreate) SetNillableUpdateTime(t *time.Time) *OrderCreate {
 		oc.SetUpdateTime(*t)
 	}
 	return oc
+}
+
+// SetSellerID sets the "seller" edge to the Seller entity by ID.
+func (oc *OrderCreate) SetSellerID(id int) *OrderCreate {
+	oc.mutation.SetSellerID(id)
+	return oc
+}
+
+// SetNillableSellerID sets the "seller" edge to the Seller entity by ID if the given value is not nil.
+func (oc *OrderCreate) SetNillableSellerID(id *int) *OrderCreate {
+	if id != nil {
+		oc = oc.SetSellerID(*id)
+	}
+	return oc
+}
+
+// SetSeller sets the "seller" edge to the Seller entity.
+func (oc *OrderCreate) SetSeller(s *Seller) *OrderCreate {
+	return oc.SetSellerID(s.ID)
 }
 
 // AddProductIDs adds the "product" edge to the Product entity by IDs.
@@ -166,6 +186,23 @@ func (oc *OrderCreate) createSpec() (*Order, *sqlgraph.CreateSpec) {
 		_spec.SetField(order.FieldUpdateTime, field.TypeTime, value)
 		_node.UpdateTime = value
 	}
+	if nodes := oc.mutation.SellerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   order.SellerTable,
+			Columns: []string{order.SellerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(seller.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.seller_id = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
 	if nodes := oc.mutation.ProductIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -196,7 +233,7 @@ func (oc *OrderCreate) createSpec() (*Order, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.user_order = &nodes[0]
+		_node.user_id = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

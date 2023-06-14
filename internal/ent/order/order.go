@@ -18,12 +18,21 @@ const (
 	FieldCreateTime = "create_time"
 	// FieldUpdateTime holds the string denoting the update_time field in the database.
 	FieldUpdateTime = "update_time"
+	// EdgeSeller holds the string denoting the seller edge name in mutations.
+	EdgeSeller = "seller"
 	// EdgeProduct holds the string denoting the product edge name in mutations.
 	EdgeProduct = "product"
 	// EdgeUser holds the string denoting the user edge name in mutations.
 	EdgeUser = "user"
 	// Table holds the table name of the order in the database.
 	Table = "orders"
+	// SellerTable is the table that holds the seller relation/edge.
+	SellerTable = "orders"
+	// SellerInverseTable is the table name for the Seller entity.
+	// It exists in this package in order to avoid circular dependency with the "seller" package.
+	SellerInverseTable = "sellers"
+	// SellerColumn is the table column denoting the seller relation/edge.
+	SellerColumn = "seller_id"
 	// ProductTable is the table that holds the product relation/edge. The primary key declared below.
 	ProductTable = "product_order"
 	// ProductInverseTable is the table name for the Product entity.
@@ -35,7 +44,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "user" package.
 	UserInverseTable = "users"
 	// UserColumn is the table column denoting the user relation/edge.
-	UserColumn = "user_order"
+	UserColumn = "user_id"
 )
 
 // Columns holds all SQL columns for order fields.
@@ -48,7 +57,8 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "orders"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"user_order",
+	"seller_id",
+	"user_id",
 }
 
 var (
@@ -99,6 +109,13 @@ func ByUpdateTime(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUpdateTime, opts...).ToFunc()
 }
 
+// BySellerField orders the results by seller field.
+func BySellerField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSellerStep(), sql.OrderByField(field, opts...))
+	}
+}
+
 // ByProductCount orders the results by product count.
 func ByProductCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -118,6 +135,13 @@ func ByUserField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newUserStep(), sql.OrderByField(field, opts...))
 	}
+}
+func newSellerStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SellerInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, SellerTable, SellerColumn),
+	)
 }
 func newProductStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(

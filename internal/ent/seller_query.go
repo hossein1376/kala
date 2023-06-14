@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"kala/internal/ent/address"
 	"kala/internal/ent/category"
+	"kala/internal/ent/order"
 	"kala/internal/ent/predicate"
 	"kala/internal/ent/product"
 	"kala/internal/ent/seller"
@@ -29,6 +30,7 @@ type SellerQuery struct {
 	withProduct  *ProductQuery
 	withCategory *CategoryQuery
 	withAddress  *AddressQuery
+	withOrder    *OrderQuery
 	withUser     *UserQuery
 	withFKs      bool
 	// intermediate query (i.e. traversal path).
@@ -126,6 +128,28 @@ func (sq *SellerQuery) QueryAddress() *AddressQuery {
 			sqlgraph.From(seller.Table, seller.FieldID, selector),
 			sqlgraph.To(address.Table, address.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, seller.AddressTable, seller.AddressColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryOrder chains the current query on the "order" edge.
+func (sq *SellerQuery) QueryOrder() *OrderQuery {
+	query := (&OrderClient{config: sq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := sq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := sq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(seller.Table, seller.FieldID, selector),
+			sqlgraph.To(order.Table, order.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, seller.OrderTable, seller.OrderColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
 		return fromU, nil
@@ -350,6 +374,7 @@ func (sq *SellerQuery) Clone() *SellerQuery {
 		withProduct:  sq.withProduct.Clone(),
 		withCategory: sq.withCategory.Clone(),
 		withAddress:  sq.withAddress.Clone(),
+		withOrder:    sq.withOrder.Clone(),
 		withUser:     sq.withUser.Clone(),
 		// clone intermediate query.
 		sql:  sq.sql.Clone(),
@@ -387,6 +412,17 @@ func (sq *SellerQuery) WithAddress(opts ...func(*AddressQuery)) *SellerQuery {
 		opt(query)
 	}
 	sq.withAddress = query
+	return sq
+}
+
+// WithOrder tells the query-builder to eager-load the nodes that are connected to
+// the "order" edge. The optional arguments are used to configure the query builder of the edge.
+func (sq *SellerQuery) WithOrder(opts ...func(*OrderQuery)) *SellerQuery {
+	query := (&OrderClient{config: sq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	sq.withOrder = query
 	return sq
 }
 
@@ -480,10 +516,11 @@ func (sq *SellerQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Selle
 		nodes       = []*Seller{}
 		withFKs     = sq.withFKs
 		_spec       = sq.querySpec()
-		loadedTypes = [4]bool{
+		loadedTypes = [5]bool{
 			sq.withProduct != nil,
 			sq.withCategory != nil,
 			sq.withAddress != nil,
+			sq.withOrder != nil,
 			sq.withUser != nil,
 		}
 	)
@@ -532,6 +569,13 @@ func (sq *SellerQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Selle
 			return nil, err
 		}
 	}
+	if query := sq.withOrder; query != nil {
+		if err := sq.loadOrder(ctx, query, nodes,
+			func(n *Seller) { n.Edges.Order = []*Order{} },
+			func(n *Seller, e *Order) { n.Edges.Order = append(n.Edges.Order, e) }); err != nil {
+			return nil, err
+		}
+	}
 	if query := sq.withUser; query != nil {
 		if err := sq.loadUser(ctx, query, nodes, nil,
 			func(n *Seller, e *User) { n.Edges.User = e }); err != nil {
@@ -560,13 +604,13 @@ func (sq *SellerQuery) loadProduct(ctx context.Context, query *ProductQuery, nod
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.seller_product
+		fk := n.product_id
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "seller_product" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "product_id" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "seller_product" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "product_id" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -652,13 +696,44 @@ func (sq *SellerQuery) loadAddress(ctx context.Context, query *AddressQuery, nod
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.seller_address
+		fk := n.address_id
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "seller_address" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "address_id" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "seller_address" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "address_id" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (sq *SellerQuery) loadOrder(ctx context.Context, query *OrderQuery, nodes []*Seller, init func(*Seller), assign func(*Seller, *Order)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Seller)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.Order(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(seller.OrderColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.seller_id
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "seller_id" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "seller_id" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

@@ -102,23 +102,23 @@ func (cu *CommentUpdate) AddDislikes(i int32) *CommentUpdate {
 }
 
 // SetRating sets the "rating" field.
-func (cu *CommentUpdate) SetRating(i int8) *CommentUpdate {
+func (cu *CommentUpdate) SetRating(f float64) *CommentUpdate {
 	cu.mutation.ResetRating()
-	cu.mutation.SetRating(i)
+	cu.mutation.SetRating(f)
 	return cu
 }
 
 // SetNillableRating sets the "rating" field if the given value is not nil.
-func (cu *CommentUpdate) SetNillableRating(i *int8) *CommentUpdate {
-	if i != nil {
-		cu.SetRating(*i)
+func (cu *CommentUpdate) SetNillableRating(f *float64) *CommentUpdate {
+	if f != nil {
+		cu.SetRating(*f)
 	}
 	return cu
 }
 
-// AddRating adds i to the "rating" field.
-func (cu *CommentUpdate) AddRating(i int8) *CommentUpdate {
-	cu.mutation.AddRating(i)
+// AddRating adds f to the "rating" field.
+func (cu *CommentUpdate) AddRating(f float64) *CommentUpdate {
+	cu.mutation.AddRating(f)
 	return cu
 }
 
@@ -141,19 +141,23 @@ func (cu *CommentUpdate) SetVerifiedBuyer(b bool) *CommentUpdate {
 	return cu
 }
 
-// AddImageIDs adds the "image" edge to the Image entity by IDs.
-func (cu *CommentUpdate) AddImageIDs(ids ...int) *CommentUpdate {
-	cu.mutation.AddImageIDs(ids...)
+// SetImageID sets the "image" edge to the Image entity by ID.
+func (cu *CommentUpdate) SetImageID(id int) *CommentUpdate {
+	cu.mutation.SetImageID(id)
 	return cu
 }
 
-// AddImage adds the "image" edges to the Image entity.
-func (cu *CommentUpdate) AddImage(i ...*Image) *CommentUpdate {
-	ids := make([]int, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
+// SetNillableImageID sets the "image" edge to the Image entity by ID if the given value is not nil.
+func (cu *CommentUpdate) SetNillableImageID(id *int) *CommentUpdate {
+	if id != nil {
+		cu = cu.SetImageID(*id)
 	}
-	return cu.AddImageIDs(ids...)
+	return cu
+}
+
+// SetImage sets the "image" edge to the Image entity.
+func (cu *CommentUpdate) SetImage(i *Image) *CommentUpdate {
+	return cu.SetImageID(i.ID)
 }
 
 // AddConIDs adds the "cons" edge to the Cons entity by IDs.
@@ -221,25 +225,10 @@ func (cu *CommentUpdate) Mutation() *CommentMutation {
 	return cu.mutation
 }
 
-// ClearImage clears all "image" edges to the Image entity.
+// ClearImage clears the "image" edge to the Image entity.
 func (cu *CommentUpdate) ClearImage() *CommentUpdate {
 	cu.mutation.ClearImage()
 	return cu
-}
-
-// RemoveImageIDs removes the "image" edge to Image entities by IDs.
-func (cu *CommentUpdate) RemoveImageIDs(ids ...int) *CommentUpdate {
-	cu.mutation.RemoveImageIDs(ids...)
-	return cu
-}
-
-// RemoveImage removes "image" edges to Image entities.
-func (cu *CommentUpdate) RemoveImage(i ...*Image) *CommentUpdate {
-	ids := make([]int, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
-	}
-	return cu.RemoveImageIDs(ids...)
 }
 
 // ClearCons clears all "cons" edges to the Cons entity.
@@ -431,10 +420,10 @@ func (cu *CommentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.AddField(comment.FieldDislikes, field.TypeInt32, value)
 	}
 	if value, ok := cu.mutation.Rating(); ok {
-		_spec.SetField(comment.FieldRating, field.TypeInt8, value)
+		_spec.SetField(comment.FieldRating, field.TypeFloat64, value)
 	}
 	if value, ok := cu.mutation.AddedRating(); ok {
-		_spec.AddField(comment.FieldRating, field.TypeInt8, value)
+		_spec.AddField(comment.FieldRating, field.TypeFloat64, value)
 	}
 	if value, ok := cu.mutation.RatingCount(); ok {
 		_spec.SetField(comment.FieldRatingCount, field.TypeInt32, value)
@@ -447,7 +436,7 @@ func (cu *CommentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if cu.mutation.ImageCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   comment.ImageTable,
 			Columns: []string{comment.ImageColumn},
@@ -455,28 +444,12 @@ func (cu *CommentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cu.mutation.RemovedImageIDs(); len(nodes) > 0 && !cu.mutation.ImageCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   comment.ImageTable,
-			Columns: []string{comment.ImageColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := cu.mutation.ImageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   comment.ImageTable,
 			Columns: []string{comment.ImageColumn},
@@ -759,23 +732,23 @@ func (cuo *CommentUpdateOne) AddDislikes(i int32) *CommentUpdateOne {
 }
 
 // SetRating sets the "rating" field.
-func (cuo *CommentUpdateOne) SetRating(i int8) *CommentUpdateOne {
+func (cuo *CommentUpdateOne) SetRating(f float64) *CommentUpdateOne {
 	cuo.mutation.ResetRating()
-	cuo.mutation.SetRating(i)
+	cuo.mutation.SetRating(f)
 	return cuo
 }
 
 // SetNillableRating sets the "rating" field if the given value is not nil.
-func (cuo *CommentUpdateOne) SetNillableRating(i *int8) *CommentUpdateOne {
-	if i != nil {
-		cuo.SetRating(*i)
+func (cuo *CommentUpdateOne) SetNillableRating(f *float64) *CommentUpdateOne {
+	if f != nil {
+		cuo.SetRating(*f)
 	}
 	return cuo
 }
 
-// AddRating adds i to the "rating" field.
-func (cuo *CommentUpdateOne) AddRating(i int8) *CommentUpdateOne {
-	cuo.mutation.AddRating(i)
+// AddRating adds f to the "rating" field.
+func (cuo *CommentUpdateOne) AddRating(f float64) *CommentUpdateOne {
+	cuo.mutation.AddRating(f)
 	return cuo
 }
 
@@ -798,19 +771,23 @@ func (cuo *CommentUpdateOne) SetVerifiedBuyer(b bool) *CommentUpdateOne {
 	return cuo
 }
 
-// AddImageIDs adds the "image" edge to the Image entity by IDs.
-func (cuo *CommentUpdateOne) AddImageIDs(ids ...int) *CommentUpdateOne {
-	cuo.mutation.AddImageIDs(ids...)
+// SetImageID sets the "image" edge to the Image entity by ID.
+func (cuo *CommentUpdateOne) SetImageID(id int) *CommentUpdateOne {
+	cuo.mutation.SetImageID(id)
 	return cuo
 }
 
-// AddImage adds the "image" edges to the Image entity.
-func (cuo *CommentUpdateOne) AddImage(i ...*Image) *CommentUpdateOne {
-	ids := make([]int, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
+// SetNillableImageID sets the "image" edge to the Image entity by ID if the given value is not nil.
+func (cuo *CommentUpdateOne) SetNillableImageID(id *int) *CommentUpdateOne {
+	if id != nil {
+		cuo = cuo.SetImageID(*id)
 	}
-	return cuo.AddImageIDs(ids...)
+	return cuo
+}
+
+// SetImage sets the "image" edge to the Image entity.
+func (cuo *CommentUpdateOne) SetImage(i *Image) *CommentUpdateOne {
+	return cuo.SetImageID(i.ID)
 }
 
 // AddConIDs adds the "cons" edge to the Cons entity by IDs.
@@ -878,25 +855,10 @@ func (cuo *CommentUpdateOne) Mutation() *CommentMutation {
 	return cuo.mutation
 }
 
-// ClearImage clears all "image" edges to the Image entity.
+// ClearImage clears the "image" edge to the Image entity.
 func (cuo *CommentUpdateOne) ClearImage() *CommentUpdateOne {
 	cuo.mutation.ClearImage()
 	return cuo
-}
-
-// RemoveImageIDs removes the "image" edge to Image entities by IDs.
-func (cuo *CommentUpdateOne) RemoveImageIDs(ids ...int) *CommentUpdateOne {
-	cuo.mutation.RemoveImageIDs(ids...)
-	return cuo
-}
-
-// RemoveImage removes "image" edges to Image entities.
-func (cuo *CommentUpdateOne) RemoveImage(i ...*Image) *CommentUpdateOne {
-	ids := make([]int, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
-	}
-	return cuo.RemoveImageIDs(ids...)
 }
 
 // ClearCons clears all "cons" edges to the Cons entity.
@@ -1118,10 +1080,10 @@ func (cuo *CommentUpdateOne) sqlSave(ctx context.Context) (_node *Comment, err e
 		_spec.AddField(comment.FieldDislikes, field.TypeInt32, value)
 	}
 	if value, ok := cuo.mutation.Rating(); ok {
-		_spec.SetField(comment.FieldRating, field.TypeInt8, value)
+		_spec.SetField(comment.FieldRating, field.TypeFloat64, value)
 	}
 	if value, ok := cuo.mutation.AddedRating(); ok {
-		_spec.AddField(comment.FieldRating, field.TypeInt8, value)
+		_spec.AddField(comment.FieldRating, field.TypeFloat64, value)
 	}
 	if value, ok := cuo.mutation.RatingCount(); ok {
 		_spec.SetField(comment.FieldRatingCount, field.TypeInt32, value)
@@ -1134,7 +1096,7 @@ func (cuo *CommentUpdateOne) sqlSave(ctx context.Context) (_node *Comment, err e
 	}
 	if cuo.mutation.ImageCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   comment.ImageTable,
 			Columns: []string{comment.ImageColumn},
@@ -1142,28 +1104,12 @@ func (cuo *CommentUpdateOne) sqlSave(ctx context.Context) (_node *Comment, err e
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cuo.mutation.RemovedImageIDs(); len(nodes) > 0 && !cuo.mutation.ImageCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   comment.ImageTable,
-			Columns: []string{comment.ImageColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := cuo.mutation.ImageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   comment.ImageTable,
 			Columns: []string{comment.ImageColumn},

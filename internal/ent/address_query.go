@@ -487,10 +487,10 @@ func (aq *AddressQuery) loadSeller(ctx context.Context, query *SellerQuery, node
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Address)
 	for i := range nodes {
-		if nodes[i].seller_address == nil {
+		if nodes[i].address_id == nil {
 			continue
 		}
-		fk := *nodes[i].seller_address
+		fk := *nodes[i].address_id
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -507,7 +507,7 @@ func (aq *AddressQuery) loadSeller(ctx context.Context, query *SellerQuery, node
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "seller_address" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "address_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

@@ -32,7 +32,9 @@ func (Brand) Fields() []ent.Field {
 // Edges of the Brand.
 func (Brand) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("image", Image.Type),
+		edge.To("image", Image.Type).
+			StorageKey(edge.Column("image")).
+			Unique(),
 		edge.To("category", Category.Type),
 		edge.To("product", Product.Type),
 	}

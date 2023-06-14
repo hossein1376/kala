@@ -5,6 +5,7 @@ package ent
 import (
 	"fmt"
 	"kala/internal/ent/brand"
+	"kala/internal/ent/image"
 	"kala/internal/ent/product"
 	"strings"
 	"time"
@@ -42,10 +43,11 @@ type Product struct {
 	Status bool `json:"status,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ProductQuery when eager-loading is set.
-	Edges          ProductEdges `json:"edges"`
-	brand_product  *int
-	seller_product *int
-	selectValues   sql.SelectValues
+	Edges         ProductEdges `json:"edges"`
+	brand_product *int
+	image         *int
+	product_id    *int
+	selectValues  sql.SelectValues
 }
 
 // ProductEdges holds the relations/edges for other nodes in the graph.
@@ -55,7 +57,7 @@ type ProductEdges struct {
 	// Comment holds the value of the comment edge.
 	Comment []*Comment `json:"comment,omitempty"`
 	// Image holds the value of the image edge.
-	Image []*Image `json:"image,omitempty"`
+	Image *Image `json:"image,omitempty"`
 	// Order holds the value of the order edge.
 	Order []*Order `json:"order,omitempty"`
 	// Category holds the value of the category edge.
@@ -88,9 +90,13 @@ func (e ProductEdges) CommentOrErr() ([]*Comment, error) {
 }
 
 // ImageOrErr returns the Image value or an error if the edge
-// was not loaded in eager-loading.
-func (e ProductEdges) ImageOrErr() ([]*Image, error) {
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ProductEdges) ImageOrErr() (*Image, error) {
 	if e.loadedTypes[2] {
+		if e.Image == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: image.Label}
+		}
 		return e.Image, nil
 	}
 	return nil, &NotLoadedError{edge: "image"}
@@ -153,7 +159,9 @@ func (*Product) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullTime)
 		case product.ForeignKeys[0]: // brand_product
 			values[i] = new(sql.NullInt64)
-		case product.ForeignKeys[1]: // seller_product
+		case product.ForeignKeys[1]: // image
+			values[i] = new(sql.NullInt64)
+		case product.ForeignKeys[2]: // product_id
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -251,10 +259,17 @@ func (pr *Product) assignValues(columns []string, values []any) error {
 			}
 		case product.ForeignKeys[1]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field seller_product", value)
+				return fmt.Errorf("unexpected type %T for edge-field image", value)
 			} else if value.Valid {
-				pr.seller_product = new(int)
-				*pr.seller_product = int(value.Int64)
+				pr.image = new(int)
+				*pr.image = int(value.Int64)
+			}
+		case product.ForeignKeys[2]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field product_id", value)
+			} else if value.Valid {
+				pr.product_id = new(int)
+				*pr.product_id = int(value.Int64)
 			}
 		default:
 			pr.selectValues.Set(columns[i], values[i])

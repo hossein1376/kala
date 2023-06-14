@@ -15,9 +15,14 @@ type Address struct {
 func (Address) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("address").NotEmpty(),
-		field.String("zip_code").NotEmpty(),
+		field.String("city").NotEmpty(),
+		field.String("state").NotEmpty(),
+		field.String("first_name").Optional().Nillable(),
+		field.String("last_name").Optional().Nillable(),
 		field.String("phone").NotEmpty(),
+		field.String("zip_code").NotEmpty(),
 		field.String("coordinates").NotEmpty(),
+		field.Bool("is_seller").Default(false),
 	}
 }
 

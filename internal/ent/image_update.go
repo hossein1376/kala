@@ -7,10 +7,12 @@ import (
 	"errors"
 	"fmt"
 	"kala/internal/ent/brand"
+	"kala/internal/ent/category"
 	"kala/internal/ent/comment"
 	"kala/internal/ent/image"
 	"kala/internal/ent/predicate"
 	"kala/internal/ent/product"
+	"kala/internal/ent/subcategory"
 	"kala/internal/ent/user"
 	"time"
 
@@ -109,80 +111,94 @@ func (iu *ImageUpdate) SetUploadedAt(t time.Time) *ImageUpdate {
 	return iu
 }
 
-// SetUserID sets the "user" edge to the User entity by ID.
-func (iu *ImageUpdate) SetUserID(id int) *ImageUpdate {
-	iu.mutation.SetUserID(id)
+// AddUserIDs adds the "user" edge to the User entity by IDs.
+func (iu *ImageUpdate) AddUserIDs(ids ...int) *ImageUpdate {
+	iu.mutation.AddUserIDs(ids...)
 	return iu
 }
 
-// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
-func (iu *ImageUpdate) SetNillableUserID(id *int) *ImageUpdate {
-	if id != nil {
-		iu = iu.SetUserID(*id)
+// AddUser adds the "user" edges to the User entity.
+func (iu *ImageUpdate) AddUser(u ...*User) *ImageUpdate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
 	}
+	return iu.AddUserIDs(ids...)
+}
+
+// AddCommentIDs adds the "comment" edge to the Comment entity by IDs.
+func (iu *ImageUpdate) AddCommentIDs(ids ...int) *ImageUpdate {
+	iu.mutation.AddCommentIDs(ids...)
 	return iu
 }
 
-// SetUser sets the "user" edge to the User entity.
-func (iu *ImageUpdate) SetUser(u *User) *ImageUpdate {
-	return iu.SetUserID(u.ID)
-}
-
-// SetCommentID sets the "comment" edge to the Comment entity by ID.
-func (iu *ImageUpdate) SetCommentID(id int) *ImageUpdate {
-	iu.mutation.SetCommentID(id)
-	return iu
-}
-
-// SetNillableCommentID sets the "comment" edge to the Comment entity by ID if the given value is not nil.
-func (iu *ImageUpdate) SetNillableCommentID(id *int) *ImageUpdate {
-	if id != nil {
-		iu = iu.SetCommentID(*id)
+// AddComment adds the "comment" edges to the Comment entity.
+func (iu *ImageUpdate) AddComment(c ...*Comment) *ImageUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
 	}
+	return iu.AddCommentIDs(ids...)
+}
+
+// AddBrandIDs adds the "brand" edge to the Brand entity by IDs.
+func (iu *ImageUpdate) AddBrandIDs(ids ...int) *ImageUpdate {
+	iu.mutation.AddBrandIDs(ids...)
 	return iu
 }
 
-// SetComment sets the "comment" edge to the Comment entity.
-func (iu *ImageUpdate) SetComment(c *Comment) *ImageUpdate {
-	return iu.SetCommentID(c.ID)
-}
-
-// SetBrandID sets the "brand" edge to the Brand entity by ID.
-func (iu *ImageUpdate) SetBrandID(id int) *ImageUpdate {
-	iu.mutation.SetBrandID(id)
-	return iu
-}
-
-// SetNillableBrandID sets the "brand" edge to the Brand entity by ID if the given value is not nil.
-func (iu *ImageUpdate) SetNillableBrandID(id *int) *ImageUpdate {
-	if id != nil {
-		iu = iu.SetBrandID(*id)
+// AddBrand adds the "brand" edges to the Brand entity.
+func (iu *ImageUpdate) AddBrand(b ...*Brand) *ImageUpdate {
+	ids := make([]int, len(b))
+	for i := range b {
+		ids[i] = b[i].ID
 	}
+	return iu.AddBrandIDs(ids...)
+}
+
+// AddProductIDs adds the "product" edge to the Product entity by IDs.
+func (iu *ImageUpdate) AddProductIDs(ids ...int) *ImageUpdate {
+	iu.mutation.AddProductIDs(ids...)
 	return iu
 }
 
-// SetBrand sets the "brand" edge to the Brand entity.
-func (iu *ImageUpdate) SetBrand(b *Brand) *ImageUpdate {
-	return iu.SetBrandID(b.ID)
-}
-
-// SetProductID sets the "product" edge to the Product entity by ID.
-func (iu *ImageUpdate) SetProductID(id int) *ImageUpdate {
-	iu.mutation.SetProductID(id)
-	return iu
-}
-
-// SetNillableProductID sets the "product" edge to the Product entity by ID if the given value is not nil.
-func (iu *ImageUpdate) SetNillableProductID(id *int) *ImageUpdate {
-	if id != nil {
-		iu = iu.SetProductID(*id)
+// AddProduct adds the "product" edges to the Product entity.
+func (iu *ImageUpdate) AddProduct(p ...*Product) *ImageUpdate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
 	}
+	return iu.AddProductIDs(ids...)
+}
+
+// AddCategoryIDs adds the "category" edge to the Category entity by IDs.
+func (iu *ImageUpdate) AddCategoryIDs(ids ...int) *ImageUpdate {
+	iu.mutation.AddCategoryIDs(ids...)
 	return iu
 }
 
-// SetProduct sets the "product" edge to the Product entity.
-func (iu *ImageUpdate) SetProduct(p *Product) *ImageUpdate {
-	return iu.SetProductID(p.ID)
+// AddCategory adds the "category" edges to the Category entity.
+func (iu *ImageUpdate) AddCategory(c ...*Category) *ImageUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return iu.AddCategoryIDs(ids...)
+}
+
+// AddSubCategoryIDs adds the "sub_category" edge to the SubCategory entity by IDs.
+func (iu *ImageUpdate) AddSubCategoryIDs(ids ...int) *ImageUpdate {
+	iu.mutation.AddSubCategoryIDs(ids...)
+	return iu
+}
+
+// AddSubCategory adds the "sub_category" edges to the SubCategory entity.
+func (iu *ImageUpdate) AddSubCategory(s ...*SubCategory) *ImageUpdate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return iu.AddSubCategoryIDs(ids...)
 }
 
 // Mutation returns the ImageMutation object of the builder.
@@ -190,28 +206,130 @@ func (iu *ImageUpdate) Mutation() *ImageMutation {
 	return iu.mutation
 }
 
-// ClearUser clears the "user" edge to the User entity.
+// ClearUser clears all "user" edges to the User entity.
 func (iu *ImageUpdate) ClearUser() *ImageUpdate {
 	iu.mutation.ClearUser()
 	return iu
 }
 
-// ClearComment clears the "comment" edge to the Comment entity.
+// RemoveUserIDs removes the "user" edge to User entities by IDs.
+func (iu *ImageUpdate) RemoveUserIDs(ids ...int) *ImageUpdate {
+	iu.mutation.RemoveUserIDs(ids...)
+	return iu
+}
+
+// RemoveUser removes "user" edges to User entities.
+func (iu *ImageUpdate) RemoveUser(u ...*User) *ImageUpdate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return iu.RemoveUserIDs(ids...)
+}
+
+// ClearComment clears all "comment" edges to the Comment entity.
 func (iu *ImageUpdate) ClearComment() *ImageUpdate {
 	iu.mutation.ClearComment()
 	return iu
 }
 
-// ClearBrand clears the "brand" edge to the Brand entity.
+// RemoveCommentIDs removes the "comment" edge to Comment entities by IDs.
+func (iu *ImageUpdate) RemoveCommentIDs(ids ...int) *ImageUpdate {
+	iu.mutation.RemoveCommentIDs(ids...)
+	return iu
+}
+
+// RemoveComment removes "comment" edges to Comment entities.
+func (iu *ImageUpdate) RemoveComment(c ...*Comment) *ImageUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return iu.RemoveCommentIDs(ids...)
+}
+
+// ClearBrand clears all "brand" edges to the Brand entity.
 func (iu *ImageUpdate) ClearBrand() *ImageUpdate {
 	iu.mutation.ClearBrand()
 	return iu
 }
 
-// ClearProduct clears the "product" edge to the Product entity.
+// RemoveBrandIDs removes the "brand" edge to Brand entities by IDs.
+func (iu *ImageUpdate) RemoveBrandIDs(ids ...int) *ImageUpdate {
+	iu.mutation.RemoveBrandIDs(ids...)
+	return iu
+}
+
+// RemoveBrand removes "brand" edges to Brand entities.
+func (iu *ImageUpdate) RemoveBrand(b ...*Brand) *ImageUpdate {
+	ids := make([]int, len(b))
+	for i := range b {
+		ids[i] = b[i].ID
+	}
+	return iu.RemoveBrandIDs(ids...)
+}
+
+// ClearProduct clears all "product" edges to the Product entity.
 func (iu *ImageUpdate) ClearProduct() *ImageUpdate {
 	iu.mutation.ClearProduct()
 	return iu
+}
+
+// RemoveProductIDs removes the "product" edge to Product entities by IDs.
+func (iu *ImageUpdate) RemoveProductIDs(ids ...int) *ImageUpdate {
+	iu.mutation.RemoveProductIDs(ids...)
+	return iu
+}
+
+// RemoveProduct removes "product" edges to Product entities.
+func (iu *ImageUpdate) RemoveProduct(p ...*Product) *ImageUpdate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return iu.RemoveProductIDs(ids...)
+}
+
+// ClearCategory clears all "category" edges to the Category entity.
+func (iu *ImageUpdate) ClearCategory() *ImageUpdate {
+	iu.mutation.ClearCategory()
+	return iu
+}
+
+// RemoveCategoryIDs removes the "category" edge to Category entities by IDs.
+func (iu *ImageUpdate) RemoveCategoryIDs(ids ...int) *ImageUpdate {
+	iu.mutation.RemoveCategoryIDs(ids...)
+	return iu
+}
+
+// RemoveCategory removes "category" edges to Category entities.
+func (iu *ImageUpdate) RemoveCategory(c ...*Category) *ImageUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return iu.RemoveCategoryIDs(ids...)
+}
+
+// ClearSubCategory clears all "sub_category" edges to the SubCategory entity.
+func (iu *ImageUpdate) ClearSubCategory() *ImageUpdate {
+	iu.mutation.ClearSubCategory()
+	return iu
+}
+
+// RemoveSubCategoryIDs removes the "sub_category" edge to SubCategory entities by IDs.
+func (iu *ImageUpdate) RemoveSubCategoryIDs(ids ...int) *ImageUpdate {
+	iu.mutation.RemoveSubCategoryIDs(ids...)
+	return iu
+}
+
+// RemoveSubCategory removes "sub_category" edges to SubCategory entities.
+func (iu *ImageUpdate) RemoveSubCategory(s ...*SubCategory) *ImageUpdate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return iu.RemoveSubCategoryIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -318,7 +436,7 @@ func (iu *ImageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if iu.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
 			Table:   image.UserTable,
 			Columns: []string{image.UserColumn},
@@ -329,9 +447,25 @@ func (iu *ImageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
+	if nodes := iu.mutation.RemovedUserIDs(); len(nodes) > 0 && !iu.mutation.UserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   image.UserTable,
+			Columns: []string{image.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
 	if nodes := iu.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
 			Table:   image.UserTable,
 			Columns: []string{image.UserColumn},
@@ -347,7 +481,7 @@ func (iu *ImageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if iu.mutation.CommentCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
 			Table:   image.CommentTable,
 			Columns: []string{image.CommentColumn},
@@ -358,9 +492,25 @@ func (iu *ImageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
+	if nodes := iu.mutation.RemovedCommentIDs(); len(nodes) > 0 && !iu.mutation.CommentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   image.CommentTable,
+			Columns: []string{image.CommentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
 	if nodes := iu.mutation.CommentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
 			Table:   image.CommentTable,
 			Columns: []string{image.CommentColumn},
@@ -376,7 +526,7 @@ func (iu *ImageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if iu.mutation.BrandCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
 			Table:   image.BrandTable,
 			Columns: []string{image.BrandColumn},
@@ -387,9 +537,25 @@ func (iu *ImageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
+	if nodes := iu.mutation.RemovedBrandIDs(); len(nodes) > 0 && !iu.mutation.BrandCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   image.BrandTable,
+			Columns: []string{image.BrandColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(brand.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
 	if nodes := iu.mutation.BrandIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
 			Table:   image.BrandTable,
 			Columns: []string{image.BrandColumn},
@@ -405,7 +571,7 @@ func (iu *ImageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if iu.mutation.ProductCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
 			Table:   image.ProductTable,
 			Columns: []string{image.ProductColumn},
@@ -416,15 +582,121 @@ func (iu *ImageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := iu.mutation.ProductIDs(); len(nodes) > 0 {
+	if nodes := iu.mutation.RemovedProductIDs(); len(nodes) > 0 && !iu.mutation.ProductCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
 			Table:   image.ProductTable,
 			Columns: []string{image.ProductColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := iu.mutation.ProductIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   image.ProductTable,
+			Columns: []string{image.ProductColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if iu.mutation.CategoryCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   image.CategoryTable,
+			Columns: []string{image.CategoryColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := iu.mutation.RemovedCategoryIDs(); len(nodes) > 0 && !iu.mutation.CategoryCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   image.CategoryTable,
+			Columns: []string{image.CategoryColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := iu.mutation.CategoryIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   image.CategoryTable,
+			Columns: []string{image.CategoryColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if iu.mutation.SubCategoryCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   image.SubCategoryTable,
+			Columns: []string{image.SubCategoryColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(subcategory.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := iu.mutation.RemovedSubCategoryIDs(); len(nodes) > 0 && !iu.mutation.SubCategoryCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   image.SubCategoryTable,
+			Columns: []string{image.SubCategoryColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(subcategory.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := iu.mutation.SubCategoryIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   image.SubCategoryTable,
+			Columns: []string{image.SubCategoryColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(subcategory.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -529,80 +801,94 @@ func (iuo *ImageUpdateOne) SetUploadedAt(t time.Time) *ImageUpdateOne {
 	return iuo
 }
 
-// SetUserID sets the "user" edge to the User entity by ID.
-func (iuo *ImageUpdateOne) SetUserID(id int) *ImageUpdateOne {
-	iuo.mutation.SetUserID(id)
+// AddUserIDs adds the "user" edge to the User entity by IDs.
+func (iuo *ImageUpdateOne) AddUserIDs(ids ...int) *ImageUpdateOne {
+	iuo.mutation.AddUserIDs(ids...)
 	return iuo
 }
 
-// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
-func (iuo *ImageUpdateOne) SetNillableUserID(id *int) *ImageUpdateOne {
-	if id != nil {
-		iuo = iuo.SetUserID(*id)
+// AddUser adds the "user" edges to the User entity.
+func (iuo *ImageUpdateOne) AddUser(u ...*User) *ImageUpdateOne {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
 	}
+	return iuo.AddUserIDs(ids...)
+}
+
+// AddCommentIDs adds the "comment" edge to the Comment entity by IDs.
+func (iuo *ImageUpdateOne) AddCommentIDs(ids ...int) *ImageUpdateOne {
+	iuo.mutation.AddCommentIDs(ids...)
 	return iuo
 }
 
-// SetUser sets the "user" edge to the User entity.
-func (iuo *ImageUpdateOne) SetUser(u *User) *ImageUpdateOne {
-	return iuo.SetUserID(u.ID)
-}
-
-// SetCommentID sets the "comment" edge to the Comment entity by ID.
-func (iuo *ImageUpdateOne) SetCommentID(id int) *ImageUpdateOne {
-	iuo.mutation.SetCommentID(id)
-	return iuo
-}
-
-// SetNillableCommentID sets the "comment" edge to the Comment entity by ID if the given value is not nil.
-func (iuo *ImageUpdateOne) SetNillableCommentID(id *int) *ImageUpdateOne {
-	if id != nil {
-		iuo = iuo.SetCommentID(*id)
+// AddComment adds the "comment" edges to the Comment entity.
+func (iuo *ImageUpdateOne) AddComment(c ...*Comment) *ImageUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
 	}
+	return iuo.AddCommentIDs(ids...)
+}
+
+// AddBrandIDs adds the "brand" edge to the Brand entity by IDs.
+func (iuo *ImageUpdateOne) AddBrandIDs(ids ...int) *ImageUpdateOne {
+	iuo.mutation.AddBrandIDs(ids...)
 	return iuo
 }
 
-// SetComment sets the "comment" edge to the Comment entity.
-func (iuo *ImageUpdateOne) SetComment(c *Comment) *ImageUpdateOne {
-	return iuo.SetCommentID(c.ID)
-}
-
-// SetBrandID sets the "brand" edge to the Brand entity by ID.
-func (iuo *ImageUpdateOne) SetBrandID(id int) *ImageUpdateOne {
-	iuo.mutation.SetBrandID(id)
-	return iuo
-}
-
-// SetNillableBrandID sets the "brand" edge to the Brand entity by ID if the given value is not nil.
-func (iuo *ImageUpdateOne) SetNillableBrandID(id *int) *ImageUpdateOne {
-	if id != nil {
-		iuo = iuo.SetBrandID(*id)
+// AddBrand adds the "brand" edges to the Brand entity.
+func (iuo *ImageUpdateOne) AddBrand(b ...*Brand) *ImageUpdateOne {
+	ids := make([]int, len(b))
+	for i := range b {
+		ids[i] = b[i].ID
 	}
+	return iuo.AddBrandIDs(ids...)
+}
+
+// AddProductIDs adds the "product" edge to the Product entity by IDs.
+func (iuo *ImageUpdateOne) AddProductIDs(ids ...int) *ImageUpdateOne {
+	iuo.mutation.AddProductIDs(ids...)
 	return iuo
 }
 
-// SetBrand sets the "brand" edge to the Brand entity.
-func (iuo *ImageUpdateOne) SetBrand(b *Brand) *ImageUpdateOne {
-	return iuo.SetBrandID(b.ID)
-}
-
-// SetProductID sets the "product" edge to the Product entity by ID.
-func (iuo *ImageUpdateOne) SetProductID(id int) *ImageUpdateOne {
-	iuo.mutation.SetProductID(id)
-	return iuo
-}
-
-// SetNillableProductID sets the "product" edge to the Product entity by ID if the given value is not nil.
-func (iuo *ImageUpdateOne) SetNillableProductID(id *int) *ImageUpdateOne {
-	if id != nil {
-		iuo = iuo.SetProductID(*id)
+// AddProduct adds the "product" edges to the Product entity.
+func (iuo *ImageUpdateOne) AddProduct(p ...*Product) *ImageUpdateOne {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
 	}
+	return iuo.AddProductIDs(ids...)
+}
+
+// AddCategoryIDs adds the "category" edge to the Category entity by IDs.
+func (iuo *ImageUpdateOne) AddCategoryIDs(ids ...int) *ImageUpdateOne {
+	iuo.mutation.AddCategoryIDs(ids...)
 	return iuo
 }
 
-// SetProduct sets the "product" edge to the Product entity.
-func (iuo *ImageUpdateOne) SetProduct(p *Product) *ImageUpdateOne {
-	return iuo.SetProductID(p.ID)
+// AddCategory adds the "category" edges to the Category entity.
+func (iuo *ImageUpdateOne) AddCategory(c ...*Category) *ImageUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return iuo.AddCategoryIDs(ids...)
+}
+
+// AddSubCategoryIDs adds the "sub_category" edge to the SubCategory entity by IDs.
+func (iuo *ImageUpdateOne) AddSubCategoryIDs(ids ...int) *ImageUpdateOne {
+	iuo.mutation.AddSubCategoryIDs(ids...)
+	return iuo
+}
+
+// AddSubCategory adds the "sub_category" edges to the SubCategory entity.
+func (iuo *ImageUpdateOne) AddSubCategory(s ...*SubCategory) *ImageUpdateOne {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return iuo.AddSubCategoryIDs(ids...)
 }
 
 // Mutation returns the ImageMutation object of the builder.
@@ -610,28 +896,130 @@ func (iuo *ImageUpdateOne) Mutation() *ImageMutation {
 	return iuo.mutation
 }
 
-// ClearUser clears the "user" edge to the User entity.
+// ClearUser clears all "user" edges to the User entity.
 func (iuo *ImageUpdateOne) ClearUser() *ImageUpdateOne {
 	iuo.mutation.ClearUser()
 	return iuo
 }
 
-// ClearComment clears the "comment" edge to the Comment entity.
+// RemoveUserIDs removes the "user" edge to User entities by IDs.
+func (iuo *ImageUpdateOne) RemoveUserIDs(ids ...int) *ImageUpdateOne {
+	iuo.mutation.RemoveUserIDs(ids...)
+	return iuo
+}
+
+// RemoveUser removes "user" edges to User entities.
+func (iuo *ImageUpdateOne) RemoveUser(u ...*User) *ImageUpdateOne {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return iuo.RemoveUserIDs(ids...)
+}
+
+// ClearComment clears all "comment" edges to the Comment entity.
 func (iuo *ImageUpdateOne) ClearComment() *ImageUpdateOne {
 	iuo.mutation.ClearComment()
 	return iuo
 }
 
-// ClearBrand clears the "brand" edge to the Brand entity.
+// RemoveCommentIDs removes the "comment" edge to Comment entities by IDs.
+func (iuo *ImageUpdateOne) RemoveCommentIDs(ids ...int) *ImageUpdateOne {
+	iuo.mutation.RemoveCommentIDs(ids...)
+	return iuo
+}
+
+// RemoveComment removes "comment" edges to Comment entities.
+func (iuo *ImageUpdateOne) RemoveComment(c ...*Comment) *ImageUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return iuo.RemoveCommentIDs(ids...)
+}
+
+// ClearBrand clears all "brand" edges to the Brand entity.
 func (iuo *ImageUpdateOne) ClearBrand() *ImageUpdateOne {
 	iuo.mutation.ClearBrand()
 	return iuo
 }
 
-// ClearProduct clears the "product" edge to the Product entity.
+// RemoveBrandIDs removes the "brand" edge to Brand entities by IDs.
+func (iuo *ImageUpdateOne) RemoveBrandIDs(ids ...int) *ImageUpdateOne {
+	iuo.mutation.RemoveBrandIDs(ids...)
+	return iuo
+}
+
+// RemoveBrand removes "brand" edges to Brand entities.
+func (iuo *ImageUpdateOne) RemoveBrand(b ...*Brand) *ImageUpdateOne {
+	ids := make([]int, len(b))
+	for i := range b {
+		ids[i] = b[i].ID
+	}
+	return iuo.RemoveBrandIDs(ids...)
+}
+
+// ClearProduct clears all "product" edges to the Product entity.
 func (iuo *ImageUpdateOne) ClearProduct() *ImageUpdateOne {
 	iuo.mutation.ClearProduct()
 	return iuo
+}
+
+// RemoveProductIDs removes the "product" edge to Product entities by IDs.
+func (iuo *ImageUpdateOne) RemoveProductIDs(ids ...int) *ImageUpdateOne {
+	iuo.mutation.RemoveProductIDs(ids...)
+	return iuo
+}
+
+// RemoveProduct removes "product" edges to Product entities.
+func (iuo *ImageUpdateOne) RemoveProduct(p ...*Product) *ImageUpdateOne {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return iuo.RemoveProductIDs(ids...)
+}
+
+// ClearCategory clears all "category" edges to the Category entity.
+func (iuo *ImageUpdateOne) ClearCategory() *ImageUpdateOne {
+	iuo.mutation.ClearCategory()
+	return iuo
+}
+
+// RemoveCategoryIDs removes the "category" edge to Category entities by IDs.
+func (iuo *ImageUpdateOne) RemoveCategoryIDs(ids ...int) *ImageUpdateOne {
+	iuo.mutation.RemoveCategoryIDs(ids...)
+	return iuo
+}
+
+// RemoveCategory removes "category" edges to Category entities.
+func (iuo *ImageUpdateOne) RemoveCategory(c ...*Category) *ImageUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return iuo.RemoveCategoryIDs(ids...)
+}
+
+// ClearSubCategory clears all "sub_category" edges to the SubCategory entity.
+func (iuo *ImageUpdateOne) ClearSubCategory() *ImageUpdateOne {
+	iuo.mutation.ClearSubCategory()
+	return iuo
+}
+
+// RemoveSubCategoryIDs removes the "sub_category" edge to SubCategory entities by IDs.
+func (iuo *ImageUpdateOne) RemoveSubCategoryIDs(ids ...int) *ImageUpdateOne {
+	iuo.mutation.RemoveSubCategoryIDs(ids...)
+	return iuo
+}
+
+// RemoveSubCategory removes "sub_category" edges to SubCategory entities.
+func (iuo *ImageUpdateOne) RemoveSubCategory(s ...*SubCategory) *ImageUpdateOne {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return iuo.RemoveSubCategoryIDs(ids...)
 }
 
 // Where appends a list predicates to the ImageUpdate builder.
@@ -768,7 +1156,7 @@ func (iuo *ImageUpdateOne) sqlSave(ctx context.Context) (_node *Image, err error
 	}
 	if iuo.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
 			Table:   image.UserTable,
 			Columns: []string{image.UserColumn},
@@ -779,9 +1167,25 @@ func (iuo *ImageUpdateOne) sqlSave(ctx context.Context) (_node *Image, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
+	if nodes := iuo.mutation.RemovedUserIDs(); len(nodes) > 0 && !iuo.mutation.UserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   image.UserTable,
+			Columns: []string{image.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
 	if nodes := iuo.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
 			Table:   image.UserTable,
 			Columns: []string{image.UserColumn},
@@ -797,7 +1201,7 @@ func (iuo *ImageUpdateOne) sqlSave(ctx context.Context) (_node *Image, err error
 	}
 	if iuo.mutation.CommentCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
 			Table:   image.CommentTable,
 			Columns: []string{image.CommentColumn},
@@ -808,9 +1212,25 @@ func (iuo *ImageUpdateOne) sqlSave(ctx context.Context) (_node *Image, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
+	if nodes := iuo.mutation.RemovedCommentIDs(); len(nodes) > 0 && !iuo.mutation.CommentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   image.CommentTable,
+			Columns: []string{image.CommentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
 	if nodes := iuo.mutation.CommentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
 			Table:   image.CommentTable,
 			Columns: []string{image.CommentColumn},
@@ -826,7 +1246,7 @@ func (iuo *ImageUpdateOne) sqlSave(ctx context.Context) (_node *Image, err error
 	}
 	if iuo.mutation.BrandCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
 			Table:   image.BrandTable,
 			Columns: []string{image.BrandColumn},
@@ -837,9 +1257,25 @@ func (iuo *ImageUpdateOne) sqlSave(ctx context.Context) (_node *Image, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
+	if nodes := iuo.mutation.RemovedBrandIDs(); len(nodes) > 0 && !iuo.mutation.BrandCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   image.BrandTable,
+			Columns: []string{image.BrandColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(brand.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
 	if nodes := iuo.mutation.BrandIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
 			Table:   image.BrandTable,
 			Columns: []string{image.BrandColumn},
@@ -855,7 +1291,7 @@ func (iuo *ImageUpdateOne) sqlSave(ctx context.Context) (_node *Image, err error
 	}
 	if iuo.mutation.ProductCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
 			Table:   image.ProductTable,
 			Columns: []string{image.ProductColumn},
@@ -866,15 +1302,121 @@ func (iuo *ImageUpdateOne) sqlSave(ctx context.Context) (_node *Image, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := iuo.mutation.ProductIDs(); len(nodes) > 0 {
+	if nodes := iuo.mutation.RemovedProductIDs(); len(nodes) > 0 && !iuo.mutation.ProductCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
 			Table:   image.ProductTable,
 			Columns: []string{image.ProductColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := iuo.mutation.ProductIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   image.ProductTable,
+			Columns: []string{image.ProductColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if iuo.mutation.CategoryCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   image.CategoryTable,
+			Columns: []string{image.CategoryColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := iuo.mutation.RemovedCategoryIDs(); len(nodes) > 0 && !iuo.mutation.CategoryCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   image.CategoryTable,
+			Columns: []string{image.CategoryColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := iuo.mutation.CategoryIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   image.CategoryTable,
+			Columns: []string{image.CategoryColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if iuo.mutation.SubCategoryCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   image.SubCategoryTable,
+			Columns: []string{image.SubCategoryColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(subcategory.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := iuo.mutation.RemovedSubCategoryIDs(); len(nodes) > 0 && !iuo.mutation.SubCategoryCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   image.SubCategoryTable,
+			Columns: []string{image.SubCategoryColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(subcategory.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := iuo.mutation.SubCategoryIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   image.SubCategoryTable,
+			Columns: []string{image.SubCategoryColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(subcategory.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

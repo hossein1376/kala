@@ -4,11 +4,7 @@ package ent
 
 import (
 	"fmt"
-	"kala/internal/ent/brand"
-	"kala/internal/ent/comment"
 	"kala/internal/ent/image"
-	"kala/internal/ent/product"
-	"kala/internal/ent/user"
 	"strings"
 	"time"
 
@@ -37,79 +33,81 @@ type Image struct {
 	UploadedAt time.Time `json:"uploaded_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ImageQuery when eager-loading is set.
-	Edges         ImageEdges `json:"edges"`
-	brand_image   *int
-	comment_image *int
-	product_image *int
-	user_image    *int
-	selectValues  sql.SelectValues
+	Edges        ImageEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // ImageEdges holds the relations/edges for other nodes in the graph.
 type ImageEdges struct {
 	// User holds the value of the user edge.
-	User *User `json:"user,omitempty"`
+	User []*User `json:"user,omitempty"`
 	// Comment holds the value of the comment edge.
-	Comment *Comment `json:"comment,omitempty"`
+	Comment []*Comment `json:"comment,omitempty"`
 	// Brand holds the value of the brand edge.
-	Brand *Brand `json:"brand,omitempty"`
+	Brand []*Brand `json:"brand,omitempty"`
 	// Product holds the value of the product edge.
-	Product *Product `json:"product,omitempty"`
+	Product []*Product `json:"product,omitempty"`
+	// Category holds the value of the category edge.
+	Category []*Category `json:"category,omitempty"`
+	// SubCategory holds the value of the sub_category edge.
+	SubCategory []*SubCategory `json:"sub_category,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [4]bool
+	loadedTypes [6]bool
 }
 
 // UserOrErr returns the User value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e ImageEdges) UserOrErr() (*User, error) {
+// was not loaded in eager-loading.
+func (e ImageEdges) UserOrErr() ([]*User, error) {
 	if e.loadedTypes[0] {
-		if e.User == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: user.Label}
-		}
 		return e.User, nil
 	}
 	return nil, &NotLoadedError{edge: "user"}
 }
 
 // CommentOrErr returns the Comment value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e ImageEdges) CommentOrErr() (*Comment, error) {
+// was not loaded in eager-loading.
+func (e ImageEdges) CommentOrErr() ([]*Comment, error) {
 	if e.loadedTypes[1] {
-		if e.Comment == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: comment.Label}
-		}
 		return e.Comment, nil
 	}
 	return nil, &NotLoadedError{edge: "comment"}
 }
 
 // BrandOrErr returns the Brand value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e ImageEdges) BrandOrErr() (*Brand, error) {
+// was not loaded in eager-loading.
+func (e ImageEdges) BrandOrErr() ([]*Brand, error) {
 	if e.loadedTypes[2] {
-		if e.Brand == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: brand.Label}
-		}
 		return e.Brand, nil
 	}
 	return nil, &NotLoadedError{edge: "brand"}
 }
 
 // ProductOrErr returns the Product value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e ImageEdges) ProductOrErr() (*Product, error) {
+// was not loaded in eager-loading.
+func (e ImageEdges) ProductOrErr() ([]*Product, error) {
 	if e.loadedTypes[3] {
-		if e.Product == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: product.Label}
-		}
 		return e.Product, nil
 	}
 	return nil, &NotLoadedError{edge: "product"}
+}
+
+// CategoryOrErr returns the Category value or an error if the edge
+// was not loaded in eager-loading.
+func (e ImageEdges) CategoryOrErr() ([]*Category, error) {
+	if e.loadedTypes[4] {
+		return e.Category, nil
+	}
+	return nil, &NotLoadedError{edge: "category"}
+}
+
+// SubCategoryOrErr returns the SubCategory value or an error if the edge
+// was not loaded in eager-loading.
+func (e ImageEdges) SubCategoryOrErr() ([]*SubCategory, error) {
+	if e.loadedTypes[5] {
+		return e.SubCategory, nil
+	}
+	return nil, &NotLoadedError{edge: "sub_category"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -125,14 +123,6 @@ func (*Image) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case image.FieldUploadedAt:
 			values[i] = new(sql.NullTime)
-		case image.ForeignKeys[0]: // brand_image
-			values[i] = new(sql.NullInt64)
-		case image.ForeignKeys[1]: // comment_image
-			values[i] = new(sql.NullInt64)
-		case image.ForeignKeys[2]: // product_image
-			values[i] = new(sql.NullInt64)
-		case image.ForeignKeys[3]: // user_image
-			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -196,34 +186,6 @@ func (i *Image) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				i.UploadedAt = value.Time
 			}
-		case image.ForeignKeys[0]:
-			if value, ok := values[j].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field brand_image", value)
-			} else if value.Valid {
-				i.brand_image = new(int)
-				*i.brand_image = int(value.Int64)
-			}
-		case image.ForeignKeys[1]:
-			if value, ok := values[j].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field comment_image", value)
-			} else if value.Valid {
-				i.comment_image = new(int)
-				*i.comment_image = int(value.Int64)
-			}
-		case image.ForeignKeys[2]:
-			if value, ok := values[j].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field product_image", value)
-			} else if value.Valid {
-				i.product_image = new(int)
-				*i.product_image = int(value.Int64)
-			}
-		case image.ForeignKeys[3]:
-			if value, ok := values[j].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field user_image", value)
-			} else if value.Valid {
-				i.user_image = new(int)
-				*i.user_image = int(value.Int64)
-			}
 		default:
 			i.selectValues.Set(columns[j], values[j])
 		}
@@ -255,6 +217,16 @@ func (i *Image) QueryBrand() *BrandQuery {
 // QueryProduct queries the "product" edge of the Image entity.
 func (i *Image) QueryProduct() *ProductQuery {
 	return NewImageClient(i.config).QueryProduct(i)
+}
+
+// QueryCategory queries the "category" edge of the Image entity.
+func (i *Image) QueryCategory() *CategoryQuery {
+	return NewImageClient(i.config).QueryCategory(i)
+}
+
+// QuerySubCategory queries the "sub_category" edge of the Image entity.
+func (i *Image) QuerySubCategory() *SubCategoryQuery {
+	return NewImageClient(i.config).QuerySubCategory(i)
 }
 
 // Update returns a builder for updating this Image.

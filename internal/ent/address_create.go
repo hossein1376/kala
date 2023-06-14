@@ -27,9 +27,43 @@ func (ac *AddressCreate) SetAddress(s string) *AddressCreate {
 	return ac
 }
 
-// SetZipCode sets the "zip_code" field.
-func (ac *AddressCreate) SetZipCode(s string) *AddressCreate {
-	ac.mutation.SetZipCode(s)
+// SetCity sets the "city" field.
+func (ac *AddressCreate) SetCity(s string) *AddressCreate {
+	ac.mutation.SetCity(s)
+	return ac
+}
+
+// SetState sets the "state" field.
+func (ac *AddressCreate) SetState(s string) *AddressCreate {
+	ac.mutation.SetState(s)
+	return ac
+}
+
+// SetFirstName sets the "first_name" field.
+func (ac *AddressCreate) SetFirstName(s string) *AddressCreate {
+	ac.mutation.SetFirstName(s)
+	return ac
+}
+
+// SetNillableFirstName sets the "first_name" field if the given value is not nil.
+func (ac *AddressCreate) SetNillableFirstName(s *string) *AddressCreate {
+	if s != nil {
+		ac.SetFirstName(*s)
+	}
+	return ac
+}
+
+// SetLastName sets the "last_name" field.
+func (ac *AddressCreate) SetLastName(s string) *AddressCreate {
+	ac.mutation.SetLastName(s)
+	return ac
+}
+
+// SetNillableLastName sets the "last_name" field if the given value is not nil.
+func (ac *AddressCreate) SetNillableLastName(s *string) *AddressCreate {
+	if s != nil {
+		ac.SetLastName(*s)
+	}
 	return ac
 }
 
@@ -39,9 +73,29 @@ func (ac *AddressCreate) SetPhone(s string) *AddressCreate {
 	return ac
 }
 
+// SetZipCode sets the "zip_code" field.
+func (ac *AddressCreate) SetZipCode(s string) *AddressCreate {
+	ac.mutation.SetZipCode(s)
+	return ac
+}
+
 // SetCoordinates sets the "coordinates" field.
 func (ac *AddressCreate) SetCoordinates(s string) *AddressCreate {
 	ac.mutation.SetCoordinates(s)
+	return ac
+}
+
+// SetIsSeller sets the "is_seller" field.
+func (ac *AddressCreate) SetIsSeller(b bool) *AddressCreate {
+	ac.mutation.SetIsSeller(b)
+	return ac
+}
+
+// SetNillableIsSeller sets the "is_seller" field if the given value is not nil.
+func (ac *AddressCreate) SetNillableIsSeller(b *bool) *AddressCreate {
+	if b != nil {
+		ac.SetIsSeller(*b)
+	}
 	return ac
 }
 
@@ -90,6 +144,7 @@ func (ac *AddressCreate) Mutation() *AddressMutation {
 
 // Save creates the Address in the database.
 func (ac *AddressCreate) Save(ctx context.Context) (*Address, error) {
+	ac.defaults()
 	return withHooks(ctx, ac.sqlSave, ac.mutation, ac.hooks)
 }
 
@@ -115,6 +170,14 @@ func (ac *AddressCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (ac *AddressCreate) defaults() {
+	if _, ok := ac.mutation.IsSeller(); !ok {
+		v := address.DefaultIsSeller
+		ac.mutation.SetIsSeller(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (ac *AddressCreate) check() error {
 	if _, ok := ac.mutation.Address(); !ok {
@@ -125,12 +188,20 @@ func (ac *AddressCreate) check() error {
 			return &ValidationError{Name: "address", err: fmt.Errorf(`ent: validator failed for field "Address.address": %w`, err)}
 		}
 	}
-	if _, ok := ac.mutation.ZipCode(); !ok {
-		return &ValidationError{Name: "zip_code", err: errors.New(`ent: missing required field "Address.zip_code"`)}
+	if _, ok := ac.mutation.City(); !ok {
+		return &ValidationError{Name: "city", err: errors.New(`ent: missing required field "Address.city"`)}
 	}
-	if v, ok := ac.mutation.ZipCode(); ok {
-		if err := address.ZipCodeValidator(v); err != nil {
-			return &ValidationError{Name: "zip_code", err: fmt.Errorf(`ent: validator failed for field "Address.zip_code": %w`, err)}
+	if v, ok := ac.mutation.City(); ok {
+		if err := address.CityValidator(v); err != nil {
+			return &ValidationError{Name: "city", err: fmt.Errorf(`ent: validator failed for field "Address.city": %w`, err)}
+		}
+	}
+	if _, ok := ac.mutation.State(); !ok {
+		return &ValidationError{Name: "state", err: errors.New(`ent: missing required field "Address.state"`)}
+	}
+	if v, ok := ac.mutation.State(); ok {
+		if err := address.StateValidator(v); err != nil {
+			return &ValidationError{Name: "state", err: fmt.Errorf(`ent: validator failed for field "Address.state": %w`, err)}
 		}
 	}
 	if _, ok := ac.mutation.Phone(); !ok {
@@ -141,6 +212,14 @@ func (ac *AddressCreate) check() error {
 			return &ValidationError{Name: "phone", err: fmt.Errorf(`ent: validator failed for field "Address.phone": %w`, err)}
 		}
 	}
+	if _, ok := ac.mutation.ZipCode(); !ok {
+		return &ValidationError{Name: "zip_code", err: errors.New(`ent: missing required field "Address.zip_code"`)}
+	}
+	if v, ok := ac.mutation.ZipCode(); ok {
+		if err := address.ZipCodeValidator(v); err != nil {
+			return &ValidationError{Name: "zip_code", err: fmt.Errorf(`ent: validator failed for field "Address.zip_code": %w`, err)}
+		}
+	}
 	if _, ok := ac.mutation.Coordinates(); !ok {
 		return &ValidationError{Name: "coordinates", err: errors.New(`ent: missing required field "Address.coordinates"`)}
 	}
@@ -148,6 +227,9 @@ func (ac *AddressCreate) check() error {
 		if err := address.CoordinatesValidator(v); err != nil {
 			return &ValidationError{Name: "coordinates", err: fmt.Errorf(`ent: validator failed for field "Address.coordinates": %w`, err)}
 		}
+	}
+	if _, ok := ac.mutation.IsSeller(); !ok {
+		return &ValidationError{Name: "is_seller", err: errors.New(`ent: missing required field "Address.is_seller"`)}
 	}
 	return nil
 }
@@ -179,17 +261,37 @@ func (ac *AddressCreate) createSpec() (*Address, *sqlgraph.CreateSpec) {
 		_spec.SetField(address.FieldAddress, field.TypeString, value)
 		_node.Address = value
 	}
-	if value, ok := ac.mutation.ZipCode(); ok {
-		_spec.SetField(address.FieldZipCode, field.TypeString, value)
-		_node.ZipCode = value
+	if value, ok := ac.mutation.City(); ok {
+		_spec.SetField(address.FieldCity, field.TypeString, value)
+		_node.City = value
+	}
+	if value, ok := ac.mutation.State(); ok {
+		_spec.SetField(address.FieldState, field.TypeString, value)
+		_node.State = value
+	}
+	if value, ok := ac.mutation.FirstName(); ok {
+		_spec.SetField(address.FieldFirstName, field.TypeString, value)
+		_node.FirstName = &value
+	}
+	if value, ok := ac.mutation.LastName(); ok {
+		_spec.SetField(address.FieldLastName, field.TypeString, value)
+		_node.LastName = &value
 	}
 	if value, ok := ac.mutation.Phone(); ok {
 		_spec.SetField(address.FieldPhone, field.TypeString, value)
 		_node.Phone = value
 	}
+	if value, ok := ac.mutation.ZipCode(); ok {
+		_spec.SetField(address.FieldZipCode, field.TypeString, value)
+		_node.ZipCode = value
+	}
 	if value, ok := ac.mutation.Coordinates(); ok {
 		_spec.SetField(address.FieldCoordinates, field.TypeString, value)
 		_node.Coordinates = value
+	}
+	if value, ok := ac.mutation.IsSeller(); ok {
+		_spec.SetField(address.FieldIsSeller, field.TypeBool, value)
+		_node.IsSeller = value
 	}
 	if nodes := ac.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -222,7 +324,7 @@ func (ac *AddressCreate) createSpec() (*Address, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.seller_address = &nodes[0]
+		_node.address_id = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
@@ -242,6 +344,7 @@ func (acb *AddressCreateBulk) Save(ctx context.Context) ([]*Address, error) {
 	for i := range acb.builders {
 		func(i int, root context.Context) {
 			builder := acb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*AddressMutation)
 				if !ok {

@@ -1,5 +1,5 @@
 // Package Errors provides common error responses.
-// Note that it relies on two other packages Json and Logger.
+// Note that it relies on Json package.
 package Errors
 
 import (

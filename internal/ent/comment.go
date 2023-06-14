@@ -5,6 +5,7 @@ package ent
 import (
 	"fmt"
 	"kala/internal/ent/comment"
+	"kala/internal/ent/image"
 	"strings"
 	"time"
 
@@ -30,7 +31,7 @@ type Comment struct {
 	// Dislikes holds the value of the "dislikes" field.
 	Dislikes int32 `json:"dislikes,omitempty"`
 	// Rating holds the value of the "rating" field.
-	Rating int8 `json:"rating,omitempty"`
+	Rating float64 `json:"rating,omitempty"`
 	// RatingCount holds the value of the "rating_count" field.
 	RatingCount int32 `json:"rating_count,omitempty"`
 	// VerifiedBuyer holds the value of the "verified_buyer" field.
@@ -38,13 +39,14 @@ type Comment struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CommentQuery when eager-loading is set.
 	Edges        CommentEdges `json:"edges"`
+	image        *int
 	selectValues sql.SelectValues
 }
 
 // CommentEdges holds the relations/edges for other nodes in the graph.
 type CommentEdges struct {
 	// Image holds the value of the image edge.
-	Image []*Image `json:"image,omitempty"`
+	Image *Image `json:"image,omitempty"`
 	// Cons holds the value of the cons edge.
 	Cons []*Cons `json:"cons,omitempty"`
 	// Pros holds the value of the pros edge.
@@ -59,9 +61,13 @@ type CommentEdges struct {
 }
 
 // ImageOrErr returns the Image value or an error if the edge
-// was not loaded in eager-loading.
-func (e CommentEdges) ImageOrErr() ([]*Image, error) {
+// was not loaded in eager-loading, or loaded but was not found.
+func (e CommentEdges) ImageOrErr() (*Image, error) {
 	if e.loadedTypes[0] {
+		if e.Image == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: image.Label}
+		}
 		return e.Image, nil
 	}
 	return nil, &NotLoadedError{edge: "image"}
@@ -110,12 +116,16 @@ func (*Comment) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case comment.FieldVerifiedBuyer:
 			values[i] = new(sql.NullBool)
-		case comment.FieldID, comment.FieldLikes, comment.FieldDislikes, comment.FieldRating, comment.FieldRatingCount:
+		case comment.FieldRating:
+			values[i] = new(sql.NullFloat64)
+		case comment.FieldID, comment.FieldLikes, comment.FieldDislikes, comment.FieldRatingCount:
 			values[i] = new(sql.NullInt64)
 		case comment.FieldContent, comment.FieldStatus:
 			values[i] = new(sql.NullString)
 		case comment.FieldCreateTime, comment.FieldUpdateTime:
 			values[i] = new(sql.NullTime)
+		case comment.ForeignKeys[0]: // image
+			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -174,10 +184,10 @@ func (c *Comment) assignValues(columns []string, values []any) error {
 				c.Dislikes = int32(value.Int64)
 			}
 		case comment.FieldRating:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.NullFloat64); !ok {
 				return fmt.Errorf("unexpected type %T for field rating", values[i])
 			} else if value.Valid {
-				c.Rating = int8(value.Int64)
+				c.Rating = value.Float64
 			}
 		case comment.FieldRatingCount:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -190,6 +200,13 @@ func (c *Comment) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field verified_buyer", values[i])
 			} else if value.Valid {
 				c.VerifiedBuyer = value.Bool
+			}
+		case comment.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field image", value)
+			} else if value.Valid {
+				c.image = new(int)
+				*c.image = int(value.Int64)
 			}
 		default:
 			c.selectValues.Set(columns[i], values[i])

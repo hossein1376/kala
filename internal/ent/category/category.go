@@ -24,6 +24,8 @@ const (
 	FieldDescription = "description"
 	// EdgeSubCategory holds the string denoting the sub_category edge name in mutations.
 	EdgeSubCategory = "sub_category"
+	// EdgeImage holds the string denoting the image edge name in mutations.
+	EdgeImage = "image"
 	// EdgeProduct holds the string denoting the product edge name in mutations.
 	EdgeProduct = "product"
 	// EdgeBrand holds the string denoting the brand edge name in mutations.
@@ -39,6 +41,13 @@ const (
 	SubCategoryInverseTable = "sub_categories"
 	// SubCategoryColumn is the table column denoting the sub_category relation/edge.
 	SubCategoryColumn = "category"
+	// ImageTable is the table that holds the image relation/edge.
+	ImageTable = "categories"
+	// ImageInverseTable is the table name for the Image entity.
+	// It exists in this package in order to avoid circular dependency with the "image" package.
+	ImageInverseTable = "images"
+	// ImageColumn is the table column denoting the image relation/edge.
+	ImageColumn = "image"
 	// ProductTable is the table that holds the product relation/edge. The primary key declared below.
 	ProductTable = "product_category"
 	// ProductInverseTable is the table name for the Product entity.
@@ -65,6 +74,12 @@ var Columns = []string{
 	FieldDescription,
 }
 
+// ForeignKeys holds the SQL foreign-keys that are owned by the "categories"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"image",
+}
+
 var (
 	// ProductPrimaryKey and ProductColumn2 are the table columns denoting the
 	// primary key for the product relation (M2M).
@@ -81,6 +96,11 @@ var (
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
+			return true
+		}
+	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -142,6 +162,13 @@ func BySubCategory(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByImageField orders the results by image field.
+func ByImageField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newImageStep(), sql.OrderByField(field, opts...))
+	}
+}
+
 // ByProductCount orders the results by product count.
 func ByProductCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -188,6 +215,13 @@ func newSubCategoryStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(SubCategoryInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, SubCategoryTable, SubCategoryColumn),
+	)
+}
+func newImageStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ImageInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, ImageTable, ImageColumn),
 	)
 }
 func newProductStep() *sqlgraph.Step {

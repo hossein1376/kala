@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"kala/internal/ent/address"
 	"kala/internal/ent/category"
+	"kala/internal/ent/order"
 	"kala/internal/ent/product"
 	"kala/internal/ent/seller"
 	"kala/internal/ent/user"
@@ -133,6 +134,21 @@ func (sc *SellerCreate) AddAddress(a ...*Address) *SellerCreate {
 		ids[i] = a[i].ID
 	}
 	return sc.AddAddresIDs(ids...)
+}
+
+// AddOrderIDs adds the "order" edge to the Order entity by IDs.
+func (sc *SellerCreate) AddOrderIDs(ids ...int) *SellerCreate {
+	sc.mutation.AddOrderIDs(ids...)
+	return sc
+}
+
+// AddOrder adds the "order" edges to the Order entity.
+func (sc *SellerCreate) AddOrder(o ...*Order) *SellerCreate {
+	ids := make([]int, len(o))
+	for i := range o {
+		ids[i] = o[i].ID
+	}
+	return sc.AddOrderIDs(ids...)
 }
 
 // SetUserID sets the "user" edge to the User entity by ID.
@@ -334,6 +350,22 @@ func (sc *SellerCreate) createSpec() (*Seller, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := sc.mutation.OrderIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   seller.OrderTable,
+			Columns: []string{seller.OrderColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

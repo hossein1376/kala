@@ -30,16 +30,16 @@ func (Image) Fields() []ent.Field {
 func (Image) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("user", User.Type).
-			Ref("image").
-			Unique(),
+			Ref("image"),
 		edge.From("comment", Comment.Type).
-			Ref("image").
-			Unique(),
+			Ref("image"),
 		edge.From("brand", Brand.Type).
-			Ref("image").
-			Unique(),
+			Ref("image"),
 		edge.From("product", Product.Type).
-			Ref("image").
-			Unique(),
+			Ref("image"),
+		edge.From("category", Category.Type).
+			Ref("image"),
+		edge.From("sub_category", SubCategory.Type).
+			Ref("image"),
 	}
 }

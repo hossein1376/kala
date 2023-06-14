@@ -20,18 +20,28 @@ type Address struct {
 	ID int `json:"id,omitempty"`
 	// Address holds the value of the "address" field.
 	Address string `json:"address,omitempty"`
-	// ZipCode holds the value of the "zip_code" field.
-	ZipCode string `json:"zip_code,omitempty"`
+	// City holds the value of the "city" field.
+	City string `json:"city,omitempty"`
+	// State holds the value of the "state" field.
+	State string `json:"state,omitempty"`
+	// FirstName holds the value of the "first_name" field.
+	FirstName *string `json:"first_name,omitempty"`
+	// LastName holds the value of the "last_name" field.
+	LastName *string `json:"last_name,omitempty"`
 	// Phone holds the value of the "phone" field.
 	Phone string `json:"phone,omitempty"`
+	// ZipCode holds the value of the "zip_code" field.
+	ZipCode string `json:"zip_code,omitempty"`
 	// Coordinates holds the value of the "coordinates" field.
 	Coordinates string `json:"coordinates,omitempty"`
+	// IsSeller holds the value of the "is_seller" field.
+	IsSeller bool `json:"is_seller,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the AddressQuery when eager-loading is set.
-	Edges          AddressEdges `json:"edges"`
-	seller_address *int
-	user           *int
-	selectValues   sql.SelectValues
+	Edges        AddressEdges `json:"edges"`
+	address_id   *int
+	user         *int
+	selectValues sql.SelectValues
 }
 
 // AddressEdges holds the relations/edges for other nodes in the graph.
@@ -76,11 +86,13 @@ func (*Address) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case address.FieldIsSeller:
+			values[i] = new(sql.NullBool)
 		case address.FieldID:
 			values[i] = new(sql.NullInt64)
-		case address.FieldAddress, address.FieldZipCode, address.FieldPhone, address.FieldCoordinates:
+		case address.FieldAddress, address.FieldCity, address.FieldState, address.FieldFirstName, address.FieldLastName, address.FieldPhone, address.FieldZipCode, address.FieldCoordinates:
 			values[i] = new(sql.NullString)
-		case address.ForeignKeys[0]: // seller_address
+		case address.ForeignKeys[0]: // address_id
 			values[i] = new(sql.NullInt64)
 		case address.ForeignKeys[1]: // user
 			values[i] = new(sql.NullInt64)
@@ -111,11 +123,31 @@ func (a *Address) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				a.Address = value.String
 			}
-		case address.FieldZipCode:
+		case address.FieldCity:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field zip_code", values[i])
+				return fmt.Errorf("unexpected type %T for field city", values[i])
 			} else if value.Valid {
-				a.ZipCode = value.String
+				a.City = value.String
+			}
+		case address.FieldState:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field state", values[i])
+			} else if value.Valid {
+				a.State = value.String
+			}
+		case address.FieldFirstName:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field first_name", values[i])
+			} else if value.Valid {
+				a.FirstName = new(string)
+				*a.FirstName = value.String
+			}
+		case address.FieldLastName:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field last_name", values[i])
+			} else if value.Valid {
+				a.LastName = new(string)
+				*a.LastName = value.String
 			}
 		case address.FieldPhone:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -123,18 +155,30 @@ func (a *Address) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				a.Phone = value.String
 			}
+		case address.FieldZipCode:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field zip_code", values[i])
+			} else if value.Valid {
+				a.ZipCode = value.String
+			}
 		case address.FieldCoordinates:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field coordinates", values[i])
 			} else if value.Valid {
 				a.Coordinates = value.String
 			}
+		case address.FieldIsSeller:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field is_seller", values[i])
+			} else if value.Valid {
+				a.IsSeller = value.Bool
+			}
 		case address.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field seller_address", value)
+				return fmt.Errorf("unexpected type %T for edge-field address_id", value)
 			} else if value.Valid {
-				a.seller_address = new(int)
-				*a.seller_address = int(value.Int64)
+				a.address_id = new(int)
+				*a.address_id = int(value.Int64)
 			}
 		case address.ForeignKeys[1]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -192,14 +236,33 @@ func (a *Address) String() string {
 	builder.WriteString("address=")
 	builder.WriteString(a.Address)
 	builder.WriteString(", ")
-	builder.WriteString("zip_code=")
-	builder.WriteString(a.ZipCode)
+	builder.WriteString("city=")
+	builder.WriteString(a.City)
+	builder.WriteString(", ")
+	builder.WriteString("state=")
+	builder.WriteString(a.State)
+	builder.WriteString(", ")
+	if v := a.FirstName; v != nil {
+		builder.WriteString("first_name=")
+		builder.WriteString(*v)
+	}
+	builder.WriteString(", ")
+	if v := a.LastName; v != nil {
+		builder.WriteString("last_name=")
+		builder.WriteString(*v)
+	}
 	builder.WriteString(", ")
 	builder.WriteString("phone=")
 	builder.WriteString(a.Phone)
 	builder.WriteString(", ")
+	builder.WriteString("zip_code=")
+	builder.WriteString(a.ZipCode)
+	builder.WriteString(", ")
 	builder.WriteString("coordinates=")
 	builder.WriteString(a.Coordinates)
+	builder.WriteString(", ")
+	builder.WriteString("is_seller=")
+	builder.WriteString(fmt.Sprintf("%v", a.IsSeller))
 	builder.WriteByte(')')
 	return builder.String()
 }

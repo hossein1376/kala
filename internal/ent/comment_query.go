@@ -32,6 +32,7 @@ type CommentQuery struct {
 	withPros    *ProsQuery
 	withUser    *UserQuery
 	withProduct *ProductQuery
+	withFKs     bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -82,7 +83,7 @@ func (cq *CommentQuery) QueryImage() *ImageQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(comment.Table, comment.FieldID, selector),
 			sqlgraph.To(image.Table, image.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, comment.ImageTable, comment.ImageColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, comment.ImageTable, comment.ImageColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -513,6 +514,7 @@ func (cq *CommentQuery) prepareQuery(ctx context.Context) error {
 func (cq *CommentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Comment, error) {
 	var (
 		nodes       = []*Comment{}
+		withFKs     = cq.withFKs
 		_spec       = cq.querySpec()
 		loadedTypes = [5]bool{
 			cq.withImage != nil,
@@ -522,6 +524,12 @@ func (cq *CommentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Comm
 			cq.withProduct != nil,
 		}
 	)
+	if cq.withImage != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, comment.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Comment).scanValues(nil, columns)
 	}
@@ -541,9 +549,8 @@ func (cq *CommentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Comm
 		return nodes, nil
 	}
 	if query := cq.withImage; query != nil {
-		if err := cq.loadImage(ctx, query, nodes,
-			func(n *Comment) { n.Edges.Image = []*Image{} },
-			func(n *Comment, e *Image) { n.Edges.Image = append(n.Edges.Image, e) }); err != nil {
+		if err := cq.loadImage(ctx, query, nodes, nil,
+			func(n *Comment, e *Image) { n.Edges.Image = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -579,33 +586,34 @@ func (cq *CommentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Comm
 }
 
 func (cq *CommentQuery) loadImage(ctx context.Context, query *ImageQuery, nodes []*Comment, init func(*Comment), assign func(*Comment, *Image)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*Comment)
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*Comment)
 	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
+		if nodes[i].image == nil {
+			continue
 		}
+		fk := *nodes[i].image
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
-	query.withFKs = true
-	query.Where(predicate.Image(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(comment.ImageColumn), fks...))
-	}))
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(image.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.comment_image
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "comment_image" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
+		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "comment_image" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "image" returned %v`, n.ID)
 		}
-		assign(node, n)
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
 	}
 	return nil
 }

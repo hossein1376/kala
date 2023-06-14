@@ -34,6 +34,7 @@ type UserQuery struct {
 	withOrder   *OrderQuery
 	withLogs    *LogsQuery
 	withAddress *AddressQuery
+	withFKs     bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -106,7 +107,7 @@ func (uq *UserQuery) QueryImage() *ImageQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, selector),
 			sqlgraph.To(image.Table, image.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, user.ImageTable, user.ImageColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, user.ImageTable, user.ImageColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
 		return fromU, nil
@@ -549,6 +550,7 @@ func (uq *UserQuery) prepareQuery(ctx context.Context) error {
 func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, error) {
 	var (
 		nodes       = []*User{}
+		withFKs     = uq.withFKs
 		_spec       = uq.querySpec()
 		loadedTypes = [6]bool{
 			uq.withComment != nil,
@@ -559,6 +561,12 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 			uq.withAddress != nil,
 		}
 	)
+	if uq.withImage != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, user.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*User).scanValues(nil, columns)
 	}
@@ -585,9 +593,8 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 		}
 	}
 	if query := uq.withImage; query != nil {
-		if err := uq.loadImage(ctx, query, nodes,
-			func(n *User) { n.Edges.Image = []*Image{} },
-			func(n *User, e *Image) { n.Edges.Image = append(n.Edges.Image, e) }); err != nil {
+		if err := uq.loadImage(ctx, query, nodes, nil,
+			func(n *User, e *Image) { n.Edges.Image = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -684,33 +691,34 @@ func (uq *UserQuery) loadComment(ctx context.Context, query *CommentQuery, nodes
 	return nil
 }
 func (uq *UserQuery) loadImage(ctx context.Context, query *ImageQuery, nodes []*User, init func(*User), assign func(*User, *Image)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*User)
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*User)
 	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
+		if nodes[i].image == nil {
+			continue
 		}
+		fk := *nodes[i].image
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
-	query.withFKs = true
-	query.Where(predicate.Image(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(user.ImageColumn), fks...))
-	}))
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(image.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.user_image
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "user_image" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
+		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "user_image" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "image" returned %v`, n.ID)
 		}
-		assign(node, n)
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
 	}
 	return nil
 }
@@ -764,13 +772,13 @@ func (uq *UserQuery) loadOrder(ctx context.Context, query *OrderQuery, nodes []*
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.user_order
+		fk := n.user_id
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "user_order" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "user_id" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "user_order" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "user_id" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

@@ -31,18 +31,30 @@ func init() {
 	addressDescAddress := addressFields[0].Descriptor()
 	// address.AddressValidator is a validator for the "address" field. It is called by the builders before save.
 	address.AddressValidator = addressDescAddress.Validators[0].(func(string) error)
-	// addressDescZipCode is the schema descriptor for zip_code field.
-	addressDescZipCode := addressFields[1].Descriptor()
-	// address.ZipCodeValidator is a validator for the "zip_code" field. It is called by the builders before save.
-	address.ZipCodeValidator = addressDescZipCode.Validators[0].(func(string) error)
+	// addressDescCity is the schema descriptor for city field.
+	addressDescCity := addressFields[1].Descriptor()
+	// address.CityValidator is a validator for the "city" field. It is called by the builders before save.
+	address.CityValidator = addressDescCity.Validators[0].(func(string) error)
+	// addressDescState is the schema descriptor for state field.
+	addressDescState := addressFields[2].Descriptor()
+	// address.StateValidator is a validator for the "state" field. It is called by the builders before save.
+	address.StateValidator = addressDescState.Validators[0].(func(string) error)
 	// addressDescPhone is the schema descriptor for phone field.
-	addressDescPhone := addressFields[2].Descriptor()
+	addressDescPhone := addressFields[5].Descriptor()
 	// address.PhoneValidator is a validator for the "phone" field. It is called by the builders before save.
 	address.PhoneValidator = addressDescPhone.Validators[0].(func(string) error)
+	// addressDescZipCode is the schema descriptor for zip_code field.
+	addressDescZipCode := addressFields[6].Descriptor()
+	// address.ZipCodeValidator is a validator for the "zip_code" field. It is called by the builders before save.
+	address.ZipCodeValidator = addressDescZipCode.Validators[0].(func(string) error)
 	// addressDescCoordinates is the schema descriptor for coordinates field.
-	addressDescCoordinates := addressFields[3].Descriptor()
+	addressDescCoordinates := addressFields[7].Descriptor()
 	// address.CoordinatesValidator is a validator for the "coordinates" field. It is called by the builders before save.
 	address.CoordinatesValidator = addressDescCoordinates.Validators[0].(func(string) error)
+	// addressDescIsSeller is the schema descriptor for is_seller field.
+	addressDescIsSeller := addressFields[8].Descriptor()
+	// address.DefaultIsSeller holds the default value on creation for the is_seller field.
+	address.DefaultIsSeller = addressDescIsSeller.Default.(bool)
 	attributeFields := schema.Attribute{}.Fields()
 	_ = attributeFields
 	// attributeDescName is the schema descriptor for name field.
@@ -127,9 +139,9 @@ func init() {
 	// commentDescRating is the schema descriptor for rating field.
 	commentDescRating := commentFields[4].Descriptor()
 	// comment.DefaultRating holds the default value on creation for the rating field.
-	comment.DefaultRating = commentDescRating.Default.(int8)
+	comment.DefaultRating = commentDescRating.Default.(float64)
 	// comment.RatingValidator is a validator for the "rating" field. It is called by the builders before save.
-	comment.RatingValidator = commentDescRating.Validators[0].(func(int8) error)
+	comment.RatingValidator = commentDescRating.Validators[0].(func(float64) error)
 	// commentDescRatingCount is the schema descriptor for rating_count field.
 	commentDescRatingCount := commentFields[5].Descriptor()
 	// comment.RatingCountValidator is a validator for the "rating_count" field. It is called by the builders before save.

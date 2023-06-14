@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"kala/internal/ent/brand"
 	"kala/internal/ent/category"
+	"kala/internal/ent/image"
 	"kala/internal/ent/product"
 	"kala/internal/ent/seller"
 	"kala/internal/ent/subcategory"
@@ -77,6 +78,25 @@ func (cc *CategoryCreate) AddSubCategory(s ...*SubCategory) *CategoryCreate {
 		ids[i] = s[i].ID
 	}
 	return cc.AddSubCategoryIDs(ids...)
+}
+
+// SetImageID sets the "image" edge to the Image entity by ID.
+func (cc *CategoryCreate) SetImageID(id int) *CategoryCreate {
+	cc.mutation.SetImageID(id)
+	return cc
+}
+
+// SetNillableImageID sets the "image" edge to the Image entity by ID if the given value is not nil.
+func (cc *CategoryCreate) SetNillableImageID(id *int) *CategoryCreate {
+	if id != nil {
+		cc = cc.SetImageID(*id)
+	}
+	return cc
+}
+
+// SetImage sets the "image" edge to the Image entity.
+func (cc *CategoryCreate) SetImage(i *Image) *CategoryCreate {
+	return cc.SetImageID(i.ID)
 }
 
 // AddProductIDs adds the "product" edge to the Product entity by IDs.
@@ -249,6 +269,23 @@ func (cc *CategoryCreate) createSpec() (*Category, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := cc.mutation.ImageIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   category.ImageTable,
+			Columns: []string{category.ImageColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.image = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := cc.mutation.ProductIDs(); len(nodes) > 0 {

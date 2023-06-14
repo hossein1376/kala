@@ -34,36 +34,54 @@ const (
 	EdgeBrand = "brand"
 	// EdgeProduct holds the string denoting the product edge name in mutations.
 	EdgeProduct = "product"
+	// EdgeCategory holds the string denoting the category edge name in mutations.
+	EdgeCategory = "category"
+	// EdgeSubCategory holds the string denoting the sub_category edge name in mutations.
+	EdgeSubCategory = "sub_category"
 	// Table holds the table name of the image in the database.
 	Table = "images"
 	// UserTable is the table that holds the user relation/edge.
-	UserTable = "images"
+	UserTable = "users"
 	// UserInverseTable is the table name for the User entity.
 	// It exists in this package in order to avoid circular dependency with the "user" package.
 	UserInverseTable = "users"
 	// UserColumn is the table column denoting the user relation/edge.
-	UserColumn = "user_image"
+	UserColumn = "image"
 	// CommentTable is the table that holds the comment relation/edge.
-	CommentTable = "images"
+	CommentTable = "comments"
 	// CommentInverseTable is the table name for the Comment entity.
 	// It exists in this package in order to avoid circular dependency with the "comment" package.
 	CommentInverseTable = "comments"
 	// CommentColumn is the table column denoting the comment relation/edge.
-	CommentColumn = "comment_image"
+	CommentColumn = "image"
 	// BrandTable is the table that holds the brand relation/edge.
-	BrandTable = "images"
+	BrandTable = "brands"
 	// BrandInverseTable is the table name for the Brand entity.
 	// It exists in this package in order to avoid circular dependency with the "brand" package.
 	BrandInverseTable = "brands"
 	// BrandColumn is the table column denoting the brand relation/edge.
-	BrandColumn = "brand_image"
+	BrandColumn = "image"
 	// ProductTable is the table that holds the product relation/edge.
-	ProductTable = "images"
+	ProductTable = "products"
 	// ProductInverseTable is the table name for the Product entity.
 	// It exists in this package in order to avoid circular dependency with the "product" package.
 	ProductInverseTable = "products"
 	// ProductColumn is the table column denoting the product relation/edge.
-	ProductColumn = "product_image"
+	ProductColumn = "image"
+	// CategoryTable is the table that holds the category relation/edge.
+	CategoryTable = "categories"
+	// CategoryInverseTable is the table name for the Category entity.
+	// It exists in this package in order to avoid circular dependency with the "category" package.
+	CategoryInverseTable = "categories"
+	// CategoryColumn is the table column denoting the category relation/edge.
+	CategoryColumn = "image"
+	// SubCategoryTable is the table that holds the sub_category relation/edge.
+	SubCategoryTable = "sub_categories"
+	// SubCategoryInverseTable is the table name for the SubCategory entity.
+	// It exists in this package in order to avoid circular dependency with the "subcategory" package.
+	SubCategoryInverseTable = "sub_categories"
+	// SubCategoryColumn is the table column denoting the sub_category relation/edge.
+	SubCategoryColumn = "image"
 )
 
 // Columns holds all SQL columns for image fields.
@@ -78,24 +96,10 @@ var Columns = []string{
 	FieldUploadedAt,
 }
 
-// ForeignKeys holds the SQL foreign-keys that are owned by the "images"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"brand_image",
-	"comment_image",
-	"product_image",
-	"user_image",
-}
-
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -158,58 +162,128 @@ func ByUploadedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUploadedAt, opts...).ToFunc()
 }
 
-// ByUserField orders the results by user field.
-func ByUserField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByUserCount orders the results by user count.
+func ByUserCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newUserStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborsCount(s, newUserStep(), opts...)
 	}
 }
 
-// ByCommentField orders the results by comment field.
-func ByCommentField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByUser orders the results by user terms.
+func ByUser(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newCommentStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newUserStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
-// ByBrandField orders the results by brand field.
-func ByBrandField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByCommentCount orders the results by comment count.
+func ByCommentCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newBrandStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborsCount(s, newCommentStep(), opts...)
 	}
 }
 
-// ByProductField orders the results by product field.
-func ByProductField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByComment orders the results by comment terms.
+func ByComment(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newProductStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newCommentStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByBrandCount orders the results by brand count.
+func ByBrandCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newBrandStep(), opts...)
+	}
+}
+
+// ByBrand orders the results by brand terms.
+func ByBrand(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newBrandStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByProductCount orders the results by product count.
+func ByProductCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newProductStep(), opts...)
+	}
+}
+
+// ByProduct orders the results by product terms.
+func ByProduct(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newProductStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByCategoryCount orders the results by category count.
+func ByCategoryCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newCategoryStep(), opts...)
+	}
+}
+
+// ByCategory orders the results by category terms.
+func ByCategory(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCategoryStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// BySubCategoryCount orders the results by sub_category count.
+func BySubCategoryCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newSubCategoryStep(), opts...)
+	}
+}
+
+// BySubCategory orders the results by sub_category terms.
+func BySubCategory(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSubCategoryStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 func newUserStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(UserInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, UserTable, UserColumn),
+		sqlgraph.Edge(sqlgraph.O2M, true, UserTable, UserColumn),
 	)
 }
 func newCommentStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(CommentInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, CommentTable, CommentColumn),
+		sqlgraph.Edge(sqlgraph.O2M, true, CommentTable, CommentColumn),
 	)
 }
 func newBrandStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(BrandInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, BrandTable, BrandColumn),
+		sqlgraph.Edge(sqlgraph.O2M, true, BrandTable, BrandColumn),
 	)
 }
 func newProductStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ProductInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, ProductTable, ProductColumn),
+		sqlgraph.Edge(sqlgraph.O2M, true, ProductTable, ProductColumn),
+	)
+}
+func newCategoryStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CategoryInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, true, CategoryTable, CategoryColumn),
+	)
+}
+func newSubCategoryStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SubCategoryInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, true, SubCategoryTable, SubCategoryColumn),
 	)
 }

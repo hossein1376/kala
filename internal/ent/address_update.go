@@ -35,9 +35,55 @@ func (au *AddressUpdate) SetAddress(s string) *AddressUpdate {
 	return au
 }
 
-// SetZipCode sets the "zip_code" field.
-func (au *AddressUpdate) SetZipCode(s string) *AddressUpdate {
-	au.mutation.SetZipCode(s)
+// SetCity sets the "city" field.
+func (au *AddressUpdate) SetCity(s string) *AddressUpdate {
+	au.mutation.SetCity(s)
+	return au
+}
+
+// SetState sets the "state" field.
+func (au *AddressUpdate) SetState(s string) *AddressUpdate {
+	au.mutation.SetState(s)
+	return au
+}
+
+// SetFirstName sets the "first_name" field.
+func (au *AddressUpdate) SetFirstName(s string) *AddressUpdate {
+	au.mutation.SetFirstName(s)
+	return au
+}
+
+// SetNillableFirstName sets the "first_name" field if the given value is not nil.
+func (au *AddressUpdate) SetNillableFirstName(s *string) *AddressUpdate {
+	if s != nil {
+		au.SetFirstName(*s)
+	}
+	return au
+}
+
+// ClearFirstName clears the value of the "first_name" field.
+func (au *AddressUpdate) ClearFirstName() *AddressUpdate {
+	au.mutation.ClearFirstName()
+	return au
+}
+
+// SetLastName sets the "last_name" field.
+func (au *AddressUpdate) SetLastName(s string) *AddressUpdate {
+	au.mutation.SetLastName(s)
+	return au
+}
+
+// SetNillableLastName sets the "last_name" field if the given value is not nil.
+func (au *AddressUpdate) SetNillableLastName(s *string) *AddressUpdate {
+	if s != nil {
+		au.SetLastName(*s)
+	}
+	return au
+}
+
+// ClearLastName clears the value of the "last_name" field.
+func (au *AddressUpdate) ClearLastName() *AddressUpdate {
+	au.mutation.ClearLastName()
 	return au
 }
 
@@ -47,9 +93,29 @@ func (au *AddressUpdate) SetPhone(s string) *AddressUpdate {
 	return au
 }
 
+// SetZipCode sets the "zip_code" field.
+func (au *AddressUpdate) SetZipCode(s string) *AddressUpdate {
+	au.mutation.SetZipCode(s)
+	return au
+}
+
 // SetCoordinates sets the "coordinates" field.
 func (au *AddressUpdate) SetCoordinates(s string) *AddressUpdate {
 	au.mutation.SetCoordinates(s)
+	return au
+}
+
+// SetIsSeller sets the "is_seller" field.
+func (au *AddressUpdate) SetIsSeller(b bool) *AddressUpdate {
+	au.mutation.SetIsSeller(b)
+	return au
+}
+
+// SetNillableIsSeller sets the "is_seller" field if the given value is not nil.
+func (au *AddressUpdate) SetNillableIsSeller(b *bool) *AddressUpdate {
+	if b != nil {
+		au.SetIsSeller(*b)
+	}
 	return au
 }
 
@@ -142,14 +208,24 @@ func (au *AddressUpdate) check() error {
 			return &ValidationError{Name: "address", err: fmt.Errorf(`ent: validator failed for field "Address.address": %w`, err)}
 		}
 	}
-	if v, ok := au.mutation.ZipCode(); ok {
-		if err := address.ZipCodeValidator(v); err != nil {
-			return &ValidationError{Name: "zip_code", err: fmt.Errorf(`ent: validator failed for field "Address.zip_code": %w`, err)}
+	if v, ok := au.mutation.City(); ok {
+		if err := address.CityValidator(v); err != nil {
+			return &ValidationError{Name: "city", err: fmt.Errorf(`ent: validator failed for field "Address.city": %w`, err)}
+		}
+	}
+	if v, ok := au.mutation.State(); ok {
+		if err := address.StateValidator(v); err != nil {
+			return &ValidationError{Name: "state", err: fmt.Errorf(`ent: validator failed for field "Address.state": %w`, err)}
 		}
 	}
 	if v, ok := au.mutation.Phone(); ok {
 		if err := address.PhoneValidator(v); err != nil {
 			return &ValidationError{Name: "phone", err: fmt.Errorf(`ent: validator failed for field "Address.phone": %w`, err)}
+		}
+	}
+	if v, ok := au.mutation.ZipCode(); ok {
+		if err := address.ZipCodeValidator(v); err != nil {
+			return &ValidationError{Name: "zip_code", err: fmt.Errorf(`ent: validator failed for field "Address.zip_code": %w`, err)}
 		}
 	}
 	if v, ok := au.mutation.Coordinates(); ok {
@@ -175,14 +251,35 @@ func (au *AddressUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := au.mutation.Address(); ok {
 		_spec.SetField(address.FieldAddress, field.TypeString, value)
 	}
-	if value, ok := au.mutation.ZipCode(); ok {
-		_spec.SetField(address.FieldZipCode, field.TypeString, value)
+	if value, ok := au.mutation.City(); ok {
+		_spec.SetField(address.FieldCity, field.TypeString, value)
+	}
+	if value, ok := au.mutation.State(); ok {
+		_spec.SetField(address.FieldState, field.TypeString, value)
+	}
+	if value, ok := au.mutation.FirstName(); ok {
+		_spec.SetField(address.FieldFirstName, field.TypeString, value)
+	}
+	if au.mutation.FirstNameCleared() {
+		_spec.ClearField(address.FieldFirstName, field.TypeString)
+	}
+	if value, ok := au.mutation.LastName(); ok {
+		_spec.SetField(address.FieldLastName, field.TypeString, value)
+	}
+	if au.mutation.LastNameCleared() {
+		_spec.ClearField(address.FieldLastName, field.TypeString)
 	}
 	if value, ok := au.mutation.Phone(); ok {
 		_spec.SetField(address.FieldPhone, field.TypeString, value)
 	}
+	if value, ok := au.mutation.ZipCode(); ok {
+		_spec.SetField(address.FieldZipCode, field.TypeString, value)
+	}
 	if value, ok := au.mutation.Coordinates(); ok {
 		_spec.SetField(address.FieldCoordinates, field.TypeString, value)
+	}
+	if value, ok := au.mutation.IsSeller(); ok {
+		_spec.SetField(address.FieldIsSeller, field.TypeBool, value)
 	}
 	if au.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -268,9 +365,55 @@ func (auo *AddressUpdateOne) SetAddress(s string) *AddressUpdateOne {
 	return auo
 }
 
-// SetZipCode sets the "zip_code" field.
-func (auo *AddressUpdateOne) SetZipCode(s string) *AddressUpdateOne {
-	auo.mutation.SetZipCode(s)
+// SetCity sets the "city" field.
+func (auo *AddressUpdateOne) SetCity(s string) *AddressUpdateOne {
+	auo.mutation.SetCity(s)
+	return auo
+}
+
+// SetState sets the "state" field.
+func (auo *AddressUpdateOne) SetState(s string) *AddressUpdateOne {
+	auo.mutation.SetState(s)
+	return auo
+}
+
+// SetFirstName sets the "first_name" field.
+func (auo *AddressUpdateOne) SetFirstName(s string) *AddressUpdateOne {
+	auo.mutation.SetFirstName(s)
+	return auo
+}
+
+// SetNillableFirstName sets the "first_name" field if the given value is not nil.
+func (auo *AddressUpdateOne) SetNillableFirstName(s *string) *AddressUpdateOne {
+	if s != nil {
+		auo.SetFirstName(*s)
+	}
+	return auo
+}
+
+// ClearFirstName clears the value of the "first_name" field.
+func (auo *AddressUpdateOne) ClearFirstName() *AddressUpdateOne {
+	auo.mutation.ClearFirstName()
+	return auo
+}
+
+// SetLastName sets the "last_name" field.
+func (auo *AddressUpdateOne) SetLastName(s string) *AddressUpdateOne {
+	auo.mutation.SetLastName(s)
+	return auo
+}
+
+// SetNillableLastName sets the "last_name" field if the given value is not nil.
+func (auo *AddressUpdateOne) SetNillableLastName(s *string) *AddressUpdateOne {
+	if s != nil {
+		auo.SetLastName(*s)
+	}
+	return auo
+}
+
+// ClearLastName clears the value of the "last_name" field.
+func (auo *AddressUpdateOne) ClearLastName() *AddressUpdateOne {
+	auo.mutation.ClearLastName()
 	return auo
 }
 
@@ -280,9 +423,29 @@ func (auo *AddressUpdateOne) SetPhone(s string) *AddressUpdateOne {
 	return auo
 }
 
+// SetZipCode sets the "zip_code" field.
+func (auo *AddressUpdateOne) SetZipCode(s string) *AddressUpdateOne {
+	auo.mutation.SetZipCode(s)
+	return auo
+}
+
 // SetCoordinates sets the "coordinates" field.
 func (auo *AddressUpdateOne) SetCoordinates(s string) *AddressUpdateOne {
 	auo.mutation.SetCoordinates(s)
+	return auo
+}
+
+// SetIsSeller sets the "is_seller" field.
+func (auo *AddressUpdateOne) SetIsSeller(b bool) *AddressUpdateOne {
+	auo.mutation.SetIsSeller(b)
+	return auo
+}
+
+// SetNillableIsSeller sets the "is_seller" field if the given value is not nil.
+func (auo *AddressUpdateOne) SetNillableIsSeller(b *bool) *AddressUpdateOne {
+	if b != nil {
+		auo.SetIsSeller(*b)
+	}
 	return auo
 }
 
@@ -388,14 +551,24 @@ func (auo *AddressUpdateOne) check() error {
 			return &ValidationError{Name: "address", err: fmt.Errorf(`ent: validator failed for field "Address.address": %w`, err)}
 		}
 	}
-	if v, ok := auo.mutation.ZipCode(); ok {
-		if err := address.ZipCodeValidator(v); err != nil {
-			return &ValidationError{Name: "zip_code", err: fmt.Errorf(`ent: validator failed for field "Address.zip_code": %w`, err)}
+	if v, ok := auo.mutation.City(); ok {
+		if err := address.CityValidator(v); err != nil {
+			return &ValidationError{Name: "city", err: fmt.Errorf(`ent: validator failed for field "Address.city": %w`, err)}
+		}
+	}
+	if v, ok := auo.mutation.State(); ok {
+		if err := address.StateValidator(v); err != nil {
+			return &ValidationError{Name: "state", err: fmt.Errorf(`ent: validator failed for field "Address.state": %w`, err)}
 		}
 	}
 	if v, ok := auo.mutation.Phone(); ok {
 		if err := address.PhoneValidator(v); err != nil {
 			return &ValidationError{Name: "phone", err: fmt.Errorf(`ent: validator failed for field "Address.phone": %w`, err)}
+		}
+	}
+	if v, ok := auo.mutation.ZipCode(); ok {
+		if err := address.ZipCodeValidator(v); err != nil {
+			return &ValidationError{Name: "zip_code", err: fmt.Errorf(`ent: validator failed for field "Address.zip_code": %w`, err)}
 		}
 	}
 	if v, ok := auo.mutation.Coordinates(); ok {
@@ -438,14 +611,35 @@ func (auo *AddressUpdateOne) sqlSave(ctx context.Context) (_node *Address, err e
 	if value, ok := auo.mutation.Address(); ok {
 		_spec.SetField(address.FieldAddress, field.TypeString, value)
 	}
-	if value, ok := auo.mutation.ZipCode(); ok {
-		_spec.SetField(address.FieldZipCode, field.TypeString, value)
+	if value, ok := auo.mutation.City(); ok {
+		_spec.SetField(address.FieldCity, field.TypeString, value)
+	}
+	if value, ok := auo.mutation.State(); ok {
+		_spec.SetField(address.FieldState, field.TypeString, value)
+	}
+	if value, ok := auo.mutation.FirstName(); ok {
+		_spec.SetField(address.FieldFirstName, field.TypeString, value)
+	}
+	if auo.mutation.FirstNameCleared() {
+		_spec.ClearField(address.FieldFirstName, field.TypeString)
+	}
+	if value, ok := auo.mutation.LastName(); ok {
+		_spec.SetField(address.FieldLastName, field.TypeString, value)
+	}
+	if auo.mutation.LastNameCleared() {
+		_spec.ClearField(address.FieldLastName, field.TypeString)
 	}
 	if value, ok := auo.mutation.Phone(); ok {
 		_spec.SetField(address.FieldPhone, field.TypeString, value)
 	}
+	if value, ok := auo.mutation.ZipCode(); ok {
+		_spec.SetField(address.FieldZipCode, field.TypeString, value)
+	}
 	if value, ok := auo.mutation.Coordinates(); ok {
 		_spec.SetField(address.FieldCoordinates, field.TypeString, value)
+	}
+	if value, ok := auo.mutation.IsSeller(); ok {
+		_spec.SetField(address.FieldIsSeller, field.TypeBool, value)
 	}
 	if auo.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{

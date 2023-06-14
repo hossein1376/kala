@@ -28,7 +28,7 @@ func (Comment) Fields() []ent.Field {
 				"deleted").Default("draft"),
 		field.Int32("likes").Default(0).Min(0),
 		field.Int32("dislikes").Default(0).Min(0),
-		field.Int8("rating").Default(0).Range(0, 5),
+		field.Float("rating").Default(0).Range(0, 5),
 		field.Int32("rating_count").Positive(),
 		field.Bool("verified_buyer"),
 	}
@@ -37,7 +37,9 @@ func (Comment) Fields() []ent.Field {
 // Edges of the Comment.
 func (Comment) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("image", Image.Type),
+		edge.To("image", Image.Type).
+			StorageKey(edge.Column("image")).
+			Unique(),
 		edge.To("cons", Cons.Type).
 			StorageKey(edge.Column("comment")),
 		edge.To("pros", Pros.Type).

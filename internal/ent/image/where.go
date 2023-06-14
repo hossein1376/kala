@@ -475,7 +475,7 @@ func HasUser() predicate.Image {
 	return predicate.Image(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, UserTable, UserColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, UserTable, UserColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -498,7 +498,7 @@ func HasComment() predicate.Image {
 	return predicate.Image(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, CommentTable, CommentColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, CommentTable, CommentColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -521,7 +521,7 @@ func HasBrand() predicate.Image {
 	return predicate.Image(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, BrandTable, BrandColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, BrandTable, BrandColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -544,7 +544,7 @@ func HasProduct() predicate.Image {
 	return predicate.Image(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, ProductTable, ProductColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, ProductTable, ProductColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -554,6 +554,52 @@ func HasProduct() predicate.Image {
 func HasProductWith(preds ...predicate.Product) predicate.Image {
 	return predicate.Image(func(s *sql.Selector) {
 		step := newProductStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasCategory applies the HasEdge predicate on the "category" edge.
+func HasCategory() predicate.Image {
+	return predicate.Image(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, CategoryTable, CategoryColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasCategoryWith applies the HasEdge predicate on the "category" edge with a given conditions (other predicates).
+func HasCategoryWith(preds ...predicate.Category) predicate.Image {
+	return predicate.Image(func(s *sql.Selector) {
+		step := newCategoryStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasSubCategory applies the HasEdge predicate on the "sub_category" edge.
+func HasSubCategory() predicate.Image {
+	return predicate.Image(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, SubCategoryTable, SubCategoryColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasSubCategoryWith applies the HasEdge predicate on the "sub_category" edge with a given conditions (other predicates).
+func HasSubCategoryWith(preds ...predicate.SubCategory) predicate.Image {
+	return predicate.Image(func(s *sql.Selector) {
+		step := newSubCategoryStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

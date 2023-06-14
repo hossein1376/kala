@@ -4,14 +4,14 @@ import (
 	"net/http"
 )
 
-func (h *Handler) createNewBrandHandler(w http.ResponseWriter, r *http.Request) {
+func (h *handler) createNewBrandHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (h *Handler) getAllBrandsHandler(w http.ResponseWriter, r *http.Request) {
+func (h *handler) getAllBrandsHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (h *Handler) getBrandByIDHandler(w http.ResponseWriter, r *http.Request) {
+func (h *handler) getBrandByIDHandler(w http.ResponseWriter, r *http.Request) {
 
 }

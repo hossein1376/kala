@@ -81,7 +81,7 @@ func Dislikes(v int32) predicate.Comment {
 }
 
 // Rating applies equality check predicate on the "rating" field. It's identical to RatingEQ.
-func Rating(v int8) predicate.Comment {
+func Rating(v float64) predicate.Comment {
 	return predicate.Comment(sql.FieldEQ(FieldRating, v))
 }
 
@@ -341,42 +341,42 @@ func DislikesLTE(v int32) predicate.Comment {
 }
 
 // RatingEQ applies the EQ predicate on the "rating" field.
-func RatingEQ(v int8) predicate.Comment {
+func RatingEQ(v float64) predicate.Comment {
 	return predicate.Comment(sql.FieldEQ(FieldRating, v))
 }
 
 // RatingNEQ applies the NEQ predicate on the "rating" field.
-func RatingNEQ(v int8) predicate.Comment {
+func RatingNEQ(v float64) predicate.Comment {
 	return predicate.Comment(sql.FieldNEQ(FieldRating, v))
 }
 
 // RatingIn applies the In predicate on the "rating" field.
-func RatingIn(vs ...int8) predicate.Comment {
+func RatingIn(vs ...float64) predicate.Comment {
 	return predicate.Comment(sql.FieldIn(FieldRating, vs...))
 }
 
 // RatingNotIn applies the NotIn predicate on the "rating" field.
-func RatingNotIn(vs ...int8) predicate.Comment {
+func RatingNotIn(vs ...float64) predicate.Comment {
 	return predicate.Comment(sql.FieldNotIn(FieldRating, vs...))
 }
 
 // RatingGT applies the GT predicate on the "rating" field.
-func RatingGT(v int8) predicate.Comment {
+func RatingGT(v float64) predicate.Comment {
 	return predicate.Comment(sql.FieldGT(FieldRating, v))
 }
 
 // RatingGTE applies the GTE predicate on the "rating" field.
-func RatingGTE(v int8) predicate.Comment {
+func RatingGTE(v float64) predicate.Comment {
 	return predicate.Comment(sql.FieldGTE(FieldRating, v))
 }
 
 // RatingLT applies the LT predicate on the "rating" field.
-func RatingLT(v int8) predicate.Comment {
+func RatingLT(v float64) predicate.Comment {
 	return predicate.Comment(sql.FieldLT(FieldRating, v))
 }
 
 // RatingLTE applies the LTE predicate on the "rating" field.
-func RatingLTE(v int8) predicate.Comment {
+func RatingLTE(v float64) predicate.Comment {
 	return predicate.Comment(sql.FieldLTE(FieldRating, v))
 }
 
@@ -435,7 +435,7 @@ func HasImage() predicate.Comment {
 	return predicate.Comment(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, ImageTable, ImageColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, ImageTable, ImageColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

@@ -11,14 +11,14 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-type Handler struct {
+type handler struct {
 	app   *cmd.Application
 	error *Errors.Errors
 	json  Json.Json
 }
 
-func NewHandlers(app *cmd.Application) Handler {
-	return Handler{
+func NewHandlers(app *cmd.Application) handler {
+	return handler{
 		app:   app,
 		json:  Json.NewJson(),
 		error: Errors.NewErrors(app.Logger),

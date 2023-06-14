@@ -139,19 +139,23 @@ func (pc *ProductCreate) AddComment(c ...*Comment) *ProductCreate {
 	return pc.AddCommentIDs(ids...)
 }
 
-// AddImageIDs adds the "image" edge to the Image entity by IDs.
-func (pc *ProductCreate) AddImageIDs(ids ...int) *ProductCreate {
-	pc.mutation.AddImageIDs(ids...)
+// SetImageID sets the "image" edge to the Image entity by ID.
+func (pc *ProductCreate) SetImageID(id int) *ProductCreate {
+	pc.mutation.SetImageID(id)
 	return pc
 }
 
-// AddImage adds the "image" edges to the Image entity.
-func (pc *ProductCreate) AddImage(i ...*Image) *ProductCreate {
-	ids := make([]int, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
+// SetNillableImageID sets the "image" edge to the Image entity by ID if the given value is not nil.
+func (pc *ProductCreate) SetNillableImageID(id *int) *ProductCreate {
+	if id != nil {
+		pc = pc.SetImageID(*id)
 	}
-	return pc.AddImageIDs(ids...)
+	return pc
+}
+
+// SetImage sets the "image" edge to the Image entity.
+func (pc *ProductCreate) SetImage(i *Image) *ProductCreate {
+	return pc.SetImageID(i.ID)
 }
 
 // AddOrderIDs adds the "order" edge to the Order entity by IDs.
@@ -432,7 +436,7 @@ func (pc *ProductCreate) createSpec() (*Product, *sqlgraph.CreateSpec) {
 	}
 	if nodes := pc.mutation.ImageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   product.ImageTable,
 			Columns: []string{product.ImageColumn},
@@ -444,6 +448,7 @@ func (pc *ProductCreate) createSpec() (*Product, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_node.image = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := pc.mutation.OrderIDs(); len(nodes) > 0 {

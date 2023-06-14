@@ -7,7 +7,7 @@ import (
 	"kala/internal/structure"
 )
 
-func (h *Handler) createNewProductHandler(w http.ResponseWriter, r *http.Request) {
+func (h *handler) createNewProductHandler(w http.ResponseWriter, r *http.Request) {
 	var input structure.Product
 	err := h.json.ReadJSONiter(w, r, &input)
 	if err != nil {
@@ -33,7 +33,7 @@ func (h *Handler) createNewProductHandler(w http.ResponseWriter, r *http.Request
 	}
 }
 
-func (h *Handler) getProductByIDHandler(w http.ResponseWriter, r *http.Request) {
+func (h *handler) getProductByIDHandler(w http.ResponseWriter, r *http.Request) {
 	id := paramInt(r, "id")
 	if id == 0 {
 		h.error.NotFoundResponse(w, r)
@@ -59,7 +59,7 @@ func (h *Handler) getProductByIDHandler(w http.ResponseWriter, r *http.Request) 
 	}
 }
 
-func (h *Handler) getAllProductsHandler(w http.ResponseWriter, r *http.Request) {
+func (h *handler) getAllProductsHandler(w http.ResponseWriter, r *http.Request) {
 	products, err := h.app.Models.Product.GetAllProducts()
 	if err != nil {
 		h.error.InternalServerErrorResponse(w, r, err)
@@ -73,7 +73,7 @@ func (h *Handler) getAllProductsHandler(w http.ResponseWriter, r *http.Request) 
 	}
 }
 
-func (h *Handler) updateProductByIDHandler(w http.ResponseWriter, r *http.Request) {
+func (h *handler) updateProductByIDHandler(w http.ResponseWriter, r *http.Request) {
 	id := paramInt(r, "id")
 	if id == 0 {
 		h.error.NotFoundResponse(w, r)
@@ -122,9 +122,9 @@ func (h *Handler) updateProductByIDHandler(w http.ResponseWriter, r *http.Reques
 	if input.RatingCount != nil {
 		product.RatingCount = *input.RatingCount
 	}
-	if input.Images != nil {
-		product.Edges.Image = input.Images
-	}
+	//if input.Images != nil {
+	//	product.Edges.Image = input.Images
+	//}
 	if input.Category != nil {
 		product.Edges.Category = input.Category
 	}
@@ -153,7 +153,7 @@ func (h *Handler) updateProductByIDHandler(w http.ResponseWriter, r *http.Reques
 	}
 }
 
-func (h *Handler) deleteProductByIDHandler(w http.ResponseWriter, r *http.Request) {
+func (h *handler) deleteProductByIDHandler(w http.ResponseWriter, r *http.Request) {
 	id := paramInt(r, "id")
 	if id == 0 {
 		h.error.NotFoundResponse(w, r)

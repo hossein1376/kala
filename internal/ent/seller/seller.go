@@ -34,6 +34,8 @@ const (
 	EdgeCategory = "category"
 	// EdgeAddress holds the string denoting the address edge name in mutations.
 	EdgeAddress = "address"
+	// EdgeOrder holds the string denoting the order edge name in mutations.
+	EdgeOrder = "order"
 	// EdgeUser holds the string denoting the user edge name in mutations.
 	EdgeUser = "user"
 	// Table holds the table name of the seller in the database.
@@ -44,7 +46,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "product" package.
 	ProductInverseTable = "products"
 	// ProductColumn is the table column denoting the product relation/edge.
-	ProductColumn = "seller_product"
+	ProductColumn = "product_id"
 	// CategoryTable is the table that holds the category relation/edge. The primary key declared below.
 	CategoryTable = "seller_category"
 	// CategoryInverseTable is the table name for the Category entity.
@@ -56,7 +58,14 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "address" package.
 	AddressInverseTable = "addresses"
 	// AddressColumn is the table column denoting the address relation/edge.
-	AddressColumn = "seller_address"
+	AddressColumn = "address_id"
+	// OrderTable is the table that holds the order relation/edge.
+	OrderTable = "orders"
+	// OrderInverseTable is the table name for the Order entity.
+	// It exists in this package in order to avoid circular dependency with the "order" package.
+	OrderInverseTable = "orders"
+	// OrderColumn is the table column denoting the order relation/edge.
+	OrderColumn = "seller_id"
 	// UserTable is the table that holds the user relation/edge.
 	UserTable = "sellers"
 	// UserInverseTable is the table name for the User entity.
@@ -207,6 +216,20 @@ func ByAddress(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByOrderCount orders the results by order count.
+func ByOrderCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newOrderStep(), opts...)
+	}
+}
+
+// ByOrder orders the results by order terms.
+func ByOrder(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newOrderStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByUserField orders the results by user field.
 func ByUserField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -232,6 +255,13 @@ func newAddressStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(AddressInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, AddressTable, AddressColumn),
+	)
+}
+func newOrderStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(OrderInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, OrderTable, OrderColumn),
 	)
 }
 func newUserStep() *sqlgraph.Step {

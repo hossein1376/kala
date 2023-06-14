@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"kala/internal/ent/brand"
 	"kala/internal/ent/category"
+	"kala/internal/ent/image"
 	"kala/internal/ent/predicate"
 	"kala/internal/ent/product"
 	"kala/internal/ent/seller"
@@ -27,9 +28,11 @@ type CategoryQuery struct {
 	inters          []Interceptor
 	predicates      []predicate.Category
 	withSubCategory *SubCategoryQuery
+	withImage       *ImageQuery
 	withProduct     *ProductQuery
 	withBrand       *BrandQuery
 	withSeller      *SellerQuery
+	withFKs         bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -81,6 +84,28 @@ func (cq *CategoryQuery) QuerySubCategory() *SubCategoryQuery {
 			sqlgraph.From(category.Table, category.FieldID, selector),
 			sqlgraph.To(subcategory.Table, subcategory.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, category.SubCategoryTable, category.SubCategoryColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryImage chains the current query on the "image" edge.
+func (cq *CategoryQuery) QueryImage() *ImageQuery {
+	query := (&ImageClient{config: cq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := cq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := cq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(category.Table, category.FieldID, selector),
+			sqlgraph.To(image.Table, image.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, category.ImageTable, category.ImageColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -347,6 +372,7 @@ func (cq *CategoryQuery) Clone() *CategoryQuery {
 		inters:          append([]Interceptor{}, cq.inters...),
 		predicates:      append([]predicate.Category{}, cq.predicates...),
 		withSubCategory: cq.withSubCategory.Clone(),
+		withImage:       cq.withImage.Clone(),
 		withProduct:     cq.withProduct.Clone(),
 		withBrand:       cq.withBrand.Clone(),
 		withSeller:      cq.withSeller.Clone(),
@@ -364,6 +390,17 @@ func (cq *CategoryQuery) WithSubCategory(opts ...func(*SubCategoryQuery)) *Categ
 		opt(query)
 	}
 	cq.withSubCategory = query
+	return cq
+}
+
+// WithImage tells the query-builder to eager-load the nodes that are connected to
+// the "image" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *CategoryQuery) WithImage(opts ...func(*ImageQuery)) *CategoryQuery {
+	query := (&ImageClient{config: cq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	cq.withImage = query
 	return cq
 }
 
@@ -477,14 +514,22 @@ func (cq *CategoryQuery) prepareQuery(ctx context.Context) error {
 func (cq *CategoryQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Category, error) {
 	var (
 		nodes       = []*Category{}
+		withFKs     = cq.withFKs
 		_spec       = cq.querySpec()
-		loadedTypes = [4]bool{
+		loadedTypes = [5]bool{
 			cq.withSubCategory != nil,
+			cq.withImage != nil,
 			cq.withProduct != nil,
 			cq.withBrand != nil,
 			cq.withSeller != nil,
 		}
 	)
+	if cq.withImage != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, category.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Category).scanValues(nil, columns)
 	}
@@ -507,6 +552,12 @@ func (cq *CategoryQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Cat
 		if err := cq.loadSubCategory(ctx, query, nodes,
 			func(n *Category) { n.Edges.SubCategory = []*SubCategory{} },
 			func(n *Category, e *SubCategory) { n.Edges.SubCategory = append(n.Edges.SubCategory, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := cq.withImage; query != nil {
+		if err := cq.loadImage(ctx, query, nodes, nil,
+			func(n *Category, e *Image) { n.Edges.Image = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -562,6 +613,38 @@ func (cq *CategoryQuery) loadSubCategory(ctx context.Context, query *SubCategory
 			return fmt.Errorf(`unexpected referenced foreign-key "category" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
+	}
+	return nil
+}
+func (cq *CategoryQuery) loadImage(ctx context.Context, query *ImageQuery, nodes []*Category, init func(*Category), assign func(*Category, *Image)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*Category)
+	for i := range nodes {
+		if nodes[i].image == nil {
+			continue
+		}
+		fk := *nodes[i].image
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(image.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "image" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
 	}
 	return nil
 }

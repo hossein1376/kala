@@ -131,7 +131,7 @@ func (pq *ProductQuery) QueryImage() *ImageQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(product.Table, product.FieldID, selector),
 			sqlgraph.To(image.Table, image.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, product.ImageTable, product.ImageColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, product.ImageTable, product.ImageColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
 		return fromU, nil
@@ -598,7 +598,7 @@ func (pq *ProductQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Prod
 			pq.withBrand != nil,
 		}
 	)
-	if pq.withBrand != nil {
+	if pq.withImage != nil || pq.withBrand != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -637,9 +637,8 @@ func (pq *ProductQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Prod
 		}
 	}
 	if query := pq.withImage; query != nil {
-		if err := pq.loadImage(ctx, query, nodes,
-			func(n *Product) { n.Edges.Image = []*Image{} },
-			func(n *Product, e *Image) { n.Edges.Image = append(n.Edges.Image, e) }); err != nil {
+		if err := pq.loadImage(ctx, query, nodes, nil,
+			func(n *Product, e *Image) { n.Edges.Image = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -765,33 +764,34 @@ func (pq *ProductQuery) loadComment(ctx context.Context, query *CommentQuery, no
 	return nil
 }
 func (pq *ProductQuery) loadImage(ctx context.Context, query *ImageQuery, nodes []*Product, init func(*Product), assign func(*Product, *Image)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*Product)
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*Product)
 	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
+		if nodes[i].image == nil {
+			continue
 		}
+		fk := *nodes[i].image
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
-	query.withFKs = true
-	query.Where(predicate.Image(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(product.ImageColumn), fks...))
-	}))
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(image.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.product_image
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "product_image" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
+		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "product_image" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "image" returned %v`, n.ID)
 		}
-		assign(node, n)
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
 	}
 	return nil
 }

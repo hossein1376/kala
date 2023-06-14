@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"kala/internal/ent/address"
 	"kala/internal/ent/category"
+	"kala/internal/ent/order"
 	"kala/internal/ent/predicate"
 	"kala/internal/ent/product"
 	"kala/internal/ent/seller"
@@ -141,6 +142,21 @@ func (su *SellerUpdate) AddAddress(a ...*Address) *SellerUpdate {
 	return su.AddAddresIDs(ids...)
 }
 
+// AddOrderIDs adds the "order" edge to the Order entity by IDs.
+func (su *SellerUpdate) AddOrderIDs(ids ...int) *SellerUpdate {
+	su.mutation.AddOrderIDs(ids...)
+	return su
+}
+
+// AddOrder adds the "order" edges to the Order entity.
+func (su *SellerUpdate) AddOrder(o ...*Order) *SellerUpdate {
+	ids := make([]int, len(o))
+	for i := range o {
+		ids[i] = o[i].ID
+	}
+	return su.AddOrderIDs(ids...)
+}
+
 // SetUserID sets the "user" edge to the User entity by ID.
 func (su *SellerUpdate) SetUserID(id int) *SellerUpdate {
 	su.mutation.SetUserID(id)
@@ -226,6 +242,27 @@ func (su *SellerUpdate) RemoveAddress(a ...*Address) *SellerUpdate {
 		ids[i] = a[i].ID
 	}
 	return su.RemoveAddresIDs(ids...)
+}
+
+// ClearOrder clears all "order" edges to the Order entity.
+func (su *SellerUpdate) ClearOrder() *SellerUpdate {
+	su.mutation.ClearOrder()
+	return su
+}
+
+// RemoveOrderIDs removes the "order" edge to Order entities by IDs.
+func (su *SellerUpdate) RemoveOrderIDs(ids ...int) *SellerUpdate {
+	su.mutation.RemoveOrderIDs(ids...)
+	return su
+}
+
+// RemoveOrder removes "order" edges to Order entities.
+func (su *SellerUpdate) RemoveOrder(o ...*Order) *SellerUpdate {
+	ids := make([]int, len(o))
+	for i := range o {
+		ids[i] = o[i].ID
+	}
+	return su.RemoveOrderIDs(ids...)
 }
 
 // ClearUser clears the "user" edge to the User entity.
@@ -469,6 +506,51 @@ func (su *SellerUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if su.mutation.OrderCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   seller.OrderTable,
+			Columns: []string{seller.OrderColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.RemovedOrderIDs(); len(nodes) > 0 && !su.mutation.OrderCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   seller.OrderTable,
+			Columns: []string{seller.OrderColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.OrderIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   seller.OrderTable,
+			Columns: []string{seller.OrderColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if su.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -627,6 +709,21 @@ func (suo *SellerUpdateOne) AddAddress(a ...*Address) *SellerUpdateOne {
 	return suo.AddAddresIDs(ids...)
 }
 
+// AddOrderIDs adds the "order" edge to the Order entity by IDs.
+func (suo *SellerUpdateOne) AddOrderIDs(ids ...int) *SellerUpdateOne {
+	suo.mutation.AddOrderIDs(ids...)
+	return suo
+}
+
+// AddOrder adds the "order" edges to the Order entity.
+func (suo *SellerUpdateOne) AddOrder(o ...*Order) *SellerUpdateOne {
+	ids := make([]int, len(o))
+	for i := range o {
+		ids[i] = o[i].ID
+	}
+	return suo.AddOrderIDs(ids...)
+}
+
 // SetUserID sets the "user" edge to the User entity by ID.
 func (suo *SellerUpdateOne) SetUserID(id int) *SellerUpdateOne {
 	suo.mutation.SetUserID(id)
@@ -712,6 +809,27 @@ func (suo *SellerUpdateOne) RemoveAddress(a ...*Address) *SellerUpdateOne {
 		ids[i] = a[i].ID
 	}
 	return suo.RemoveAddresIDs(ids...)
+}
+
+// ClearOrder clears all "order" edges to the Order entity.
+func (suo *SellerUpdateOne) ClearOrder() *SellerUpdateOne {
+	suo.mutation.ClearOrder()
+	return suo
+}
+
+// RemoveOrderIDs removes the "order" edge to Order entities by IDs.
+func (suo *SellerUpdateOne) RemoveOrderIDs(ids ...int) *SellerUpdateOne {
+	suo.mutation.RemoveOrderIDs(ids...)
+	return suo
+}
+
+// RemoveOrder removes "order" edges to Order entities.
+func (suo *SellerUpdateOne) RemoveOrder(o ...*Order) *SellerUpdateOne {
+	ids := make([]int, len(o))
+	for i := range o {
+		ids[i] = o[i].ID
+	}
+	return suo.RemoveOrderIDs(ids...)
 }
 
 // ClearUser clears the "user" edge to the User entity.
@@ -978,6 +1096,51 @@ func (suo *SellerUpdateOne) sqlSave(ctx context.Context) (_node *Seller, err err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if suo.mutation.OrderCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   seller.OrderTable,
+			Columns: []string{seller.OrderColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.RemovedOrderIDs(); len(nodes) > 0 && !suo.mutation.OrderCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   seller.OrderTable,
+			Columns: []string{seller.OrderColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.OrderIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   seller.OrderTable,
+			Columns: []string{seller.OrderColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

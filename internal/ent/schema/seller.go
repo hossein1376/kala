@@ -32,9 +32,13 @@ func (Seller) Fields() []ent.Field {
 // Edges of the Seller.
 func (Seller) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("product", Product.Type),
+		edge.To("product", Product.Type).
+			StorageKey(edge.Column("product_id")),
 		edge.To("category", Category.Type),
-		edge.To("address", Address.Type),
+		edge.To("address", Address.Type).
+			StorageKey(edge.Column("address_id")),
+		edge.To("order", Order.Type).
+			StorageKey(edge.Column("seller_id")),
 
 		edge.From("user", User.Type).
 			Ref("seller").

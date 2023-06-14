@@ -5,6 +5,7 @@ import (
 )
 
 type User struct {
+	ID        int               `json:"id"`
 	FirstName string            `json:"firstname"`
 	LastName  string            `json:"lastname"`
 	Username  string            `json:"username"`
@@ -45,4 +46,15 @@ type UserResponse struct {
 }
 
 type Address struct {
+	ID          int     `json:"id"`
+	UserID      int     `json:"user_id"`
+	FirstName   *string `json:"first_name"`
+	LastName    *string `json:"last_name"`
+	Address     string  `json:"address"`
+	City        string  `json:"city"`
+	State       string  `json:"state"`
+	Phone       string  `json:"phone"`
+	ZipCode     string  `json:"zip_code"`
+	Coordinates string  `json:"coordinates"`
+	Seller      bool    `json:"seller"`
 }

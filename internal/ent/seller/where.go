@@ -524,6 +524,29 @@ func HasAddressWith(preds ...predicate.Address) predicate.Seller {
 	})
 }
 
+// HasOrder applies the HasEdge predicate on the "order" edge.
+func HasOrder() predicate.Seller {
+	return predicate.Seller(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, OrderTable, OrderColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasOrderWith applies the HasEdge predicate on the "order" edge with a given conditions (other predicates).
+func HasOrderWith(preds ...predicate.Order) predicate.Seller {
+	return predicate.Seller(func(s *sql.Selector) {
+		step := newOrderStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasUser applies the HasEdge predicate on the "user" edge.
 func HasUser() predicate.Seller {
 	return predicate.Seller(func(s *sql.Selector) {

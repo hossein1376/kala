@@ -22,12 +22,21 @@ const (
 	FieldName = "name"
 	// FieldDescription holds the string denoting the description field in the database.
 	FieldDescription = "description"
+	// EdgeImage holds the string denoting the image edge name in mutations.
+	EdgeImage = "image"
 	// EdgeProduct holds the string denoting the product edge name in mutations.
 	EdgeProduct = "product"
 	// EdgeCategory holds the string denoting the category edge name in mutations.
 	EdgeCategory = "category"
 	// Table holds the table name of the subcategory in the database.
 	Table = "sub_categories"
+	// ImageTable is the table that holds the image relation/edge.
+	ImageTable = "sub_categories"
+	// ImageInverseTable is the table name for the Image entity.
+	// It exists in this package in order to avoid circular dependency with the "image" package.
+	ImageInverseTable = "images"
+	// ImageColumn is the table column denoting the image relation/edge.
+	ImageColumn = "image"
 	// ProductTable is the table that holds the product relation/edge. The primary key declared below.
 	ProductTable = "product_sub_category"
 	// ProductInverseTable is the table name for the Product entity.
@@ -55,6 +64,7 @@ var Columns = []string{
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
 	"category",
+	"image",
 }
 
 var (
@@ -119,6 +129,13 @@ func ByDescription(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDescription, opts...).ToFunc()
 }
 
+// ByImageField orders the results by image field.
+func ByImageField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newImageStep(), sql.OrderByField(field, opts...))
+	}
+}
+
 // ByProductCount orders the results by product count.
 func ByProductCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -138,6 +155,13 @@ func ByCategoryField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newCategoryStep(), sql.OrderByField(field, opts...))
 	}
+}
+func newImageStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ImageInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, ImageTable, ImageColumn),
+	)
 }
 func newProductStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(

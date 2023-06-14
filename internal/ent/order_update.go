@@ -9,6 +9,7 @@ import (
 	"kala/internal/ent/order"
 	"kala/internal/ent/predicate"
 	"kala/internal/ent/product"
+	"kala/internal/ent/seller"
 	"kala/internal/ent/user"
 	"time"
 
@@ -34,6 +35,25 @@ func (ou *OrderUpdate) Where(ps ...predicate.Order) *OrderUpdate {
 func (ou *OrderUpdate) SetUpdateTime(t time.Time) *OrderUpdate {
 	ou.mutation.SetUpdateTime(t)
 	return ou
+}
+
+// SetSellerID sets the "seller" edge to the Seller entity by ID.
+func (ou *OrderUpdate) SetSellerID(id int) *OrderUpdate {
+	ou.mutation.SetSellerID(id)
+	return ou
+}
+
+// SetNillableSellerID sets the "seller" edge to the Seller entity by ID if the given value is not nil.
+func (ou *OrderUpdate) SetNillableSellerID(id *int) *OrderUpdate {
+	if id != nil {
+		ou = ou.SetSellerID(*id)
+	}
+	return ou
+}
+
+// SetSeller sets the "seller" edge to the Seller entity.
+func (ou *OrderUpdate) SetSeller(s *Seller) *OrderUpdate {
+	return ou.SetSellerID(s.ID)
 }
 
 // AddProductIDs adds the "product" edge to the Product entity by IDs.
@@ -65,6 +85,12 @@ func (ou *OrderUpdate) SetUser(u *User) *OrderUpdate {
 // Mutation returns the OrderMutation object of the builder.
 func (ou *OrderUpdate) Mutation() *OrderMutation {
 	return ou.mutation
+}
+
+// ClearSeller clears the "seller" edge to the Seller entity.
+func (ou *OrderUpdate) ClearSeller() *OrderUpdate {
+	ou.mutation.ClearSeller()
+	return ou
 }
 
 // ClearProduct clears all "product" edges to the Product entity.
@@ -152,6 +178,35 @@ func (ou *OrderUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := ou.mutation.UpdateTime(); ok {
 		_spec.SetField(order.FieldUpdateTime, field.TypeTime, value)
+	}
+	if ou.mutation.SellerCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   order.SellerTable,
+			Columns: []string{order.SellerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(seller.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ou.mutation.SellerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   order.SellerTable,
+			Columns: []string{order.SellerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(seller.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if ou.mutation.ProductCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -253,6 +308,25 @@ func (ouo *OrderUpdateOne) SetUpdateTime(t time.Time) *OrderUpdateOne {
 	return ouo
 }
 
+// SetSellerID sets the "seller" edge to the Seller entity by ID.
+func (ouo *OrderUpdateOne) SetSellerID(id int) *OrderUpdateOne {
+	ouo.mutation.SetSellerID(id)
+	return ouo
+}
+
+// SetNillableSellerID sets the "seller" edge to the Seller entity by ID if the given value is not nil.
+func (ouo *OrderUpdateOne) SetNillableSellerID(id *int) *OrderUpdateOne {
+	if id != nil {
+		ouo = ouo.SetSellerID(*id)
+	}
+	return ouo
+}
+
+// SetSeller sets the "seller" edge to the Seller entity.
+func (ouo *OrderUpdateOne) SetSeller(s *Seller) *OrderUpdateOne {
+	return ouo.SetSellerID(s.ID)
+}
+
 // AddProductIDs adds the "product" edge to the Product entity by IDs.
 func (ouo *OrderUpdateOne) AddProductIDs(ids ...int) *OrderUpdateOne {
 	ouo.mutation.AddProductIDs(ids...)
@@ -282,6 +356,12 @@ func (ouo *OrderUpdateOne) SetUser(u *User) *OrderUpdateOne {
 // Mutation returns the OrderMutation object of the builder.
 func (ouo *OrderUpdateOne) Mutation() *OrderMutation {
 	return ouo.mutation
+}
+
+// ClearSeller clears the "seller" edge to the Seller entity.
+func (ouo *OrderUpdateOne) ClearSeller() *OrderUpdateOne {
+	ouo.mutation.ClearSeller()
+	return ouo
 }
 
 // ClearProduct clears all "product" edges to the Product entity.
@@ -399,6 +479,35 @@ func (ouo *OrderUpdateOne) sqlSave(ctx context.Context) (_node *Order, err error
 	}
 	if value, ok := ouo.mutation.UpdateTime(); ok {
 		_spec.SetField(order.FieldUpdateTime, field.TypeTime, value)
+	}
+	if ouo.mutation.SellerCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   order.SellerTable,
+			Columns: []string{order.SellerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(seller.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ouo.mutation.SellerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   order.SellerTable,
+			Columns: []string{order.SellerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(seller.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if ouo.mutation.ProductCleared() {
 		edge := &sqlgraph.EdgeSpec{

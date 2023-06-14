@@ -102,15 +102,15 @@ func (cc *CommentCreate) SetNillableDislikes(i *int32) *CommentCreate {
 }
 
 // SetRating sets the "rating" field.
-func (cc *CommentCreate) SetRating(i int8) *CommentCreate {
-	cc.mutation.SetRating(i)
+func (cc *CommentCreate) SetRating(f float64) *CommentCreate {
+	cc.mutation.SetRating(f)
 	return cc
 }
 
 // SetNillableRating sets the "rating" field if the given value is not nil.
-func (cc *CommentCreate) SetNillableRating(i *int8) *CommentCreate {
-	if i != nil {
-		cc.SetRating(*i)
+func (cc *CommentCreate) SetNillableRating(f *float64) *CommentCreate {
+	if f != nil {
+		cc.SetRating(*f)
 	}
 	return cc
 }
@@ -127,19 +127,23 @@ func (cc *CommentCreate) SetVerifiedBuyer(b bool) *CommentCreate {
 	return cc
 }
 
-// AddImageIDs adds the "image" edge to the Image entity by IDs.
-func (cc *CommentCreate) AddImageIDs(ids ...int) *CommentCreate {
-	cc.mutation.AddImageIDs(ids...)
+// SetImageID sets the "image" edge to the Image entity by ID.
+func (cc *CommentCreate) SetImageID(id int) *CommentCreate {
+	cc.mutation.SetImageID(id)
 	return cc
 }
 
-// AddImage adds the "image" edges to the Image entity.
-func (cc *CommentCreate) AddImage(i ...*Image) *CommentCreate {
-	ids := make([]int, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
+// SetNillableImageID sets the "image" edge to the Image entity by ID if the given value is not nil.
+func (cc *CommentCreate) SetNillableImageID(id *int) *CommentCreate {
+	if id != nil {
+		cc = cc.SetImageID(*id)
 	}
-	return cc.AddImageIDs(ids...)
+	return cc
+}
+
+// SetImage sets the "image" edge to the Image entity.
+func (cc *CommentCreate) SetImage(i *Image) *CommentCreate {
+	return cc.SetImageID(i.ID)
 }
 
 // AddConIDs adds the "cons" edge to the Cons entity by IDs.
@@ -373,7 +377,7 @@ func (cc *CommentCreate) createSpec() (*Comment, *sqlgraph.CreateSpec) {
 		_node.Dislikes = value
 	}
 	if value, ok := cc.mutation.Rating(); ok {
-		_spec.SetField(comment.FieldRating, field.TypeInt8, value)
+		_spec.SetField(comment.FieldRating, field.TypeFloat64, value)
 		_node.Rating = value
 	}
 	if value, ok := cc.mutation.RatingCount(); ok {
@@ -386,7 +390,7 @@ func (cc *CommentCreate) createSpec() (*Comment, *sqlgraph.CreateSpec) {
 	}
 	if nodes := cc.mutation.ImageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   comment.ImageTable,
 			Columns: []string{comment.ImageColumn},
@@ -398,6 +402,7 @@ func (cc *CommentCreate) createSpec() (*Comment, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_node.image = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := cc.mutation.ConsIDs(); len(nodes) > 0 {

@@ -848,7 +848,7 @@ func (c *BrandClient) QueryImage(b *Brand) *ImageQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(brand.Table, brand.FieldID, id),
 			sqlgraph.To(image.Table, image.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, brand.ImageTable, brand.ImageColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, brand.ImageTable, brand.ImageColumn),
 		)
 		fromV = sqlgraph.Neighbors(b.driver.Dialect(), step)
 		return fromV, nil
@@ -1015,6 +1015,22 @@ func (c *CategoryClient) QuerySubCategory(ca *Category) *SubCategoryQuery {
 			sqlgraph.From(category.Table, category.FieldID, id),
 			sqlgraph.To(subcategory.Table, subcategory.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, category.SubCategoryTable, category.SubCategoryColumn),
+		)
+		fromV = sqlgraph.Neighbors(ca.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryImage queries the image edge of a Category.
+func (c *CategoryClient) QueryImage(ca *Category) *ImageQuery {
+	query := (&ImageClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ca.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(category.Table, category.FieldID, id),
+			sqlgraph.To(image.Table, image.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, category.ImageTable, category.ImageColumn),
 		)
 		fromV = sqlgraph.Neighbors(ca.driver.Dialect(), step)
 		return fromV, nil
@@ -1196,7 +1212,7 @@ func (c *CommentClient) QueryImage(co *Comment) *ImageQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(comment.Table, comment.FieldID, id),
 			sqlgraph.To(image.Table, image.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, comment.ImageTable, comment.ImageColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, comment.ImageTable, comment.ImageColumn),
 		)
 		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
 		return fromV, nil
@@ -1528,7 +1544,7 @@ func (c *ImageClient) QueryUser(i *Image) *UserQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(image.Table, image.FieldID, id),
 			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, image.UserTable, image.UserColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, image.UserTable, image.UserColumn),
 		)
 		fromV = sqlgraph.Neighbors(i.driver.Dialect(), step)
 		return fromV, nil
@@ -1544,7 +1560,7 @@ func (c *ImageClient) QueryComment(i *Image) *CommentQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(image.Table, image.FieldID, id),
 			sqlgraph.To(comment.Table, comment.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, image.CommentTable, image.CommentColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, image.CommentTable, image.CommentColumn),
 		)
 		fromV = sqlgraph.Neighbors(i.driver.Dialect(), step)
 		return fromV, nil
@@ -1560,7 +1576,7 @@ func (c *ImageClient) QueryBrand(i *Image) *BrandQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(image.Table, image.FieldID, id),
 			sqlgraph.To(brand.Table, brand.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, image.BrandTable, image.BrandColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, image.BrandTable, image.BrandColumn),
 		)
 		fromV = sqlgraph.Neighbors(i.driver.Dialect(), step)
 		return fromV, nil
@@ -1576,7 +1592,39 @@ func (c *ImageClient) QueryProduct(i *Image) *ProductQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(image.Table, image.FieldID, id),
 			sqlgraph.To(product.Table, product.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, image.ProductTable, image.ProductColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, image.ProductTable, image.ProductColumn),
+		)
+		fromV = sqlgraph.Neighbors(i.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCategory queries the category edge of a Image.
+func (c *ImageClient) QueryCategory(i *Image) *CategoryQuery {
+	query := (&CategoryClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := i.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(image.Table, image.FieldID, id),
+			sqlgraph.To(category.Table, category.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, image.CategoryTable, image.CategoryColumn),
+		)
+		fromV = sqlgraph.Neighbors(i.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySubCategory queries the sub_category edge of a Image.
+func (c *ImageClient) QuerySubCategory(i *Image) *SubCategoryQuery {
+	query := (&SubCategoryClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := i.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(image.Table, image.FieldID, id),
+			sqlgraph.To(subcategory.Table, subcategory.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, image.SubCategoryTable, image.SubCategoryColumn),
 		)
 		fromV = sqlgraph.Neighbors(i.driver.Dialect(), step)
 		return fromV, nil
@@ -1836,6 +1884,22 @@ func (c *OrderClient) GetX(ctx context.Context, id int) *Order {
 	return obj
 }
 
+// QuerySeller queries the seller edge of a Order.
+func (c *OrderClient) QuerySeller(o *Order) *SellerQuery {
+	query := (&SellerClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := o.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(order.Table, order.FieldID, id),
+			sqlgraph.To(seller.Table, seller.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, order.SellerTable, order.SellerColumn),
+		)
+		fromV = sqlgraph.Neighbors(o.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryProduct queries the product edge of a Order.
 func (c *OrderClient) QueryProduct(o *Order) *ProductQuery {
 	query := (&ProductClient{config: c.config}).Query()
@@ -2026,7 +2090,7 @@ func (c *ProductClient) QueryImage(pr *Product) *ImageQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(product.Table, product.FieldID, id),
 			sqlgraph.To(image.Table, image.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, product.ImageTable, product.ImageColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, product.ImageTable, product.ImageColumn),
 		)
 		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
 		return fromV, nil
@@ -2398,6 +2462,22 @@ func (c *SellerClient) QueryAddress(s *Seller) *AddressQuery {
 	return query
 }
 
+// QueryOrder queries the order edge of a Seller.
+func (c *SellerClient) QueryOrder(s *Seller) *OrderQuery {
+	query := (&OrderClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(seller.Table, seller.FieldID, id),
+			sqlgraph.To(order.Table, order.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, seller.OrderTable, seller.OrderColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryUser queries the user edge of a Seller.
 func (c *SellerClient) QueryUser(s *Seller) *UserQuery {
 	query := (&UserClient{config: c.config}).Query()
@@ -2530,6 +2610,22 @@ func (c *SubCategoryClient) GetX(ctx context.Context, id int) *SubCategory {
 		panic(err)
 	}
 	return obj
+}
+
+// QueryImage queries the image edge of a SubCategory.
+func (c *SubCategoryClient) QueryImage(sc *SubCategory) *ImageQuery {
+	query := (&ImageClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := sc.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(subcategory.Table, subcategory.FieldID, id),
+			sqlgraph.To(image.Table, image.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, subcategory.ImageTable, subcategory.ImageColumn),
+		)
+		fromV = sqlgraph.Neighbors(sc.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
 }
 
 // QueryProduct queries the product edge of a SubCategory.
@@ -2706,7 +2802,7 @@ func (c *UserClient) QueryImage(u *User) *ImageQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, id),
 			sqlgraph.To(image.Table, image.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, user.ImageTable, user.ImageColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, user.ImageTable, user.ImageColumn),
 		)
 		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
 		return fromV, nil

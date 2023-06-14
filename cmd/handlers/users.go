@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
 
 	"kala/internal/ent"
@@ -8,7 +9,7 @@ import (
 	"kala/pkg/Password"
 )
 
-func (h *Handler) createNewUserHandler(w http.ResponseWriter, r *http.Request) {
+func (h *handler) createNewUserHandler(w http.ResponseWriter, r *http.Request) {
 	var input structure.UserRequest
 	err := h.json.ReadJSONiter(w, r, &input)
 	if err != nil {
@@ -56,7 +57,7 @@ func (h *Handler) createNewUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *Handler) getUserByIDHandler(w http.ResponseWriter, r *http.Request) {
+func (h *handler) getUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 	id := paramInt(r, "id")
 	if id == 0 {
 		h.error.NotFoundResponse(w, r)
@@ -82,7 +83,7 @@ func (h *Handler) getUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *Handler) getAllUsersHandler(w http.ResponseWriter, r *http.Request) {
+func (h *handler) getAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 	users, err := h.app.Models.User.GetAllUsers()
 	if err != nil {
 		h.error.InternalServerErrorResponse(w, r, err)
@@ -95,7 +96,7 @@ func (h *Handler) getAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *Handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) {
+func (h *handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 	id := paramInt(r, "id")
 	if id == 0 {
 		h.error.NotFoundResponse(w, r)
@@ -106,6 +107,11 @@ func (h *Handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 	err := h.json.ReadJSONiter(w, r, &input)
 	if err != nil {
 		h.error.BadRequestResponse(w, r, err)
+		return
+	}
+
+	if input == (structure.UserUpdateRequest{}) {
+		h.error.BadRequestResponse(w, r, errors.New("empty request"))
 		return
 	}
 
@@ -163,7 +169,7 @@ func (h *Handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 	}
 }
 
-func (h *Handler) deleteUserByIDHandler(w http.ResponseWriter, r *http.Request) {
+func (h *handler) deleteUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 	id := paramInt(r, "id")
 	if id == 0 {
 		h.error.NotFoundResponse(w, r)

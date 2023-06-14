@@ -5,7 +5,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 )
 
-func (h *Handler) Router() *chi.Mux {
+func (h *handler) Router() *chi.Mux {
 	// create new router
 	r := chi.NewRouter()
 

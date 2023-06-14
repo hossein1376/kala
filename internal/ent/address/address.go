@@ -14,12 +14,22 @@ const (
 	FieldID = "id"
 	// FieldAddress holds the string denoting the address field in the database.
 	FieldAddress = "address"
-	// FieldZipCode holds the string denoting the zip_code field in the database.
-	FieldZipCode = "zip_code"
+	// FieldCity holds the string denoting the city field in the database.
+	FieldCity = "city"
+	// FieldState holds the string denoting the state field in the database.
+	FieldState = "state"
+	// FieldFirstName holds the string denoting the first_name field in the database.
+	FieldFirstName = "first_name"
+	// FieldLastName holds the string denoting the last_name field in the database.
+	FieldLastName = "last_name"
 	// FieldPhone holds the string denoting the phone field in the database.
 	FieldPhone = "phone"
+	// FieldZipCode holds the string denoting the zip_code field in the database.
+	FieldZipCode = "zip_code"
 	// FieldCoordinates holds the string denoting the coordinates field in the database.
 	FieldCoordinates = "coordinates"
+	// FieldIsSeller holds the string denoting the is_seller field in the database.
+	FieldIsSeller = "is_seller"
 	// EdgeUser holds the string denoting the user edge name in mutations.
 	EdgeUser = "user"
 	// EdgeSeller holds the string denoting the seller edge name in mutations.
@@ -39,22 +49,27 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "seller" package.
 	SellerInverseTable = "sellers"
 	// SellerColumn is the table column denoting the seller relation/edge.
-	SellerColumn = "seller_address"
+	SellerColumn = "address_id"
 )
 
 // Columns holds all SQL columns for address fields.
 var Columns = []string{
 	FieldID,
 	FieldAddress,
-	FieldZipCode,
+	FieldCity,
+	FieldState,
+	FieldFirstName,
+	FieldLastName,
 	FieldPhone,
+	FieldZipCode,
 	FieldCoordinates,
+	FieldIsSeller,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "addresses"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"seller_address",
+	"address_id",
 	"user",
 }
 
@@ -76,12 +91,18 @@ func ValidColumn(column string) bool {
 var (
 	// AddressValidator is a validator for the "address" field. It is called by the builders before save.
 	AddressValidator func(string) error
-	// ZipCodeValidator is a validator for the "zip_code" field. It is called by the builders before save.
-	ZipCodeValidator func(string) error
+	// CityValidator is a validator for the "city" field. It is called by the builders before save.
+	CityValidator func(string) error
+	// StateValidator is a validator for the "state" field. It is called by the builders before save.
+	StateValidator func(string) error
 	// PhoneValidator is a validator for the "phone" field. It is called by the builders before save.
 	PhoneValidator func(string) error
+	// ZipCodeValidator is a validator for the "zip_code" field. It is called by the builders before save.
+	ZipCodeValidator func(string) error
 	// CoordinatesValidator is a validator for the "coordinates" field. It is called by the builders before save.
 	CoordinatesValidator func(string) error
+	// DefaultIsSeller holds the default value on creation for the "is_seller" field.
+	DefaultIsSeller bool
 )
 
 // OrderOption defines the ordering options for the Address queries.
@@ -97,9 +118,24 @@ func ByAddress(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldAddress, opts...).ToFunc()
 }
 
-// ByZipCode orders the results by the zip_code field.
-func ByZipCode(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldZipCode, opts...).ToFunc()
+// ByCity orders the results by the city field.
+func ByCity(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCity, opts...).ToFunc()
+}
+
+// ByState orders the results by the state field.
+func ByState(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldState, opts...).ToFunc()
+}
+
+// ByFirstName orders the results by the first_name field.
+func ByFirstName(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldFirstName, opts...).ToFunc()
+}
+
+// ByLastName orders the results by the last_name field.
+func ByLastName(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldLastName, opts...).ToFunc()
 }
 
 // ByPhone orders the results by the phone field.
@@ -107,9 +143,19 @@ func ByPhone(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPhone, opts...).ToFunc()
 }
 
+// ByZipCode orders the results by the zip_code field.
+func ByZipCode(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldZipCode, opts...).ToFunc()
+}
+
 // ByCoordinates orders the results by the coordinates field.
 func ByCoordinates(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCoordinates, opts...).ToFunc()
+}
+
+// ByIsSeller orders the results by the is_seller field.
+func ByIsSeller(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldIsSeller, opts...).ToFunc()
 }
 
 // ByUserField orders the results by user field.

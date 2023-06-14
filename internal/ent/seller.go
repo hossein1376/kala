@@ -47,11 +47,13 @@ type SellerEdges struct {
 	Category []*Category `json:"category,omitempty"`
 	// Address holds the value of the address edge.
 	Address []*Address `json:"address,omitempty"`
+	// Order holds the value of the order edge.
+	Order []*Order `json:"order,omitempty"`
 	// User holds the value of the user edge.
 	User *User `json:"user,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [4]bool
+	loadedTypes [5]bool
 }
 
 // ProductOrErr returns the Product value or an error if the edge
@@ -81,10 +83,19 @@ func (e SellerEdges) AddressOrErr() ([]*Address, error) {
 	return nil, &NotLoadedError{edge: "address"}
 }
 
+// OrderOrErr returns the Order value or an error if the edge
+// was not loaded in eager-loading.
+func (e SellerEdges) OrderOrErr() ([]*Order, error) {
+	if e.loadedTypes[3] {
+		return e.Order, nil
+	}
+	return nil, &NotLoadedError{edge: "order"}
+}
+
 // UserOrErr returns the User value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e SellerEdges) UserOrErr() (*User, error) {
-	if e.loadedTypes[3] {
+	if e.loadedTypes[4] {
 		if e.User == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: user.Label}
@@ -205,6 +216,11 @@ func (s *Seller) QueryCategory() *CategoryQuery {
 // QueryAddress queries the "address" edge of the Seller entity.
 func (s *Seller) QueryAddress() *AddressQuery {
 	return NewSellerClient(s.config).QueryAddress(s)
+}
+
+// QueryOrder queries the "order" edge of the Seller entity.
+func (s *Seller) QueryOrder() *OrderQuery {
+	return NewSellerClient(s.config).QueryOrder(s)
 }
 
 // QueryUser queries the "user" edge of the Seller entity.
