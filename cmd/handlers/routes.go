@@ -71,6 +71,10 @@ func (h *handler) Router() *chi.Mux {
 			r.Get("/{id}", h.getAddressByIDHandler)
 		})
 
+		// image route
+		r.Route("images", func(r chi.Router) {
+			r.Post("/", h.createNewImageHandler)
+		})
 	})
 
 	return r
