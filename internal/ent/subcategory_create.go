@@ -63,23 +63,19 @@ func (scc *SubCategoryCreate) SetDescription(s string) *SubCategoryCreate {
 	return scc
 }
 
-// SetImageID sets the "image" edge to the Image entity by ID.
-func (scc *SubCategoryCreate) SetImageID(id int) *SubCategoryCreate {
-	scc.mutation.SetImageID(id)
+// AddImageIDs adds the "image" edge to the Image entity by IDs.
+func (scc *SubCategoryCreate) AddImageIDs(ids ...int) *SubCategoryCreate {
+	scc.mutation.AddImageIDs(ids...)
 	return scc
 }
 
-// SetNillableImageID sets the "image" edge to the Image entity by ID if the given value is not nil.
-func (scc *SubCategoryCreate) SetNillableImageID(id *int) *SubCategoryCreate {
-	if id != nil {
-		scc = scc.SetImageID(*id)
+// AddImage adds the "image" edges to the Image entity.
+func (scc *SubCategoryCreate) AddImage(i ...*Image) *SubCategoryCreate {
+	ids := make([]int, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
 	}
-	return scc
-}
-
-// SetImage sets the "image" edge to the Image entity.
-func (scc *SubCategoryCreate) SetImage(i *Image) *SubCategoryCreate {
-	return scc.SetImageID(i.ID)
+	return scc.AddImageIDs(ids...)
 }
 
 // AddProductIDs adds the "product" edge to the Product entity by IDs.
@@ -229,10 +225,10 @@ func (scc *SubCategoryCreate) createSpec() (*SubCategory, *sqlgraph.CreateSpec) 
 	}
 	if nodes := scc.mutation.ImageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   subcategory.ImageTable,
-			Columns: []string{subcategory.ImageColumn},
+			Columns: subcategory.ImagePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),
@@ -241,7 +237,6 @@ func (scc *SubCategoryCreate) createSpec() (*SubCategory, *sqlgraph.CreateSpec) 
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.image = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := scc.mutation.ProductIDs(); len(nodes) > 0 {

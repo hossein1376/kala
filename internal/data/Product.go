@@ -25,7 +25,7 @@ func (p *ProductModel) CreateNewProduct(product structure.Product) (*ent.Product
 		SetRating(product.Rating).
 		SetRatingCount(product.RatingCount).
 		SetQuantity(product.Quantity).
-		//AddImage(product.Image...).
+		AddImage(product.Image...).
 		AddCategory(product.Category...).
 		AddSubCategory(product.SubCategory...).
 		SetCreateTime(time.Now()).
@@ -78,7 +78,7 @@ func (p *ProductModel) UpdateProductByID(prod *ent.Product, id int) error {
 		SetRating(prod.Rating).
 		SetRatingCount(prod.RatingCount).
 		SetQuantity(prod.Quantity).
-		//AddImage(prod.Edges.Image...).
+		AddImage(prod.Edges.Image...).
 		AddCategory(prod.Edges.Category...).
 		AddSubCategory(prod.Edges.SubCategory...).
 		SetUpdateTime(time.Now()).

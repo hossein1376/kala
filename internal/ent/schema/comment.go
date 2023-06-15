@@ -38,8 +38,9 @@ func (Comment) Fields() []ent.Field {
 func (Comment) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("image", Image.Type).
-			StorageKey(edge.Column("image")).
-			Unique(),
+			StorageKey(edge.Table("comment_images"),
+				edge.Columns("comment", "image"),
+				edge.Symbols("comment_id", "image_id")),
 		edge.To("cons", Cons.Type).
 			StorageKey(edge.Column("comment")),
 		edge.To("pros", Pros.Type).

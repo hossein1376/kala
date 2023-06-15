@@ -5,7 +5,6 @@ package ent
 import (
 	"fmt"
 	"kala/internal/ent/category"
-	"kala/internal/ent/image"
 	"kala/internal/ent/subcategory"
 	"strings"
 	"time"
@@ -31,14 +30,13 @@ type SubCategory struct {
 	// The values are being populated by the SubCategoryQuery when eager-loading is set.
 	Edges        SubCategoryEdges `json:"edges"`
 	category     *int
-	image        *int
 	selectValues sql.SelectValues
 }
 
 // SubCategoryEdges holds the relations/edges for other nodes in the graph.
 type SubCategoryEdges struct {
 	// Image holds the value of the image edge.
-	Image *Image `json:"image,omitempty"`
+	Image []*Image `json:"image,omitempty"`
 	// Product holds the value of the product edge.
 	Product []*Product `json:"product,omitempty"`
 	// Category holds the value of the category edge.
@@ -49,13 +47,9 @@ type SubCategoryEdges struct {
 }
 
 // ImageOrErr returns the Image value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e SubCategoryEdges) ImageOrErr() (*Image, error) {
+// was not loaded in eager-loading.
+func (e SubCategoryEdges) ImageOrErr() ([]*Image, error) {
 	if e.loadedTypes[0] {
-		if e.Image == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: image.Label}
-		}
 		return e.Image, nil
 	}
 	return nil, &NotLoadedError{edge: "image"}
@@ -95,8 +89,6 @@ func (*SubCategory) scanValues(columns []string) ([]any, error) {
 		case subcategory.FieldCreateTime, subcategory.FieldUpdateTime:
 			values[i] = new(sql.NullTime)
 		case subcategory.ForeignKeys[0]: // category
-			values[i] = new(sql.NullInt64)
-		case subcategory.ForeignKeys[1]: // image
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -149,13 +141,6 @@ func (sc *SubCategory) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				sc.category = new(int)
 				*sc.category = int(value.Int64)
-			}
-		case subcategory.ForeignKeys[1]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field image", value)
-			} else if value.Valid {
-				sc.image = new(int)
-				*sc.image = int(value.Int64)
 			}
 		default:
 			sc.selectValues.Set(columns[i], values[i])

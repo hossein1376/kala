@@ -5,7 +5,6 @@ package ent
 import (
 	"fmt"
 	"kala/internal/ent/brand"
-	"kala/internal/ent/image"
 	"strings"
 	"time"
 
@@ -35,14 +34,13 @@ type Brand struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the BrandQuery when eager-loading is set.
 	Edges        BrandEdges `json:"edges"`
-	image        *int
 	selectValues sql.SelectValues
 }
 
 // BrandEdges holds the relations/edges for other nodes in the graph.
 type BrandEdges struct {
 	// Image holds the value of the image edge.
-	Image *Image `json:"image,omitempty"`
+	Image []*Image `json:"image,omitempty"`
 	// Category holds the value of the category edge.
 	Category []*Category `json:"category,omitempty"`
 	// Product holds the value of the product edge.
@@ -53,13 +51,9 @@ type BrandEdges struct {
 }
 
 // ImageOrErr returns the Image value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e BrandEdges) ImageOrErr() (*Image, error) {
+// was not loaded in eager-loading.
+func (e BrandEdges) ImageOrErr() ([]*Image, error) {
 	if e.loadedTypes[0] {
-		if e.Image == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: image.Label}
-		}
 		return e.Image, nil
 	}
 	return nil, &NotLoadedError{edge: "image"}
@@ -98,8 +92,6 @@ func (*Brand) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case brand.FieldCreateTime, brand.FieldUpdateTime:
 			values[i] = new(sql.NullTime)
-		case brand.ForeignKeys[0]: // image
-			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -162,13 +154,6 @@ func (b *Brand) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field rating_count", values[i])
 			} else if value.Valid {
 				b.RatingCount = int32(value.Int64)
-			}
-		case brand.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field image", value)
-			} else if value.Valid {
-				b.image = new(int)
-				*b.image = int(value.Int64)
 			}
 		default:
 			b.selectValues.Set(columns[i], values[i])

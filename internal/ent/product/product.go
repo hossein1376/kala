@@ -64,13 +64,11 @@ const (
 	// CommentInverseTable is the table name for the Comment entity.
 	// It exists in this package in order to avoid circular dependency with the "comment" package.
 	CommentInverseTable = "comments"
-	// ImageTable is the table that holds the image relation/edge.
-	ImageTable = "products"
+	// ImageTable is the table that holds the image relation/edge. The primary key declared below.
+	ImageTable = "product_images"
 	// ImageInverseTable is the table name for the Image entity.
 	// It exists in this package in order to avoid circular dependency with the "image" package.
 	ImageInverseTable = "images"
-	// ImageColumn is the table column denoting the image relation/edge.
-	ImageColumn = "image"
 	// OrderTable is the table that holds the order relation/edge. The primary key declared below.
 	OrderTable = "product_order"
 	// OrderInverseTable is the table name for the Order entity.
@@ -115,7 +113,6 @@ var Columns = []string{
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
 	"brand_product",
-	"image",
 	"product_id",
 }
 
@@ -123,6 +120,9 @@ var (
 	// CommentPrimaryKey and CommentColumn2 are the table columns denoting the
 	// primary key for the comment relation (M2M).
 	CommentPrimaryKey = []string{"product_id", "comment_id"}
+	// ImagePrimaryKey and ImageColumn2 are the table columns denoting the
+	// primary key for the image relation (M2M).
+	ImagePrimaryKey = []string{"product", "image"}
 	// OrderPrimaryKey and OrderColumn2 are the table columns denoting the
 	// primary key for the order relation (M2M).
 	OrderPrimaryKey = []string{"product_id", "order_id"}
@@ -261,10 +261,17 @@ func ByComment(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
-// ByImageField orders the results by image field.
-func ByImageField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByImageCount orders the results by image count.
+func ByImageCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newImageStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborsCount(s, newImageStep(), opts...)
+	}
+}
+
+// ByImage orders the results by image terms.
+func ByImage(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newImageStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -334,7 +341,7 @@ func newImageStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ImageInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, ImageTable, ImageColumn),
+		sqlgraph.Edge(sqlgraph.M2M, false, ImageTable, ImagePrimaryKey...),
 	)
 }
 func newOrderStep() *sqlgraph.Step {

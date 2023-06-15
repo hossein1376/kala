@@ -165,23 +165,19 @@ func (uc *UserCreate) AddComment(c ...*Comment) *UserCreate {
 	return uc.AddCommentIDs(ids...)
 }
 
-// SetImageID sets the "image" edge to the Image entity by ID.
-func (uc *UserCreate) SetImageID(id int) *UserCreate {
-	uc.mutation.SetImageID(id)
+// AddImageIDs adds the "image" edge to the Image entity by IDs.
+func (uc *UserCreate) AddImageIDs(ids ...int) *UserCreate {
+	uc.mutation.AddImageIDs(ids...)
 	return uc
 }
 
-// SetNillableImageID sets the "image" edge to the Image entity by ID if the given value is not nil.
-func (uc *UserCreate) SetNillableImageID(id *int) *UserCreate {
-	if id != nil {
-		uc = uc.SetImageID(*id)
+// AddImage adds the "image" edges to the Image entity.
+func (uc *UserCreate) AddImage(i ...*Image) *UserCreate {
+	ids := make([]int, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
 	}
-	return uc
-}
-
-// SetImage sets the "image" edge to the Image entity.
-func (uc *UserCreate) SetImage(i *Image) *UserCreate {
-	return uc.SetImageID(i.ID)
+	return uc.AddImageIDs(ids...)
 }
 
 // AddSellerIDs adds the "seller" edge to the Seller entity by IDs.
@@ -406,10 +402,10 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	}
 	if nodes := uc.mutation.ImageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   user.ImageTable,
-			Columns: []string{user.ImageColumn},
+			Columns: user.ImagePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),
@@ -418,7 +414,6 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.image = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := uc.mutation.SellerIDs(); len(nodes) > 0 {

@@ -40,48 +40,36 @@ const (
 	EdgeSubCategory = "sub_category"
 	// Table holds the table name of the image in the database.
 	Table = "images"
-	// UserTable is the table that holds the user relation/edge.
-	UserTable = "users"
+	// UserTable is the table that holds the user relation/edge. The primary key declared below.
+	UserTable = "user_images"
 	// UserInverseTable is the table name for the User entity.
 	// It exists in this package in order to avoid circular dependency with the "user" package.
 	UserInverseTable = "users"
-	// UserColumn is the table column denoting the user relation/edge.
-	UserColumn = "image"
-	// CommentTable is the table that holds the comment relation/edge.
-	CommentTable = "comments"
+	// CommentTable is the table that holds the comment relation/edge. The primary key declared below.
+	CommentTable = "comment_images"
 	// CommentInverseTable is the table name for the Comment entity.
 	// It exists in this package in order to avoid circular dependency with the "comment" package.
 	CommentInverseTable = "comments"
-	// CommentColumn is the table column denoting the comment relation/edge.
-	CommentColumn = "image"
-	// BrandTable is the table that holds the brand relation/edge.
-	BrandTable = "brands"
+	// BrandTable is the table that holds the brand relation/edge. The primary key declared below.
+	BrandTable = "brand_images"
 	// BrandInverseTable is the table name for the Brand entity.
 	// It exists in this package in order to avoid circular dependency with the "brand" package.
 	BrandInverseTable = "brands"
-	// BrandColumn is the table column denoting the brand relation/edge.
-	BrandColumn = "image"
-	// ProductTable is the table that holds the product relation/edge.
-	ProductTable = "products"
+	// ProductTable is the table that holds the product relation/edge. The primary key declared below.
+	ProductTable = "product_images"
 	// ProductInverseTable is the table name for the Product entity.
 	// It exists in this package in order to avoid circular dependency with the "product" package.
 	ProductInverseTable = "products"
-	// ProductColumn is the table column denoting the product relation/edge.
-	ProductColumn = "image"
-	// CategoryTable is the table that holds the category relation/edge.
-	CategoryTable = "categories"
+	// CategoryTable is the table that holds the category relation/edge. The primary key declared below.
+	CategoryTable = "category_images"
 	// CategoryInverseTable is the table name for the Category entity.
 	// It exists in this package in order to avoid circular dependency with the "category" package.
 	CategoryInverseTable = "categories"
-	// CategoryColumn is the table column denoting the category relation/edge.
-	CategoryColumn = "image"
-	// SubCategoryTable is the table that holds the sub_category relation/edge.
-	SubCategoryTable = "sub_categories"
+	// SubCategoryTable is the table that holds the sub_category relation/edge. The primary key declared below.
+	SubCategoryTable = "sub_category_images"
 	// SubCategoryInverseTable is the table name for the SubCategory entity.
 	// It exists in this package in order to avoid circular dependency with the "subcategory" package.
 	SubCategoryInverseTable = "sub_categories"
-	// SubCategoryColumn is the table column denoting the sub_category relation/edge.
-	SubCategoryColumn = "image"
 )
 
 // Columns holds all SQL columns for image fields.
@@ -95,6 +83,27 @@ var Columns = []string{
 	FieldSizeKB,
 	FieldUploadedAt,
 }
+
+var (
+	// UserPrimaryKey and UserColumn2 are the table columns denoting the
+	// primary key for the user relation (M2M).
+	UserPrimaryKey = []string{"user", "image"}
+	// CommentPrimaryKey and CommentColumn2 are the table columns denoting the
+	// primary key for the comment relation (M2M).
+	CommentPrimaryKey = []string{"comment", "image"}
+	// BrandPrimaryKey and BrandColumn2 are the table columns denoting the
+	// primary key for the brand relation (M2M).
+	BrandPrimaryKey = []string{"brand", "image"}
+	// ProductPrimaryKey and ProductColumn2 are the table columns denoting the
+	// primary key for the product relation (M2M).
+	ProductPrimaryKey = []string{"product", "image"}
+	// CategoryPrimaryKey and CategoryColumn2 are the table columns denoting the
+	// primary key for the category relation (M2M).
+	CategoryPrimaryKey = []string{"category", "image"}
+	// SubCategoryPrimaryKey and SubCategoryColumn2 are the table columns denoting the
+	// primary key for the sub_category relation (M2M).
+	SubCategoryPrimaryKey = []string{"sub_category", "image"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -249,41 +258,41 @@ func newUserStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(UserInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, true, UserTable, UserColumn),
+		sqlgraph.Edge(sqlgraph.M2M, true, UserTable, UserPrimaryKey...),
 	)
 }
 func newCommentStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(CommentInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, true, CommentTable, CommentColumn),
+		sqlgraph.Edge(sqlgraph.M2M, true, CommentTable, CommentPrimaryKey...),
 	)
 }
 func newBrandStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(BrandInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, true, BrandTable, BrandColumn),
+		sqlgraph.Edge(sqlgraph.M2M, true, BrandTable, BrandPrimaryKey...),
 	)
 }
 func newProductStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ProductInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, true, ProductTable, ProductColumn),
+		sqlgraph.Edge(sqlgraph.M2M, true, ProductTable, ProductPrimaryKey...),
 	)
 }
 func newCategoryStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(CategoryInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, true, CategoryTable, CategoryColumn),
+		sqlgraph.Edge(sqlgraph.M2M, true, CategoryTable, CategoryPrimaryKey...),
 	)
 }
 func newSubCategoryStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(SubCategoryInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, true, SubCategoryTable, SubCategoryColumn),
+		sqlgraph.Edge(sqlgraph.M2M, true, SubCategoryTable, SubCategoryPrimaryKey...),
 	)
 }

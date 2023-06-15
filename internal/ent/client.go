@@ -848,7 +848,7 @@ func (c *BrandClient) QueryImage(b *Brand) *ImageQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(brand.Table, brand.FieldID, id),
 			sqlgraph.To(image.Table, image.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, brand.ImageTable, brand.ImageColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, brand.ImageTable, brand.ImagePrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(b.driver.Dialect(), step)
 		return fromV, nil
@@ -1030,7 +1030,7 @@ func (c *CategoryClient) QueryImage(ca *Category) *ImageQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(category.Table, category.FieldID, id),
 			sqlgraph.To(image.Table, image.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, category.ImageTable, category.ImageColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, category.ImageTable, category.ImagePrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(ca.driver.Dialect(), step)
 		return fromV, nil
@@ -1212,7 +1212,7 @@ func (c *CommentClient) QueryImage(co *Comment) *ImageQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(comment.Table, comment.FieldID, id),
 			sqlgraph.To(image.Table, image.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, comment.ImageTable, comment.ImageColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, comment.ImageTable, comment.ImagePrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
 		return fromV, nil
@@ -1544,7 +1544,7 @@ func (c *ImageClient) QueryUser(i *Image) *UserQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(image.Table, image.FieldID, id),
 			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, image.UserTable, image.UserColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, image.UserTable, image.UserPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(i.driver.Dialect(), step)
 		return fromV, nil
@@ -1560,7 +1560,7 @@ func (c *ImageClient) QueryComment(i *Image) *CommentQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(image.Table, image.FieldID, id),
 			sqlgraph.To(comment.Table, comment.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, image.CommentTable, image.CommentColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, image.CommentTable, image.CommentPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(i.driver.Dialect(), step)
 		return fromV, nil
@@ -1576,7 +1576,7 @@ func (c *ImageClient) QueryBrand(i *Image) *BrandQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(image.Table, image.FieldID, id),
 			sqlgraph.To(brand.Table, brand.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, image.BrandTable, image.BrandColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, image.BrandTable, image.BrandPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(i.driver.Dialect(), step)
 		return fromV, nil
@@ -1592,7 +1592,7 @@ func (c *ImageClient) QueryProduct(i *Image) *ProductQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(image.Table, image.FieldID, id),
 			sqlgraph.To(product.Table, product.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, image.ProductTable, image.ProductColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, image.ProductTable, image.ProductPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(i.driver.Dialect(), step)
 		return fromV, nil
@@ -1608,7 +1608,7 @@ func (c *ImageClient) QueryCategory(i *Image) *CategoryQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(image.Table, image.FieldID, id),
 			sqlgraph.To(category.Table, category.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, image.CategoryTable, image.CategoryColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, image.CategoryTable, image.CategoryPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(i.driver.Dialect(), step)
 		return fromV, nil
@@ -1624,7 +1624,7 @@ func (c *ImageClient) QuerySubCategory(i *Image) *SubCategoryQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(image.Table, image.FieldID, id),
 			sqlgraph.To(subcategory.Table, subcategory.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, image.SubCategoryTable, image.SubCategoryColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, image.SubCategoryTable, image.SubCategoryPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(i.driver.Dialect(), step)
 		return fromV, nil
@@ -2090,7 +2090,7 @@ func (c *ProductClient) QueryImage(pr *Product) *ImageQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(product.Table, product.FieldID, id),
 			sqlgraph.To(image.Table, image.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, product.ImageTable, product.ImageColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, product.ImageTable, product.ImagePrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
 		return fromV, nil
@@ -2620,7 +2620,7 @@ func (c *SubCategoryClient) QueryImage(sc *SubCategory) *ImageQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(subcategory.Table, subcategory.FieldID, id),
 			sqlgraph.To(image.Table, image.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, subcategory.ImageTable, subcategory.ImageColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, subcategory.ImageTable, subcategory.ImagePrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(sc.driver.Dialect(), step)
 		return fromV, nil
@@ -2802,7 +2802,7 @@ func (c *UserClient) QueryImage(u *User) *ImageQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, id),
 			sqlgraph.To(image.Table, image.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, user.ImageTable, user.ImageColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, user.ImageTable, user.ImagePrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
 		return fromV, nil

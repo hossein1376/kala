@@ -66,23 +66,19 @@ func (cu *CategoryUpdate) AddSubCategory(s ...*SubCategory) *CategoryUpdate {
 	return cu.AddSubCategoryIDs(ids...)
 }
 
-// SetImageID sets the "image" edge to the Image entity by ID.
-func (cu *CategoryUpdate) SetImageID(id int) *CategoryUpdate {
-	cu.mutation.SetImageID(id)
+// AddImageIDs adds the "image" edge to the Image entity by IDs.
+func (cu *CategoryUpdate) AddImageIDs(ids ...int) *CategoryUpdate {
+	cu.mutation.AddImageIDs(ids...)
 	return cu
 }
 
-// SetNillableImageID sets the "image" edge to the Image entity by ID if the given value is not nil.
-func (cu *CategoryUpdate) SetNillableImageID(id *int) *CategoryUpdate {
-	if id != nil {
-		cu = cu.SetImageID(*id)
+// AddImage adds the "image" edges to the Image entity.
+func (cu *CategoryUpdate) AddImage(i ...*Image) *CategoryUpdate {
+	ids := make([]int, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
 	}
-	return cu
-}
-
-// SetImage sets the "image" edge to the Image entity.
-func (cu *CategoryUpdate) SetImage(i *Image) *CategoryUpdate {
-	return cu.SetImageID(i.ID)
+	return cu.AddImageIDs(ids...)
 }
 
 // AddProductIDs adds the "product" edge to the Product entity by IDs.
@@ -156,10 +152,25 @@ func (cu *CategoryUpdate) RemoveSubCategory(s ...*SubCategory) *CategoryUpdate {
 	return cu.RemoveSubCategoryIDs(ids...)
 }
 
-// ClearImage clears the "image" edge to the Image entity.
+// ClearImage clears all "image" edges to the Image entity.
 func (cu *CategoryUpdate) ClearImage() *CategoryUpdate {
 	cu.mutation.ClearImage()
 	return cu
+}
+
+// RemoveImageIDs removes the "image" edge to Image entities by IDs.
+func (cu *CategoryUpdate) RemoveImageIDs(ids ...int) *CategoryUpdate {
+	cu.mutation.RemoveImageIDs(ids...)
+	return cu
+}
+
+// RemoveImage removes "image" edges to Image entities.
+func (cu *CategoryUpdate) RemoveImage(i ...*Image) *CategoryUpdate {
+	ids := make([]int, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return cu.RemoveImageIDs(ids...)
 }
 
 // ClearProduct clears all "product" edges to the Product entity.
@@ -344,10 +355,10 @@ func (cu *CategoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if cu.mutation.ImageCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   category.ImageTable,
-			Columns: []string{category.ImageColumn},
+			Columns: category.ImagePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),
@@ -355,12 +366,28 @@ func (cu *CategoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cu.mutation.ImageIDs(); len(nodes) > 0 {
+	if nodes := cu.mutation.RemovedImageIDs(); len(nodes) > 0 && !cu.mutation.ImageCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   category.ImageTable,
-			Columns: []string{category.ImageColumn},
+			Columns: category.ImagePrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.ImageIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   category.ImageTable,
+			Columns: category.ImagePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),
@@ -559,23 +586,19 @@ func (cuo *CategoryUpdateOne) AddSubCategory(s ...*SubCategory) *CategoryUpdateO
 	return cuo.AddSubCategoryIDs(ids...)
 }
 
-// SetImageID sets the "image" edge to the Image entity by ID.
-func (cuo *CategoryUpdateOne) SetImageID(id int) *CategoryUpdateOne {
-	cuo.mutation.SetImageID(id)
+// AddImageIDs adds the "image" edge to the Image entity by IDs.
+func (cuo *CategoryUpdateOne) AddImageIDs(ids ...int) *CategoryUpdateOne {
+	cuo.mutation.AddImageIDs(ids...)
 	return cuo
 }
 
-// SetNillableImageID sets the "image" edge to the Image entity by ID if the given value is not nil.
-func (cuo *CategoryUpdateOne) SetNillableImageID(id *int) *CategoryUpdateOne {
-	if id != nil {
-		cuo = cuo.SetImageID(*id)
+// AddImage adds the "image" edges to the Image entity.
+func (cuo *CategoryUpdateOne) AddImage(i ...*Image) *CategoryUpdateOne {
+	ids := make([]int, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
 	}
-	return cuo
-}
-
-// SetImage sets the "image" edge to the Image entity.
-func (cuo *CategoryUpdateOne) SetImage(i *Image) *CategoryUpdateOne {
-	return cuo.SetImageID(i.ID)
+	return cuo.AddImageIDs(ids...)
 }
 
 // AddProductIDs adds the "product" edge to the Product entity by IDs.
@@ -649,10 +672,25 @@ func (cuo *CategoryUpdateOne) RemoveSubCategory(s ...*SubCategory) *CategoryUpda
 	return cuo.RemoveSubCategoryIDs(ids...)
 }
 
-// ClearImage clears the "image" edge to the Image entity.
+// ClearImage clears all "image" edges to the Image entity.
 func (cuo *CategoryUpdateOne) ClearImage() *CategoryUpdateOne {
 	cuo.mutation.ClearImage()
 	return cuo
+}
+
+// RemoveImageIDs removes the "image" edge to Image entities by IDs.
+func (cuo *CategoryUpdateOne) RemoveImageIDs(ids ...int) *CategoryUpdateOne {
+	cuo.mutation.RemoveImageIDs(ids...)
+	return cuo
+}
+
+// RemoveImage removes "image" edges to Image entities.
+func (cuo *CategoryUpdateOne) RemoveImage(i ...*Image) *CategoryUpdateOne {
+	ids := make([]int, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return cuo.RemoveImageIDs(ids...)
 }
 
 // ClearProduct clears all "product" edges to the Product entity.
@@ -867,10 +905,10 @@ func (cuo *CategoryUpdateOne) sqlSave(ctx context.Context) (_node *Category, err
 	}
 	if cuo.mutation.ImageCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   category.ImageTable,
-			Columns: []string{category.ImageColumn},
+			Columns: category.ImagePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),
@@ -878,12 +916,28 @@ func (cuo *CategoryUpdateOne) sqlSave(ctx context.Context) (_node *Category, err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cuo.mutation.ImageIDs(); len(nodes) > 0 {
+	if nodes := cuo.mutation.RemovedImageIDs(); len(nodes) > 0 && !cuo.mutation.ImageCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   category.ImageTable,
-			Columns: []string{category.ImageColumn},
+			Columns: category.ImagePrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.ImageIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   category.ImageTable,
+			Columns: category.ImagePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),

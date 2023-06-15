@@ -616,7 +616,7 @@ func HasImage() predicate.Product {
 	return predicate.Product(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, ImageTable, ImageColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, ImageTable, ImagePrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

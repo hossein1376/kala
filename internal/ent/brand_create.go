@@ -81,23 +81,19 @@ func (bc *BrandCreate) SetRatingCount(i int32) *BrandCreate {
 	return bc
 }
 
-// SetImageID sets the "image" edge to the Image entity by ID.
-func (bc *BrandCreate) SetImageID(id int) *BrandCreate {
-	bc.mutation.SetImageID(id)
+// AddImageIDs adds the "image" edge to the Image entity by IDs.
+func (bc *BrandCreate) AddImageIDs(ids ...int) *BrandCreate {
+	bc.mutation.AddImageIDs(ids...)
 	return bc
 }
 
-// SetNillableImageID sets the "image" edge to the Image entity by ID if the given value is not nil.
-func (bc *BrandCreate) SetNillableImageID(id *int) *BrandCreate {
-	if id != nil {
-		bc = bc.SetImageID(*id)
+// AddImage adds the "image" edges to the Image entity.
+func (bc *BrandCreate) AddImage(i ...*Image) *BrandCreate {
+	ids := make([]int, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
 	}
-	return bc
-}
-
-// SetImage sets the "image" edge to the Image entity.
-func (bc *BrandCreate) SetImage(i *Image) *BrandCreate {
-	return bc.SetImageID(i.ID)
+	return bc.AddImageIDs(ids...)
 }
 
 // AddCategoryIDs adds the "category" edge to the Category entity by IDs.
@@ -254,10 +250,10 @@ func (bc *BrandCreate) createSpec() (*Brand, *sqlgraph.CreateSpec) {
 	}
 	if nodes := bc.mutation.ImageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   brand.ImageTable,
-			Columns: []string{brand.ImageColumn},
+			Columns: brand.ImagePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),
@@ -266,7 +262,6 @@ func (bc *BrandCreate) createSpec() (*Brand, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.image = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := bc.mutation.CategoryIDs(); len(nodes) > 0 {

@@ -43,8 +43,9 @@ func (User) Edges() []ent.Edge {
 				edge.Columns("user", "comment"),
 				edge.Symbols("user_id", "comment_id")),
 		edge.To("image", Image.Type).
-			StorageKey(edge.Column("image")).
-			Unique(),
+			StorageKey(edge.Table("user_images"),
+				edge.Columns("user", "image"),
+				edge.Symbols("user_id", "image_id")),
 		edge.To("seller", Seller.Type).
 			StorageKey(edge.Column("user_id")),
 		edge.To("order", Order.Type).

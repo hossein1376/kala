@@ -81,23 +81,19 @@ func (bu *BrandUpdate) AddRatingCount(i int32) *BrandUpdate {
 	return bu
 }
 
-// SetImageID sets the "image" edge to the Image entity by ID.
-func (bu *BrandUpdate) SetImageID(id int) *BrandUpdate {
-	bu.mutation.SetImageID(id)
+// AddImageIDs adds the "image" edge to the Image entity by IDs.
+func (bu *BrandUpdate) AddImageIDs(ids ...int) *BrandUpdate {
+	bu.mutation.AddImageIDs(ids...)
 	return bu
 }
 
-// SetNillableImageID sets the "image" edge to the Image entity by ID if the given value is not nil.
-func (bu *BrandUpdate) SetNillableImageID(id *int) *BrandUpdate {
-	if id != nil {
-		bu = bu.SetImageID(*id)
+// AddImage adds the "image" edges to the Image entity.
+func (bu *BrandUpdate) AddImage(i ...*Image) *BrandUpdate {
+	ids := make([]int, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
 	}
-	return bu
-}
-
-// SetImage sets the "image" edge to the Image entity.
-func (bu *BrandUpdate) SetImage(i *Image) *BrandUpdate {
-	return bu.SetImageID(i.ID)
+	return bu.AddImageIDs(ids...)
 }
 
 // AddCategoryIDs adds the "category" edge to the Category entity by IDs.
@@ -135,10 +131,25 @@ func (bu *BrandUpdate) Mutation() *BrandMutation {
 	return bu.mutation
 }
 
-// ClearImage clears the "image" edge to the Image entity.
+// ClearImage clears all "image" edges to the Image entity.
 func (bu *BrandUpdate) ClearImage() *BrandUpdate {
 	bu.mutation.ClearImage()
 	return bu
+}
+
+// RemoveImageIDs removes the "image" edge to Image entities by IDs.
+func (bu *BrandUpdate) RemoveImageIDs(ids ...int) *BrandUpdate {
+	bu.mutation.RemoveImageIDs(ids...)
+	return bu
+}
+
+// RemoveImage removes "image" edges to Image entities.
+func (bu *BrandUpdate) RemoveImage(i ...*Image) *BrandUpdate {
+	ids := make([]int, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return bu.RemoveImageIDs(ids...)
 }
 
 // ClearCategory clears all "category" edges to the Category entity.
@@ -254,10 +265,10 @@ func (bu *BrandUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if bu.mutation.ImageCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   brand.ImageTable,
-			Columns: []string{brand.ImageColumn},
+			Columns: brand.ImagePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),
@@ -265,12 +276,28 @@ func (bu *BrandUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := bu.mutation.ImageIDs(); len(nodes) > 0 {
+	if nodes := bu.mutation.RemovedImageIDs(); len(nodes) > 0 && !bu.mutation.ImageCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   brand.ImageTable,
-			Columns: []string{brand.ImageColumn},
+			Columns: brand.ImagePrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := bu.mutation.ImageIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   brand.ImageTable,
+			Columns: brand.ImagePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),
@@ -441,23 +468,19 @@ func (buo *BrandUpdateOne) AddRatingCount(i int32) *BrandUpdateOne {
 	return buo
 }
 
-// SetImageID sets the "image" edge to the Image entity by ID.
-func (buo *BrandUpdateOne) SetImageID(id int) *BrandUpdateOne {
-	buo.mutation.SetImageID(id)
+// AddImageIDs adds the "image" edge to the Image entity by IDs.
+func (buo *BrandUpdateOne) AddImageIDs(ids ...int) *BrandUpdateOne {
+	buo.mutation.AddImageIDs(ids...)
 	return buo
 }
 
-// SetNillableImageID sets the "image" edge to the Image entity by ID if the given value is not nil.
-func (buo *BrandUpdateOne) SetNillableImageID(id *int) *BrandUpdateOne {
-	if id != nil {
-		buo = buo.SetImageID(*id)
+// AddImage adds the "image" edges to the Image entity.
+func (buo *BrandUpdateOne) AddImage(i ...*Image) *BrandUpdateOne {
+	ids := make([]int, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
 	}
-	return buo
-}
-
-// SetImage sets the "image" edge to the Image entity.
-func (buo *BrandUpdateOne) SetImage(i *Image) *BrandUpdateOne {
-	return buo.SetImageID(i.ID)
+	return buo.AddImageIDs(ids...)
 }
 
 // AddCategoryIDs adds the "category" edge to the Category entity by IDs.
@@ -495,10 +518,25 @@ func (buo *BrandUpdateOne) Mutation() *BrandMutation {
 	return buo.mutation
 }
 
-// ClearImage clears the "image" edge to the Image entity.
+// ClearImage clears all "image" edges to the Image entity.
 func (buo *BrandUpdateOne) ClearImage() *BrandUpdateOne {
 	buo.mutation.ClearImage()
 	return buo
+}
+
+// RemoveImageIDs removes the "image" edge to Image entities by IDs.
+func (buo *BrandUpdateOne) RemoveImageIDs(ids ...int) *BrandUpdateOne {
+	buo.mutation.RemoveImageIDs(ids...)
+	return buo
+}
+
+// RemoveImage removes "image" edges to Image entities.
+func (buo *BrandUpdateOne) RemoveImage(i ...*Image) *BrandUpdateOne {
+	ids := make([]int, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return buo.RemoveImageIDs(ids...)
 }
 
 // ClearCategory clears all "category" edges to the Category entity.
@@ -644,10 +682,10 @@ func (buo *BrandUpdateOne) sqlSave(ctx context.Context) (_node *Brand, err error
 	}
 	if buo.mutation.ImageCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   brand.ImageTable,
-			Columns: []string{brand.ImageColumn},
+			Columns: brand.ImagePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),
@@ -655,12 +693,28 @@ func (buo *BrandUpdateOne) sqlSave(ctx context.Context) (_node *Brand, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := buo.mutation.ImageIDs(); len(nodes) > 0 {
+	if nodes := buo.mutation.RemovedImageIDs(); len(nodes) > 0 && !buo.mutation.ImageCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   brand.ImageTable,
-			Columns: []string{brand.ImageColumn},
+			Columns: brand.ImagePrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := buo.mutation.ImageIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   brand.ImageTable,
+			Columns: brand.ImagePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),

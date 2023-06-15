@@ -33,8 +33,9 @@ func (Category) Edges() []ent.Edge {
 		edge.To("sub_category", SubCategory.Type).
 			StorageKey(edge.Column("category")),
 		edge.To("image", Image.Type).
-			StorageKey(edge.Column("image")).
-			Unique(),
+			StorageKey(edge.Table("category_images"),
+				edge.Columns("category", "image"),
+				edge.Symbols("category_id", "image_id")),
 
 		edge.From("product", Product.Type).Ref("category"),
 		edge.From("brand", Brand.Type).Ref("category"),

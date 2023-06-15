@@ -122,9 +122,9 @@ func (h *handler) updateProductByIDHandler(w http.ResponseWriter, r *http.Reques
 	if input.RatingCount != nil {
 		product.RatingCount = *input.RatingCount
 	}
-	//if input.Images != nil {
-	//	product.Edges.Image = input.Images
-	//}
+	if input.Images != nil {
+		product.Edges.Image = input.Images
+	}
 	if input.Category != nil {
 		product.Edges.Category = input.Category
 	}

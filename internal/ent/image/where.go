@@ -475,7 +475,7 @@ func HasUser() predicate.Image {
 	return predicate.Image(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, UserTable, UserColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, UserTable, UserPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -498,7 +498,7 @@ func HasComment() predicate.Image {
 	return predicate.Image(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, CommentTable, CommentColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, CommentTable, CommentPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -521,7 +521,7 @@ func HasBrand() predicate.Image {
 	return predicate.Image(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, BrandTable, BrandColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, BrandTable, BrandPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -544,7 +544,7 @@ func HasProduct() predicate.Image {
 	return predicate.Image(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, ProductTable, ProductColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, ProductTable, ProductPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -567,7 +567,7 @@ func HasCategory() predicate.Image {
 	return predicate.Image(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, CategoryTable, CategoryColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, CategoryTable, CategoryPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -590,7 +590,7 @@ func HasSubCategory() predicate.Image {
 	return predicate.Image(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, SubCategoryTable, SubCategoryColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, SubCategoryTable, SubCategoryPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

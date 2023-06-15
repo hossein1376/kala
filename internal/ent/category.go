@@ -5,7 +5,6 @@ package ent
 import (
 	"fmt"
 	"kala/internal/ent/category"
-	"kala/internal/ent/image"
 	"strings"
 	"time"
 
@@ -29,7 +28,6 @@ type Category struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CategoryQuery when eager-loading is set.
 	Edges        CategoryEdges `json:"edges"`
-	image        *int
 	selectValues sql.SelectValues
 }
 
@@ -38,7 +36,7 @@ type CategoryEdges struct {
 	// SubCategory holds the value of the sub_category edge.
 	SubCategory []*SubCategory `json:"sub_category,omitempty"`
 	// Image holds the value of the image edge.
-	Image *Image `json:"image,omitempty"`
+	Image []*Image `json:"image,omitempty"`
 	// Product holds the value of the product edge.
 	Product []*Product `json:"product,omitempty"`
 	// Brand holds the value of the brand edge.
@@ -60,13 +58,9 @@ func (e CategoryEdges) SubCategoryOrErr() ([]*SubCategory, error) {
 }
 
 // ImageOrErr returns the Image value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e CategoryEdges) ImageOrErr() (*Image, error) {
+// was not loaded in eager-loading.
+func (e CategoryEdges) ImageOrErr() ([]*Image, error) {
 	if e.loadedTypes[1] {
-		if e.Image == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: image.Label}
-		}
 		return e.Image, nil
 	}
 	return nil, &NotLoadedError{edge: "image"}
@@ -110,8 +104,6 @@ func (*Category) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case category.FieldCreateTime, category.FieldUpdateTime:
 			values[i] = new(sql.NullTime)
-		case category.ForeignKeys[0]: // image
-			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -156,13 +148,6 @@ func (c *Category) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field description", values[i])
 			} else if value.Valid {
 				c.Description = value.String
-			}
-		case category.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field image", value)
-			} else if value.Valid {
-				c.image = new(int)
-				*c.image = int(value.Int64)
 			}
 		default:
 			c.selectValues.Set(columns[i], values[i])

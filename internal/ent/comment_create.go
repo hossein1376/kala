@@ -127,23 +127,19 @@ func (cc *CommentCreate) SetVerifiedBuyer(b bool) *CommentCreate {
 	return cc
 }
 
-// SetImageID sets the "image" edge to the Image entity by ID.
-func (cc *CommentCreate) SetImageID(id int) *CommentCreate {
-	cc.mutation.SetImageID(id)
+// AddImageIDs adds the "image" edge to the Image entity by IDs.
+func (cc *CommentCreate) AddImageIDs(ids ...int) *CommentCreate {
+	cc.mutation.AddImageIDs(ids...)
 	return cc
 }
 
-// SetNillableImageID sets the "image" edge to the Image entity by ID if the given value is not nil.
-func (cc *CommentCreate) SetNillableImageID(id *int) *CommentCreate {
-	if id != nil {
-		cc = cc.SetImageID(*id)
+// AddImage adds the "image" edges to the Image entity.
+func (cc *CommentCreate) AddImage(i ...*Image) *CommentCreate {
+	ids := make([]int, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
 	}
-	return cc
-}
-
-// SetImage sets the "image" edge to the Image entity.
-func (cc *CommentCreate) SetImage(i *Image) *CommentCreate {
-	return cc.SetImageID(i.ID)
+	return cc.AddImageIDs(ids...)
 }
 
 // AddConIDs adds the "cons" edge to the Cons entity by IDs.
@@ -390,10 +386,10 @@ func (cc *CommentCreate) createSpec() (*Comment, *sqlgraph.CreateSpec) {
 	}
 	if nodes := cc.mutation.ImageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   comment.ImageTable,
-			Columns: []string{comment.ImageColumn},
+			Columns: comment.ImagePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),
@@ -402,7 +398,6 @@ func (cc *CommentCreate) createSpec() (*Comment, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.image = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := cc.mutation.ConsIDs(); len(nodes) > 0 {

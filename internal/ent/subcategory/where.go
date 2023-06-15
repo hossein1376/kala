@@ -290,7 +290,7 @@ func HasImage() predicate.SubCategory {
 	return predicate.SubCategory(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, ImageTable, ImageColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, ImageTable, ImagePrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

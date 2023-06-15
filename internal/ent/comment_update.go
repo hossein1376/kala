@@ -141,23 +141,19 @@ func (cu *CommentUpdate) SetVerifiedBuyer(b bool) *CommentUpdate {
 	return cu
 }
 
-// SetImageID sets the "image" edge to the Image entity by ID.
-func (cu *CommentUpdate) SetImageID(id int) *CommentUpdate {
-	cu.mutation.SetImageID(id)
+// AddImageIDs adds the "image" edge to the Image entity by IDs.
+func (cu *CommentUpdate) AddImageIDs(ids ...int) *CommentUpdate {
+	cu.mutation.AddImageIDs(ids...)
 	return cu
 }
 
-// SetNillableImageID sets the "image" edge to the Image entity by ID if the given value is not nil.
-func (cu *CommentUpdate) SetNillableImageID(id *int) *CommentUpdate {
-	if id != nil {
-		cu = cu.SetImageID(*id)
+// AddImage adds the "image" edges to the Image entity.
+func (cu *CommentUpdate) AddImage(i ...*Image) *CommentUpdate {
+	ids := make([]int, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
 	}
-	return cu
-}
-
-// SetImage sets the "image" edge to the Image entity.
-func (cu *CommentUpdate) SetImage(i *Image) *CommentUpdate {
-	return cu.SetImageID(i.ID)
+	return cu.AddImageIDs(ids...)
 }
 
 // AddConIDs adds the "cons" edge to the Cons entity by IDs.
@@ -225,10 +221,25 @@ func (cu *CommentUpdate) Mutation() *CommentMutation {
 	return cu.mutation
 }
 
-// ClearImage clears the "image" edge to the Image entity.
+// ClearImage clears all "image" edges to the Image entity.
 func (cu *CommentUpdate) ClearImage() *CommentUpdate {
 	cu.mutation.ClearImage()
 	return cu
+}
+
+// RemoveImageIDs removes the "image" edge to Image entities by IDs.
+func (cu *CommentUpdate) RemoveImageIDs(ids ...int) *CommentUpdate {
+	cu.mutation.RemoveImageIDs(ids...)
+	return cu
+}
+
+// RemoveImage removes "image" edges to Image entities.
+func (cu *CommentUpdate) RemoveImage(i ...*Image) *CommentUpdate {
+	ids := make([]int, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return cu.RemoveImageIDs(ids...)
 }
 
 // ClearCons clears all "cons" edges to the Cons entity.
@@ -436,10 +447,10 @@ func (cu *CommentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if cu.mutation.ImageCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   comment.ImageTable,
-			Columns: []string{comment.ImageColumn},
+			Columns: comment.ImagePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),
@@ -447,12 +458,28 @@ func (cu *CommentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cu.mutation.ImageIDs(); len(nodes) > 0 {
+	if nodes := cu.mutation.RemovedImageIDs(); len(nodes) > 0 && !cu.mutation.ImageCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   comment.ImageTable,
-			Columns: []string{comment.ImageColumn},
+			Columns: comment.ImagePrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.ImageIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   comment.ImageTable,
+			Columns: comment.ImagePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),
@@ -771,23 +798,19 @@ func (cuo *CommentUpdateOne) SetVerifiedBuyer(b bool) *CommentUpdateOne {
 	return cuo
 }
 
-// SetImageID sets the "image" edge to the Image entity by ID.
-func (cuo *CommentUpdateOne) SetImageID(id int) *CommentUpdateOne {
-	cuo.mutation.SetImageID(id)
+// AddImageIDs adds the "image" edge to the Image entity by IDs.
+func (cuo *CommentUpdateOne) AddImageIDs(ids ...int) *CommentUpdateOne {
+	cuo.mutation.AddImageIDs(ids...)
 	return cuo
 }
 
-// SetNillableImageID sets the "image" edge to the Image entity by ID if the given value is not nil.
-func (cuo *CommentUpdateOne) SetNillableImageID(id *int) *CommentUpdateOne {
-	if id != nil {
-		cuo = cuo.SetImageID(*id)
+// AddImage adds the "image" edges to the Image entity.
+func (cuo *CommentUpdateOne) AddImage(i ...*Image) *CommentUpdateOne {
+	ids := make([]int, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
 	}
-	return cuo
-}
-
-// SetImage sets the "image" edge to the Image entity.
-func (cuo *CommentUpdateOne) SetImage(i *Image) *CommentUpdateOne {
-	return cuo.SetImageID(i.ID)
+	return cuo.AddImageIDs(ids...)
 }
 
 // AddConIDs adds the "cons" edge to the Cons entity by IDs.
@@ -855,10 +878,25 @@ func (cuo *CommentUpdateOne) Mutation() *CommentMutation {
 	return cuo.mutation
 }
 
-// ClearImage clears the "image" edge to the Image entity.
+// ClearImage clears all "image" edges to the Image entity.
 func (cuo *CommentUpdateOne) ClearImage() *CommentUpdateOne {
 	cuo.mutation.ClearImage()
 	return cuo
+}
+
+// RemoveImageIDs removes the "image" edge to Image entities by IDs.
+func (cuo *CommentUpdateOne) RemoveImageIDs(ids ...int) *CommentUpdateOne {
+	cuo.mutation.RemoveImageIDs(ids...)
+	return cuo
+}
+
+// RemoveImage removes "image" edges to Image entities.
+func (cuo *CommentUpdateOne) RemoveImage(i ...*Image) *CommentUpdateOne {
+	ids := make([]int, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return cuo.RemoveImageIDs(ids...)
 }
 
 // ClearCons clears all "cons" edges to the Cons entity.
@@ -1096,10 +1134,10 @@ func (cuo *CommentUpdateOne) sqlSave(ctx context.Context) (_node *Comment, err e
 	}
 	if cuo.mutation.ImageCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   comment.ImageTable,
-			Columns: []string{comment.ImageColumn},
+			Columns: comment.ImagePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),
@@ -1107,12 +1145,28 @@ func (cuo *CommentUpdateOne) sqlSave(ctx context.Context) (_node *Comment, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cuo.mutation.ImageIDs(); len(nodes) > 0 {
+	if nodes := cuo.mutation.RemovedImageIDs(); len(nodes) > 0 && !cuo.mutation.ImageCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   comment.ImageTable,
-			Columns: []string{comment.ImageColumn},
+			Columns: comment.ImagePrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.ImageIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   comment.ImageTable,
+			Columns: comment.ImagePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),
