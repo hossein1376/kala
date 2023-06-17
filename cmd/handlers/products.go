@@ -11,7 +11,7 @@ func (h *handler) createNewProductHandler(w http.ResponseWriter, r *http.Request
 	var input structure.Product
 	err := h.ReadJSONiter(w, r, &input)
 	if err != nil {
-		h.BadRequestResponse(w, r, err)
+		h.error.BadRequestResponse(w, r, err)
 		return
 	}
 
@@ -19,16 +19,16 @@ func (h *handler) createNewProductHandler(w http.ResponseWriter, r *http.Request
 	if err != nil {
 		switch {
 		case ent.IsConstraintError(err) || ent.IsValidationError(err):
-			h.BadRequestResponse(w, r, err)
+			h.error.BadRequestResponse(w, r, err)
 		default:
-			h.InternalServerErrorResponse(w, r, err)
+			h.error.InternalServerErrorResponse(w, r, err)
 		}
 		return
 	}
 
 	err = h.WriteJSONiter(w, http.StatusCreated, product, nil)
 	if err != nil {
-		h.InternalServerErrorResponse(w, r, err)
+		h.error.InternalServerErrorResponse(w, r, err)
 		return
 	}
 }
@@ -36,7 +36,7 @@ func (h *handler) createNewProductHandler(w http.ResponseWriter, r *http.Request
 func (h *handler) getProductByIDHandler(w http.ResponseWriter, r *http.Request) {
 	id := paramInt(r, "id")
 	if id == 0 {
-		h.NotFoundResponse(w, r)
+		h.error.NotFoundResponse(w, r)
 		return
 	}
 
@@ -44,17 +44,17 @@ func (h *handler) getProductByIDHandler(w http.ResponseWriter, r *http.Request) 
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
-			h.NotFoundResponse(w, r)
+			h.error.NotFoundResponse(w, r)
 			return
 		default:
-			h.InternalServerErrorResponse(w, r, err)
+			h.error.InternalServerErrorResponse(w, r, err)
 			return
 		}
 	}
 
 	err = h.WriteJSONiter(w, http.StatusOK, product, nil)
 	if err != nil {
-		h.InternalServerErrorResponse(w, r, err)
+		h.error.InternalServerErrorResponse(w, r, err)
 		return
 	}
 }
@@ -62,13 +62,13 @@ func (h *handler) getProductByIDHandler(w http.ResponseWriter, r *http.Request) 
 func (h *handler) getAllProductsHandler(w http.ResponseWriter, r *http.Request) {
 	products, err := h.app.Models.Product.GetAllProducts()
 	if err != nil {
-		h.InternalServerErrorResponse(w, r, err)
+		h.error.InternalServerErrorResponse(w, r, err)
 		return
 	}
 
 	err = h.WriteJSONiter(w, http.StatusOK, products, nil)
 	if err != nil {
-		h.InternalServerErrorResponse(w, r, err)
+		h.error.InternalServerErrorResponse(w, r, err)
 		return
 	}
 }
@@ -76,14 +76,14 @@ func (h *handler) getAllProductsHandler(w http.ResponseWriter, r *http.Request) 
 func (h *handler) updateProductByIDHandler(w http.ResponseWriter, r *http.Request) {
 	id := paramInt(r, "id")
 	if id == 0 {
-		h.NotFoundResponse(w, r)
+		h.error.NotFoundResponse(w, r)
 		return
 	}
 
 	var input structure.ProductUpdate
 	err := h.ReadJSONiter(w, r, &input)
 	if err != nil {
-		h.BadRequestResponse(w, r, err)
+		h.error.BadRequestResponse(w, r, err)
 		return
 	}
 
@@ -91,9 +91,9 @@ func (h *handler) updateProductByIDHandler(w http.ResponseWriter, r *http.Reques
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
-			h.NotFoundResponse(w, r)
+			h.error.NotFoundResponse(w, r)
 		default:
-			h.InternalServerErrorResponse(w, r, err)
+			h.error.InternalServerErrorResponse(w, r, err)
 		}
 		return
 	}
@@ -139,16 +139,16 @@ func (h *handler) updateProductByIDHandler(w http.ResponseWriter, r *http.Reques
 	if err != nil {
 		switch {
 		case ent.IsConstraintError(err) || ent.IsValidationError(err):
-			h.BadRequestResponse(w, r, err)
+			h.error.BadRequestResponse(w, r, err)
 		default:
-			h.InternalServerErrorResponse(w, r, err)
+			h.error.InternalServerErrorResponse(w, r, err)
 		}
 		return
 	}
 
 	err = h.WriteJSONiter(w, http.StatusNoContent, product, nil)
 	if err != nil {
-		h.InternalServerErrorResponse(w, r, err)
+		h.error.InternalServerErrorResponse(w, r, err)
 		return
 	}
 }
@@ -156,7 +156,7 @@ func (h *handler) updateProductByIDHandler(w http.ResponseWriter, r *http.Reques
 func (h *handler) deleteProductByIDHandler(w http.ResponseWriter, r *http.Request) {
 	id := paramInt(r, "id")
 	if id == 0 {
-		h.NotFoundResponse(w, r)
+		h.error.NotFoundResponse(w, r)
 		return
 	}
 
@@ -164,16 +164,16 @@ func (h *handler) deleteProductByIDHandler(w http.ResponseWriter, r *http.Reques
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
-			h.NotFoundResponse(w, r)
+			h.error.NotFoundResponse(w, r)
 		default:
-			h.InternalServerErrorResponse(w, r, err)
+			h.error.InternalServerErrorResponse(w, r, err)
 		}
 		return
 	}
 
 	err = h.WriteJSONiter(w, http.StatusOK, nil, nil)
 	if err != nil {
-		h.InternalServerErrorResponse(w, r, err)
+		h.error.InternalServerErrorResponse(w, r, err)
 		return
 	}
 

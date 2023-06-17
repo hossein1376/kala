@@ -12,14 +12,15 @@ import (
 )
 
 type handler struct {
-	app *cmd.Application
-	*Errors.Errors
+	app   *cmd.Application
+	error *Errors.Errors
 	Json.Json
 }
 
 func NewHandlers(app *cmd.Application) *handler {
 	return &handler{
-		app: app,
+		app:   app,
+		error: Errors.NewErrors(app.Logger),
 	}
 }
 

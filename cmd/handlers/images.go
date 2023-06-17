@@ -12,14 +12,14 @@ import (
 func (h *handler) createNewImageHandler(w http.ResponseWriter, r *http.Request) {
 	file, header, err := r.FormFile("image")
 	if err != nil {
-		h.BadRequestResponse(w, r, err)
+		h.error.BadRequestResponse(w, r, err)
 		return
 	}
 	defer file.Close()
 
 	err = os.MkdirAll("/etc/www/images", os.ModePerm)
 	if err != nil {
-		h.InternalServerErrorResponse(w, r, err)
+		h.error.InternalServerErrorResponse(w, r, err)
 		return
 	}
 
