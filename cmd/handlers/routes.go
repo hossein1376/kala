@@ -72,7 +72,7 @@ func (h *handler) Router() *chi.Mux {
 		})
 
 		// image route
-		r.Route("images", func(r chi.Router) {
+		r.Route("/images", func(r chi.Router) {
 			r.Post("/", h.createNewImageHandler)
 		})
 	})
