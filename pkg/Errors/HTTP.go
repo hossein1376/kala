@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"kala/pkg/Json"
+	"github.com/hossein1376/kala/pkg/Json"
 
 	"golang.org/x/exp/slog"
 )
@@ -48,8 +48,12 @@ func (e *Errors) InternalServerErrorResponse(w http.ResponseWriter, r *http.Requ
 }
 
 // NotFoundResponse returns the classic 404
-func (e *Errors) NotFoundResponse(w http.ResponseWriter, r *http.Request) {
-	e.errorResponse(w, r, http.StatusNotFound, http.StatusText(http.StatusNotFound))
+func (e *Errors) NotFoundResponse(w http.ResponseWriter, r *http.Request, err error) {
+	if err == nil {
+		e.errorResponse(w, r, http.StatusNotFound, http.StatusText(http.StatusNotFound))
+	} else {
+		e.errorResponse(w, r, http.StatusNotFound, err.Error())
+	}
 }
 
 // MethodNotAllowedResponse is returned when the request's method is not acceptable

@@ -10,7 +10,7 @@ import (
 	"syscall"
 	"time"
 
-	"kala/cmd"
+	"github.com/hossein1376/kala/cmd"
 
 	"github.com/go-chi/chi/v5"
 	"golang.org/x/exp/slog"

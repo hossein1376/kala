@@ -3,22 +3,23 @@
 package ent
 
 import (
-	"kala/internal/ent/address"
-	"kala/internal/ent/attribute"
-	"kala/internal/ent/attributevalue"
-	"kala/internal/ent/brand"
-	"kala/internal/ent/category"
-	"kala/internal/ent/comment"
-	"kala/internal/ent/cons"
-	"kala/internal/ent/image"
-	"kala/internal/ent/order"
-	"kala/internal/ent/product"
-	"kala/internal/ent/pros"
-	"kala/internal/ent/schema"
-	"kala/internal/ent/seller"
-	"kala/internal/ent/subcategory"
-	"kala/internal/ent/user"
 	"time"
+
+	"github.com/hossein1376/kala/internal/ent/address"
+	"github.com/hossein1376/kala/internal/ent/attribute"
+	"github.com/hossein1376/kala/internal/ent/attributevalue"
+	"github.com/hossein1376/kala/internal/ent/brand"
+	"github.com/hossein1376/kala/internal/ent/category"
+	"github.com/hossein1376/kala/internal/ent/comment"
+	"github.com/hossein1376/kala/internal/ent/cons"
+	"github.com/hossein1376/kala/internal/ent/image"
+	"github.com/hossein1376/kala/internal/ent/order"
+	"github.com/hossein1376/kala/internal/ent/product"
+	"github.com/hossein1376/kala/internal/ent/pros"
+	"github.com/hossein1376/kala/internal/ent/schema"
+	"github.com/hossein1376/kala/internal/ent/seller"
+	"github.com/hossein1376/kala/internal/ent/subcategory"
+	"github.com/hossein1376/kala/internal/ent/user"
 )
 
 // The init function reads all schema descriptors with runtime code
@@ -166,10 +167,10 @@ func init() {
 	imageDescWidth := imageFields[3].Descriptor()
 	// image.WidthValidator is a validator for the "width" field. It is called by the builders before save.
 	image.WidthValidator = imageDescWidth.Validators[0].(func(int32) error)
-	// imageDescHigh is the schema descriptor for high field.
-	imageDescHigh := imageFields[4].Descriptor()
-	// image.HighValidator is a validator for the "high" field. It is called by the builders before save.
-	image.HighValidator = imageDescHigh.Validators[0].(func(int32) error)
+	// imageDescHeight is the schema descriptor for height field.
+	imageDescHeight := imageFields[4].Descriptor()
+	// image.HeightValidator is a validator for the "height" field. It is called by the builders before save.
+	image.HeightValidator = imageDescHeight.Validators[0].(func(int32) error)
 	// imageDescSizeKB is the schema descriptor for size_kb field.
 	imageDescSizeKB := imageFields[5].Descriptor()
 	// image.SizeKBValidator is a validator for the "size_kb" field. It is called by the builders before save.

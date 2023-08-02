@@ -6,19 +6,19 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"kala/internal/ent/brand"
-	"kala/internal/ent/category"
-	"kala/internal/ent/comment"
-	"kala/internal/ent/image"
-	"kala/internal/ent/predicate"
-	"kala/internal/ent/product"
-	"kala/internal/ent/subcategory"
-	"kala/internal/ent/user"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/hossein1376/kala/internal/ent/brand"
+	"github.com/hossein1376/kala/internal/ent/category"
+	"github.com/hossein1376/kala/internal/ent/comment"
+	"github.com/hossein1376/kala/internal/ent/image"
+	"github.com/hossein1376/kala/internal/ent/predicate"
+	"github.com/hossein1376/kala/internal/ent/product"
+	"github.com/hossein1376/kala/internal/ent/subcategory"
+	"github.com/hossein1376/kala/internal/ent/user"
 )
 
 // ImageUpdate is the builder for updating Image entities.
@@ -79,16 +79,16 @@ func (iu *ImageUpdate) AddWidth(i int32) *ImageUpdate {
 	return iu
 }
 
-// SetHigh sets the "high" field.
-func (iu *ImageUpdate) SetHigh(i int32) *ImageUpdate {
-	iu.mutation.ResetHigh()
-	iu.mutation.SetHigh(i)
+// SetHeight sets the "height" field.
+func (iu *ImageUpdate) SetHeight(i int32) *ImageUpdate {
+	iu.mutation.ResetHeight()
+	iu.mutation.SetHeight(i)
 	return iu
 }
 
-// AddHigh adds i to the "high" field.
-func (iu *ImageUpdate) AddHigh(i int32) *ImageUpdate {
-	iu.mutation.AddHigh(i)
+// AddHeight adds i to the "height" field.
+func (iu *ImageUpdate) AddHeight(i int32) *ImageUpdate {
+	iu.mutation.AddHeight(i)
 	return iu
 }
 
@@ -376,9 +376,9 @@ func (iu *ImageUpdate) check() error {
 			return &ValidationError{Name: "width", err: fmt.Errorf(`ent: validator failed for field "Image.width": %w`, err)}
 		}
 	}
-	if v, ok := iu.mutation.High(); ok {
-		if err := image.HighValidator(v); err != nil {
-			return &ValidationError{Name: "high", err: fmt.Errorf(`ent: validator failed for field "Image.high": %w`, err)}
+	if v, ok := iu.mutation.Height(); ok {
+		if err := image.HeightValidator(v); err != nil {
+			return &ValidationError{Name: "height", err: fmt.Errorf(`ent: validator failed for field "Image.height": %w`, err)}
 		}
 	}
 	if v, ok := iu.mutation.SizeKB(); ok {
@@ -419,11 +419,11 @@ func (iu *ImageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := iu.mutation.AddedWidth(); ok {
 		_spec.AddField(image.FieldWidth, field.TypeInt32, value)
 	}
-	if value, ok := iu.mutation.High(); ok {
-		_spec.SetField(image.FieldHigh, field.TypeInt32, value)
+	if value, ok := iu.mutation.Height(); ok {
+		_spec.SetField(image.FieldHeight, field.TypeInt32, value)
 	}
-	if value, ok := iu.mutation.AddedHigh(); ok {
-		_spec.AddField(image.FieldHigh, field.TypeInt32, value)
+	if value, ok := iu.mutation.AddedHeight(); ok {
+		_spec.AddField(image.FieldHeight, field.TypeInt32, value)
 	}
 	if value, ok := iu.mutation.SizeKB(); ok {
 		_spec.SetField(image.FieldSizeKB, field.TypeFloat64, value)
@@ -769,16 +769,16 @@ func (iuo *ImageUpdateOne) AddWidth(i int32) *ImageUpdateOne {
 	return iuo
 }
 
-// SetHigh sets the "high" field.
-func (iuo *ImageUpdateOne) SetHigh(i int32) *ImageUpdateOne {
-	iuo.mutation.ResetHigh()
-	iuo.mutation.SetHigh(i)
+// SetHeight sets the "height" field.
+func (iuo *ImageUpdateOne) SetHeight(i int32) *ImageUpdateOne {
+	iuo.mutation.ResetHeight()
+	iuo.mutation.SetHeight(i)
 	return iuo
 }
 
-// AddHigh adds i to the "high" field.
-func (iuo *ImageUpdateOne) AddHigh(i int32) *ImageUpdateOne {
-	iuo.mutation.AddHigh(i)
+// AddHeight adds i to the "height" field.
+func (iuo *ImageUpdateOne) AddHeight(i int32) *ImageUpdateOne {
+	iuo.mutation.AddHeight(i)
 	return iuo
 }
 
@@ -1079,9 +1079,9 @@ func (iuo *ImageUpdateOne) check() error {
 			return &ValidationError{Name: "width", err: fmt.Errorf(`ent: validator failed for field "Image.width": %w`, err)}
 		}
 	}
-	if v, ok := iuo.mutation.High(); ok {
-		if err := image.HighValidator(v); err != nil {
-			return &ValidationError{Name: "high", err: fmt.Errorf(`ent: validator failed for field "Image.high": %w`, err)}
+	if v, ok := iuo.mutation.Height(); ok {
+		if err := image.HeightValidator(v); err != nil {
+			return &ValidationError{Name: "height", err: fmt.Errorf(`ent: validator failed for field "Image.height": %w`, err)}
 		}
 	}
 	if v, ok := iuo.mutation.SizeKB(); ok {
@@ -1139,11 +1139,11 @@ func (iuo *ImageUpdateOne) sqlSave(ctx context.Context) (_node *Image, err error
 	if value, ok := iuo.mutation.AddedWidth(); ok {
 		_spec.AddField(image.FieldWidth, field.TypeInt32, value)
 	}
-	if value, ok := iuo.mutation.High(); ok {
-		_spec.SetField(image.FieldHigh, field.TypeInt32, value)
+	if value, ok := iuo.mutation.Height(); ok {
+		_spec.SetField(image.FieldHeight, field.TypeInt32, value)
 	}
-	if value, ok := iuo.mutation.AddedHigh(); ok {
-		_spec.AddField(image.FieldHigh, field.TypeInt32, value)
+	if value, ok := iuo.mutation.AddedHeight(); ok {
+		_spec.AddField(image.FieldHeight, field.TypeInt32, value)
 	}
 	if value, ok := iuo.mutation.SizeKB(); ok {
 		_spec.SetField(image.FieldSizeKB, field.TypeFloat64, value)

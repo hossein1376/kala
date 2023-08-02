@@ -6,14 +6,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"kala/internal/ent/address"
-	"kala/internal/ent/predicate"
-	"kala/internal/ent/seller"
-	"kala/internal/ent/user"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/hossein1376/kala/internal/ent/address"
+	"github.com/hossein1376/kala/internal/ent/predicate"
+	"github.com/hossein1376/kala/internal/ent/seller"
+	"github.com/hossein1376/kala/internal/ent/user"
 )
 
 // AddressUpdate is the builder for updating Address entities.

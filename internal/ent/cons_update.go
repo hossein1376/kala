@@ -6,13 +6,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"kala/internal/ent/comment"
-	"kala/internal/ent/cons"
-	"kala/internal/ent/predicate"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/hossein1376/kala/internal/ent/comment"
+	"github.com/hossein1376/kala/internal/ent/cons"
+	"github.com/hossein1376/kala/internal/ent/predicate"
 )
 
 // ConsUpdate is the builder for updating Cons entities.

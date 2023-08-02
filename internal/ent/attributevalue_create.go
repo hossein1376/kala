@@ -6,12 +6,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"kala/internal/ent/attribute"
-	"kala/internal/ent/attributevalue"
-	"kala/internal/ent/product"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/hossein1376/kala/internal/ent/attribute"
+	"github.com/hossein1376/kala/internal/ent/attributevalue"
+	"github.com/hossein1376/kala/internal/ent/product"
 )
 
 // AttributeValueCreate is the builder for creating a AttributeValue entity.

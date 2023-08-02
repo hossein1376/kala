@@ -4,12 +4,12 @@ package ent
 
 import (
 	"context"
-	"kala/internal/ent/brand"
-	"kala/internal/ent/predicate"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/hossein1376/kala/internal/ent/brand"
+	"github.com/hossein1376/kala/internal/ent/predicate"
 )
 
 // BrandDelete is the builder for deleting a Brand entity.

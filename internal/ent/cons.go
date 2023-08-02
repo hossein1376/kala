@@ -4,12 +4,12 @@ package ent
 
 import (
 	"fmt"
-	"kala/internal/ent/comment"
-	"kala/internal/ent/cons"
 	"strings"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/hossein1376/kala/internal/ent/comment"
+	"github.com/hossein1376/kala/internal/ent/cons"
 )
 
 // Cons is the model entity for the Cons schema.

@@ -1,7 +1,7 @@
 package structure
 
 import (
-	"kala/pkg/Password"
+	"github.com/hossein1376/kala/pkg/Password"
 )
 
 type User struct {

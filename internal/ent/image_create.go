@@ -6,17 +6,17 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"kala/internal/ent/brand"
-	"kala/internal/ent/category"
-	"kala/internal/ent/comment"
-	"kala/internal/ent/image"
-	"kala/internal/ent/product"
-	"kala/internal/ent/subcategory"
-	"kala/internal/ent/user"
 	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/hossein1376/kala/internal/ent/brand"
+	"github.com/hossein1376/kala/internal/ent/category"
+	"github.com/hossein1376/kala/internal/ent/comment"
+	"github.com/hossein1376/kala/internal/ent/image"
+	"github.com/hossein1376/kala/internal/ent/product"
+	"github.com/hossein1376/kala/internal/ent/subcategory"
+	"github.com/hossein1376/kala/internal/ent/user"
 )
 
 // ImageCreate is the builder for creating a Image entity.
@@ -58,9 +58,9 @@ func (ic *ImageCreate) SetWidth(i int32) *ImageCreate {
 	return ic
 }
 
-// SetHigh sets the "high" field.
-func (ic *ImageCreate) SetHigh(i int32) *ImageCreate {
-	ic.mutation.SetHigh(i)
+// SetHeight sets the "height" field.
+func (ic *ImageCreate) SetHeight(i int32) *ImageCreate {
+	ic.mutation.SetHeight(i)
 	return ic
 }
 
@@ -224,12 +224,12 @@ func (ic *ImageCreate) check() error {
 			return &ValidationError{Name: "width", err: fmt.Errorf(`ent: validator failed for field "Image.width": %w`, err)}
 		}
 	}
-	if _, ok := ic.mutation.High(); !ok {
-		return &ValidationError{Name: "high", err: errors.New(`ent: missing required field "Image.high"`)}
+	if _, ok := ic.mutation.Height(); !ok {
+		return &ValidationError{Name: "height", err: errors.New(`ent: missing required field "Image.height"`)}
 	}
-	if v, ok := ic.mutation.High(); ok {
-		if err := image.HighValidator(v); err != nil {
-			return &ValidationError{Name: "high", err: fmt.Errorf(`ent: validator failed for field "Image.high": %w`, err)}
+	if v, ok := ic.mutation.Height(); ok {
+		if err := image.HeightValidator(v); err != nil {
+			return &ValidationError{Name: "height", err: fmt.Errorf(`ent: validator failed for field "Image.height": %w`, err)}
 		}
 	}
 	if _, ok := ic.mutation.SizeKB(); !ok {
@@ -285,9 +285,9 @@ func (ic *ImageCreate) createSpec() (*Image, *sqlgraph.CreateSpec) {
 		_spec.SetField(image.FieldWidth, field.TypeInt32, value)
 		_node.Width = value
 	}
-	if value, ok := ic.mutation.High(); ok {
-		_spec.SetField(image.FieldHigh, field.TypeInt32, value)
-		_node.High = value
+	if value, ok := ic.mutation.Height(); ok {
+		_spec.SetField(image.FieldHeight, field.TypeInt32, value)
+		_node.Height = value
 	}
 	if value, ok := ic.mutation.SizeKB(); ok {
 		_spec.SetField(image.FieldSizeKB, field.TypeFloat64, value)

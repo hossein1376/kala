@@ -5,7 +5,8 @@ package hook
 import (
 	"context"
 	"fmt"
-	"kala/internal/ent"
+
+	"github.com/hossein1376/kala/internal/ent"
 )
 
 // The AddressFunc type is an adapter to allow the use of ordinary

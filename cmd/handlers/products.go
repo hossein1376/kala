@@ -3,8 +3,8 @@ package handlers
 import (
 	"net/http"
 
-	"kala/internal/ent"
-	"kala/internal/structure"
+	"github.com/hossein1376/kala/internal/ent"
+	"github.com/hossein1376/kala/internal/structure"
 )
 
 func (h *handler) createNewProductHandler(w http.ResponseWriter, r *http.Request) {
@@ -36,7 +36,7 @@ func (h *handler) createNewProductHandler(w http.ResponseWriter, r *http.Request
 func (h *handler) getProductByIDHandler(w http.ResponseWriter, r *http.Request) {
 	id := paramInt(r, "id")
 	if id == 0 {
-		h.error.NotFoundResponse(w, r)
+		h.error.NotFoundResponse(w, r, nil)
 		return
 	}
 
@@ -44,7 +44,7 @@ func (h *handler) getProductByIDHandler(w http.ResponseWriter, r *http.Request) 
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
-			h.error.NotFoundResponse(w, r)
+			h.error.NotFoundResponse(w, r, err)
 			return
 		default:
 			h.error.InternalServerErrorResponse(w, r, err)
@@ -76,7 +76,7 @@ func (h *handler) getAllProductsHandler(w http.ResponseWriter, r *http.Request) 
 func (h *handler) updateProductByIDHandler(w http.ResponseWriter, r *http.Request) {
 	id := paramInt(r, "id")
 	if id == 0 {
-		h.error.NotFoundResponse(w, r)
+		h.error.NotFoundResponse(w, r, nil)
 		return
 	}
 
@@ -91,7 +91,7 @@ func (h *handler) updateProductByIDHandler(w http.ResponseWriter, r *http.Reques
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
-			h.error.NotFoundResponse(w, r)
+			h.error.NotFoundResponse(w, r, err)
 		default:
 			h.error.InternalServerErrorResponse(w, r, err)
 		}
@@ -156,7 +156,7 @@ func (h *handler) updateProductByIDHandler(w http.ResponseWriter, r *http.Reques
 func (h *handler) deleteProductByIDHandler(w http.ResponseWriter, r *http.Request) {
 	id := paramInt(r, "id")
 	if id == 0 {
-		h.error.NotFoundResponse(w, r)
+		h.error.NotFoundResponse(w, r, nil)
 		return
 	}
 
@@ -164,7 +164,7 @@ func (h *handler) deleteProductByIDHandler(w http.ResponseWriter, r *http.Reques
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
-			h.error.NotFoundResponse(w, r)
+			h.error.NotFoundResponse(w, r, err)
 		default:
 			h.error.InternalServerErrorResponse(w, r, err)
 		}

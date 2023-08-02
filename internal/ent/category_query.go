@@ -6,18 +6,18 @@ import (
 	"context"
 	"database/sql/driver"
 	"fmt"
-	"kala/internal/ent/brand"
-	"kala/internal/ent/category"
-	"kala/internal/ent/image"
-	"kala/internal/ent/predicate"
-	"kala/internal/ent/product"
-	"kala/internal/ent/seller"
-	"kala/internal/ent/subcategory"
 	"math"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/hossein1376/kala/internal/ent/brand"
+	"github.com/hossein1376/kala/internal/ent/category"
+	"github.com/hossein1376/kala/internal/ent/image"
+	"github.com/hossein1376/kala/internal/ent/predicate"
+	"github.com/hossein1376/kala/internal/ent/product"
+	"github.com/hossein1376/kala/internal/ent/seller"
+	"github.com/hossein1376/kala/internal/ent/subcategory"
 )
 
 // CategoryQuery is the builder for querying Category entities.

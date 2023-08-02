@@ -6,11 +6,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"kala/internal/ent/comment"
-	"kala/internal/ent/cons"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/hossein1376/kala/internal/ent/comment"
+	"github.com/hossein1376/kala/internal/ent/cons"
 )
 
 // ConsCreate is the builder for creating a Cons entity.

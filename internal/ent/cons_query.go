@@ -5,14 +5,14 @@ package ent
 import (
 	"context"
 	"fmt"
-	"kala/internal/ent/comment"
-	"kala/internal/ent/cons"
-	"kala/internal/ent/predicate"
 	"math"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/hossein1376/kala/internal/ent/comment"
+	"github.com/hossein1376/kala/internal/ent/cons"
+	"github.com/hossein1376/kala/internal/ent/predicate"
 )
 
 // ConsQuery is the builder for querying Cons entities.

@@ -3,8 +3,8 @@ package api
 import (
 	"fmt"
 
-	"kala/cmd"
-	"kala/internal/ent"
+	"github.com/hossein1376/kala/cmd"
+	"github.com/hossein1376/kala/internal/ent"
 
 	_ "github.com/lib/pq"
 )

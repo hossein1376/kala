@@ -4,12 +4,12 @@ package ent
 
 import (
 	"context"
-	"kala/internal/ent/order"
-	"kala/internal/ent/predicate"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/hossein1376/kala/internal/ent/order"
+	"github.com/hossein1376/kala/internal/ent/predicate"
 )
 
 // OrderDelete is the builder for deleting a Order entity.

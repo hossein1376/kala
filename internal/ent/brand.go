@@ -4,12 +4,12 @@ package ent
 
 import (
 	"fmt"
-	"kala/internal/ent/brand"
 	"strings"
 	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/hossein1376/kala/internal/ent/brand"
 )
 
 // Brand is the model entity for the Brand schema.

@@ -6,18 +6,18 @@ import (
 	"context"
 	"database/sql/driver"
 	"fmt"
-	"kala/internal/ent/comment"
-	"kala/internal/ent/cons"
-	"kala/internal/ent/image"
-	"kala/internal/ent/predicate"
-	"kala/internal/ent/product"
-	"kala/internal/ent/pros"
-	"kala/internal/ent/user"
 	"math"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/hossein1376/kala/internal/ent/comment"
+	"github.com/hossein1376/kala/internal/ent/cons"
+	"github.com/hossein1376/kala/internal/ent/image"
+	"github.com/hossein1376/kala/internal/ent/predicate"
+	"github.com/hossein1376/kala/internal/ent/product"
+	"github.com/hossein1376/kala/internal/ent/pros"
+	"github.com/hossein1376/kala/internal/ent/user"
 )
 
 // CommentQuery is the builder for querying Comment entities.

@@ -20,7 +20,7 @@ func (Image) Fields() []ent.Field {
 		field.String("path").NotEmpty(),
 		field.String("caption").Optional(),
 		field.Int32("width").Positive(),
-		field.Int32("high").Positive(),
+		field.Int32("height").Positive(),
 		field.Float("size_kb").Positive(),
 		field.Time("uploaded_at").GoType(time.Now()),
 	}

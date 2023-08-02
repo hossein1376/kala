@@ -5,14 +5,14 @@ package ent
 import (
 	"context"
 	"fmt"
-	"kala/internal/ent/comment"
-	"kala/internal/ent/predicate"
-	"kala/internal/ent/pros"
 	"math"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/hossein1376/kala/internal/ent/comment"
+	"github.com/hossein1376/kala/internal/ent/predicate"
+	"github.com/hossein1376/kala/internal/ent/pros"
 )
 
 // ProsQuery is the builder for querying Pros entities.

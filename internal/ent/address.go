@@ -4,13 +4,13 @@ package ent
 
 import (
 	"fmt"
-	"kala/internal/ent/address"
-	"kala/internal/ent/seller"
-	"kala/internal/ent/user"
 	"strings"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/hossein1376/kala/internal/ent/address"
+	"github.com/hossein1376/kala/internal/ent/seller"
+	"github.com/hossein1376/kala/internal/ent/user"
 )
 
 // Address is the model entity for the Address schema.

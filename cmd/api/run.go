@@ -3,10 +3,10 @@ package api
 import (
 	"context"
 
-	"kala/cmd"
-	"kala/cmd/handlers"
-	"kala/internal/data"
-	"kala/pkg/Logger"
+	"github.com/hossein1376/kala/cmd"
+	"github.com/hossein1376/kala/cmd/handlers"
+	"github.com/hossein1376/kala/internal/data"
+	"github.com/hossein1376/kala/pkg/Logger"
 
 	"golang.org/x/exp/slog"
 )

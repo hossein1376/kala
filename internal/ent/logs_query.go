@@ -5,14 +5,14 @@ package ent
 import (
 	"context"
 	"fmt"
-	"kala/internal/ent/logs"
-	"kala/internal/ent/predicate"
-	"kala/internal/ent/user"
 	"math"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/hossein1376/kala/internal/ent/logs"
+	"github.com/hossein1376/kala/internal/ent/predicate"
+	"github.com/hossein1376/kala/internal/ent/user"
 )
 
 // LogsQuery is the builder for querying Logs entities.

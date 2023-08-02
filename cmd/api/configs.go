@@ -4,7 +4,7 @@ import (
 	"flag"
 	"os"
 
-	"kala/cmd"
+	"github.com/hossein1376/kala/cmd"
 )
 
 func newConfig() cmd.Config {

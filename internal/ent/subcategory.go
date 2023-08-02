@@ -4,13 +4,13 @@ package ent
 
 import (
 	"fmt"
-	"kala/internal/ent/category"
-	"kala/internal/ent/subcategory"
 	"strings"
 	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/hossein1376/kala/internal/ent/category"
+	"github.com/hossein1376/kala/internal/ent/subcategory"
 )
 
 // SubCategory is the model entity for the SubCategory schema.

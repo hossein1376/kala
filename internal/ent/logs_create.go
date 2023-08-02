@@ -6,12 +6,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"kala/internal/ent/logs"
-	"kala/internal/ent/user"
 	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/hossein1376/kala/internal/ent/logs"
+	"github.com/hossein1376/kala/internal/ent/user"
 )
 
 // LogsCreate is the builder for creating a Logs entity.

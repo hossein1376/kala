@@ -4,13 +4,13 @@ package ent
 
 import (
 	"fmt"
-	"kala/internal/ent/logs"
-	"kala/internal/ent/user"
 	"strings"
 	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/hossein1376/kala/internal/ent/logs"
+	"github.com/hossein1376/kala/internal/ent/user"
 )
 
 // Logs is the model entity for the Logs schema.

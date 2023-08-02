@@ -4,12 +4,12 @@ package ent
 
 import (
 	"fmt"
-	"kala/internal/ent/image"
 	"strings"
 	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/hossein1376/kala/internal/ent/image"
 )
 
 // Image is the model entity for the Image schema.
@@ -25,8 +25,8 @@ type Image struct {
 	Caption string `json:"caption,omitempty"`
 	// Width holds the value of the "width" field.
 	Width int32 `json:"width,omitempty"`
-	// High holds the value of the "high" field.
-	High int32 `json:"high,omitempty"`
+	// Height holds the value of the "height" field.
+	Height int32 `json:"height,omitempty"`
 	// SizeKB holds the value of the "size_kb" field.
 	SizeKB float64 `json:"size_kb,omitempty"`
 	// UploadedAt holds the value of the "uploaded_at" field.
@@ -117,7 +117,7 @@ func (*Image) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case image.FieldSizeKB:
 			values[i] = new(sql.NullFloat64)
-		case image.FieldID, image.FieldWidth, image.FieldHigh:
+		case image.FieldID, image.FieldWidth, image.FieldHeight:
 			values[i] = new(sql.NullInt64)
 		case image.FieldName, image.FieldPath, image.FieldCaption:
 			values[i] = new(sql.NullString)
@@ -168,11 +168,11 @@ func (i *Image) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				i.Width = int32(value.Int64)
 			}
-		case image.FieldHigh:
+		case image.FieldHeight:
 			if value, ok := values[j].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field high", values[j])
+				return fmt.Errorf("unexpected type %T for field height", values[j])
 			} else if value.Valid {
-				i.High = int32(value.Int64)
+				i.Height = int32(value.Int64)
 			}
 		case image.FieldSizeKB:
 			if value, ok := values[j].(*sql.NullFloat64); !ok {
@@ -264,8 +264,8 @@ func (i *Image) String() string {
 	builder.WriteString("width=")
 	builder.WriteString(fmt.Sprintf("%v", i.Width))
 	builder.WriteString(", ")
-	builder.WriteString("high=")
-	builder.WriteString(fmt.Sprintf("%v", i.High))
+	builder.WriteString("height=")
+	builder.WriteString(fmt.Sprintf("%v", i.Height))
 	builder.WriteString(", ")
 	builder.WriteString("size_kb=")
 	builder.WriteString(fmt.Sprintf("%v", i.SizeKB))

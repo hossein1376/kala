@@ -4,9 +4,9 @@ import (
 	"errors"
 	"net/http"
 
-	"kala/internal/ent"
-	"kala/internal/structure"
-	"kala/pkg/Password"
+	"github.com/hossein1376/kala/internal/ent"
+	"github.com/hossein1376/kala/internal/structure"
+	"github.com/hossein1376/kala/pkg/Password"
 )
 
 func (h *handler) createNewUserHandler(w http.ResponseWriter, r *http.Request) {
@@ -61,7 +61,7 @@ func (h *handler) createNewUserHandler(w http.ResponseWriter, r *http.Request) {
 func (h *handler) getUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 	id := paramInt(r, "id")
 	if id == 0 {
-		h.error.NotFoundResponse(w, r)
+		h.error.NotFoundResponse(w, r, nil)
 		return
 	}
 
@@ -69,7 +69,7 @@ func (h *handler) getUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
-			h.error.NotFoundResponse(w, r)
+			h.error.NotFoundResponse(w, r, err)
 			return
 		default:
 			h.error.InternalServerErrorResponse(w, r, err)
@@ -100,7 +100,7 @@ func (h *handler) getAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 func (h *handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 	id := paramInt(r, "id")
 	if id == 0 {
-		h.error.NotFoundResponse(w, r)
+		h.error.NotFoundResponse(w, r, nil)
 		return
 	}
 
@@ -120,7 +120,7 @@ func (h *handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
-			h.error.NotFoundResponse(w, r)
+			h.error.NotFoundResponse(w, r, err)
 		default:
 			h.error.InternalServerErrorResponse(w, r, err)
 		}
@@ -156,7 +156,7 @@ func (h *handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
-			h.error.NotFoundResponse(w, r)
+			h.error.NotFoundResponse(w, r, err)
 		default:
 			h.error.InternalServerErrorResponse(w, r, err)
 		}
@@ -173,7 +173,7 @@ func (h *handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 func (h *handler) deleteUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 	id := paramInt(r, "id")
 	if id == 0 {
-		h.error.NotFoundResponse(w, r)
+		h.error.NotFoundResponse(w, r, nil)
 		return
 	}
 
@@ -181,7 +181,7 @@ func (h *handler) deleteUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
-			h.error.NotFoundResponse(w, r)
+			h.error.NotFoundResponse(w, r, err)
 		default:
 			h.error.InternalServerErrorResponse(w, r, err)
 		}

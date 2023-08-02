@@ -4,13 +4,13 @@ package enttest
 
 import (
 	"context"
-	"kala/internal/ent"
-	// required by schema hooks.
-	_ "kala/internal/ent/runtime"
 
-	"kala/internal/ent/migrate"
+	"github.com/hossein1376/kala/internal/ent"
+	// required by schema hooks.
+	_ "github.com/hossein1376/kala/internal/ent/runtime"
 
 	"entgo.io/ent/dialect/sql/schema"
+	"github.com/hossein1376/kala/internal/ent/migrate"
 )
 
 type (

@@ -6,16 +6,16 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"kala/internal/ent/order"
-	"kala/internal/ent/predicate"
-	"kala/internal/ent/product"
-	"kala/internal/ent/seller"
-	"kala/internal/ent/user"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/hossein1376/kala/internal/ent/order"
+	"github.com/hossein1376/kala/internal/ent/predicate"
+	"github.com/hossein1376/kala/internal/ent/product"
+	"github.com/hossein1376/kala/internal/ent/seller"
+	"github.com/hossein1376/kala/internal/ent/user"
 )
 
 // OrderUpdate is the builder for updating Order entities.

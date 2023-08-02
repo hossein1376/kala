@@ -3,11 +3,11 @@
 package image
 
 import (
-	"kala/internal/ent/predicate"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/hossein1376/kala/internal/ent/predicate"
 )
 
 // ID filters vertices based on their ID field.
@@ -75,9 +75,9 @@ func Width(v int32) predicate.Image {
 	return predicate.Image(sql.FieldEQ(FieldWidth, v))
 }
 
-// High applies equality check predicate on the "high" field. It's identical to HighEQ.
-func High(v int32) predicate.Image {
-	return predicate.Image(sql.FieldEQ(FieldHigh, v))
+// Height applies equality check predicate on the "height" field. It's identical to HeightEQ.
+func Height(v int32) predicate.Image {
+	return predicate.Image(sql.FieldEQ(FieldHeight, v))
 }
 
 // SizeKB applies equality check predicate on the "size_kb" field. It's identical to SizeKBEQ.
@@ -336,44 +336,44 @@ func WidthLTE(v int32) predicate.Image {
 	return predicate.Image(sql.FieldLTE(FieldWidth, v))
 }
 
-// HighEQ applies the EQ predicate on the "high" field.
-func HighEQ(v int32) predicate.Image {
-	return predicate.Image(sql.FieldEQ(FieldHigh, v))
+// HeightEQ applies the EQ predicate on the "height" field.
+func HeightEQ(v int32) predicate.Image {
+	return predicate.Image(sql.FieldEQ(FieldHeight, v))
 }
 
-// HighNEQ applies the NEQ predicate on the "high" field.
-func HighNEQ(v int32) predicate.Image {
-	return predicate.Image(sql.FieldNEQ(FieldHigh, v))
+// HeightNEQ applies the NEQ predicate on the "height" field.
+func HeightNEQ(v int32) predicate.Image {
+	return predicate.Image(sql.FieldNEQ(FieldHeight, v))
 }
 
-// HighIn applies the In predicate on the "high" field.
-func HighIn(vs ...int32) predicate.Image {
-	return predicate.Image(sql.FieldIn(FieldHigh, vs...))
+// HeightIn applies the In predicate on the "height" field.
+func HeightIn(vs ...int32) predicate.Image {
+	return predicate.Image(sql.FieldIn(FieldHeight, vs...))
 }
 
-// HighNotIn applies the NotIn predicate on the "high" field.
-func HighNotIn(vs ...int32) predicate.Image {
-	return predicate.Image(sql.FieldNotIn(FieldHigh, vs...))
+// HeightNotIn applies the NotIn predicate on the "height" field.
+func HeightNotIn(vs ...int32) predicate.Image {
+	return predicate.Image(sql.FieldNotIn(FieldHeight, vs...))
 }
 
-// HighGT applies the GT predicate on the "high" field.
-func HighGT(v int32) predicate.Image {
-	return predicate.Image(sql.FieldGT(FieldHigh, v))
+// HeightGT applies the GT predicate on the "height" field.
+func HeightGT(v int32) predicate.Image {
+	return predicate.Image(sql.FieldGT(FieldHeight, v))
 }
 
-// HighGTE applies the GTE predicate on the "high" field.
-func HighGTE(v int32) predicate.Image {
-	return predicate.Image(sql.FieldGTE(FieldHigh, v))
+// HeightGTE applies the GTE predicate on the "height" field.
+func HeightGTE(v int32) predicate.Image {
+	return predicate.Image(sql.FieldGTE(FieldHeight, v))
 }
 
-// HighLT applies the LT predicate on the "high" field.
-func HighLT(v int32) predicate.Image {
-	return predicate.Image(sql.FieldLT(FieldHigh, v))
+// HeightLT applies the LT predicate on the "height" field.
+func HeightLT(v int32) predicate.Image {
+	return predicate.Image(sql.FieldLT(FieldHeight, v))
 }
 
-// HighLTE applies the LTE predicate on the "high" field.
-func HighLTE(v int32) predicate.Image {
-	return predicate.Image(sql.FieldLTE(FieldHigh, v))
+// HeightLTE applies the LTE predicate on the "height" field.
+func HeightLTE(v int32) predicate.Image {
+	return predicate.Image(sql.FieldLTE(FieldHeight, v))
 }
 
 // SizeKBEQ applies the EQ predicate on the "size_kb" field.

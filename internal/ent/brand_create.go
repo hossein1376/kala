@@ -6,14 +6,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"kala/internal/ent/brand"
-	"kala/internal/ent/category"
-	"kala/internal/ent/image"
-	"kala/internal/ent/product"
 	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/hossein1376/kala/internal/ent/brand"
+	"github.com/hossein1376/kala/internal/ent/category"
+	"github.com/hossein1376/kala/internal/ent/image"
+	"github.com/hossein1376/kala/internal/ent/product"
 )
 
 // BrandCreate is the builder for creating a Brand entity.

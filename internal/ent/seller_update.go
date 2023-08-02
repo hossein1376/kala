@@ -6,18 +6,18 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"kala/internal/ent/address"
-	"kala/internal/ent/category"
-	"kala/internal/ent/order"
-	"kala/internal/ent/predicate"
-	"kala/internal/ent/product"
-	"kala/internal/ent/seller"
-	"kala/internal/ent/user"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/hossein1376/kala/internal/ent/address"
+	"github.com/hossein1376/kala/internal/ent/category"
+	"github.com/hossein1376/kala/internal/ent/order"
+	"github.com/hossein1376/kala/internal/ent/predicate"
+	"github.com/hossein1376/kala/internal/ent/product"
+	"github.com/hossein1376/kala/internal/ent/seller"
+	"github.com/hossein1376/kala/internal/ent/user"
 )
 
 // SellerUpdate is the builder for updating Seller entities.

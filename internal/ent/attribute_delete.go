@@ -4,12 +4,12 @@ package ent
 
 import (
 	"context"
-	"kala/internal/ent/attribute"
-	"kala/internal/ent/predicate"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/hossein1376/kala/internal/ent/attribute"
+	"github.com/hossein1376/kala/internal/ent/predicate"
 )
 
 // AttributeDelete is the builder for deleting a Attribute entity.

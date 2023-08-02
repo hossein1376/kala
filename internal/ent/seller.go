@@ -4,13 +4,13 @@ package ent
 
 import (
 	"fmt"
-	"kala/internal/ent/seller"
-	"kala/internal/ent/user"
 	"strings"
 	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/hossein1376/kala/internal/ent/seller"
+	"github.com/hossein1376/kala/internal/ent/user"
 )
 
 // Seller is the model entity for the Seller schema.

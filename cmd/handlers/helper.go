@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"kala/cmd"
-	"kala/pkg/Errors"
-	"kala/pkg/Json"
+	"github.com/hossein1376/kala/cmd"
+	"github.com/hossein1376/kala/pkg/Errors"
+	"github.com/hossein1376/kala/pkg/Json"
 
 	"github.com/go-chi/chi/v5"
 )

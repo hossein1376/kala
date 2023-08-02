@@ -6,16 +6,16 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"kala/internal/ent/address"
-	"kala/internal/ent/category"
-	"kala/internal/ent/order"
-	"kala/internal/ent/product"
-	"kala/internal/ent/seller"
-	"kala/internal/ent/user"
 	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/hossein1376/kala/internal/ent/address"
+	"github.com/hossein1376/kala/internal/ent/category"
+	"github.com/hossein1376/kala/internal/ent/order"
+	"github.com/hossein1376/kala/internal/ent/product"
+	"github.com/hossein1376/kala/internal/ent/seller"
+	"github.com/hossein1376/kala/internal/ent/user"
 )
 
 // SellerCreate is the builder for creating a Seller entity.

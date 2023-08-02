@@ -20,8 +20,8 @@ const (
 	FieldCaption = "caption"
 	// FieldWidth holds the string denoting the width field in the database.
 	FieldWidth = "width"
-	// FieldHigh holds the string denoting the high field in the database.
-	FieldHigh = "high"
+	// FieldHeight holds the string denoting the height field in the database.
+	FieldHeight = "height"
 	// FieldSizeKB holds the string denoting the size_kb field in the database.
 	FieldSizeKB = "size_kb"
 	// FieldUploadedAt holds the string denoting the uploaded_at field in the database.
@@ -79,7 +79,7 @@ var Columns = []string{
 	FieldPath,
 	FieldCaption,
 	FieldWidth,
-	FieldHigh,
+	FieldHeight,
 	FieldSizeKB,
 	FieldUploadedAt,
 }
@@ -122,8 +122,8 @@ var (
 	PathValidator func(string) error
 	// WidthValidator is a validator for the "width" field. It is called by the builders before save.
 	WidthValidator func(int32) error
-	// HighValidator is a validator for the "high" field. It is called by the builders before save.
-	HighValidator func(int32) error
+	// HeightValidator is a validator for the "height" field. It is called by the builders before save.
+	HeightValidator func(int32) error
 	// SizeKBValidator is a validator for the "size_kb" field. It is called by the builders before save.
 	SizeKBValidator func(float64) error
 )
@@ -156,9 +156,9 @@ func ByWidth(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldWidth, opts...).ToFunc()
 }
 
-// ByHigh orders the results by the high field.
-func ByHigh(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldHigh, opts...).ToFunc()
+// ByHeight orders the results by the height field.
+func ByHeight(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldHeight, opts...).ToFunc()
 }
 
 // BySizeKB orders the results by the size_kb field.

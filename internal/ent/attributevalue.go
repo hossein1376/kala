@@ -4,13 +4,13 @@ package ent
 
 import (
 	"fmt"
-	"kala/internal/ent/attribute"
-	"kala/internal/ent/attributevalue"
-	"kala/internal/ent/product"
 	"strings"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/hossein1376/kala/internal/ent/attribute"
+	"github.com/hossein1376/kala/internal/ent/attributevalue"
+	"github.com/hossein1376/kala/internal/ent/product"
 )
 
 // AttributeValue is the model entity for the AttributeValue schema.

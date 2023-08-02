@@ -6,17 +6,17 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"kala/internal/ent/address"
-	"kala/internal/ent/comment"
-	"kala/internal/ent/image"
-	"kala/internal/ent/logs"
-	"kala/internal/ent/order"
-	"kala/internal/ent/seller"
-	"kala/internal/ent/user"
 	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/hossein1376/kala/internal/ent/address"
+	"github.com/hossein1376/kala/internal/ent/comment"
+	"github.com/hossein1376/kala/internal/ent/image"
+	"github.com/hossein1376/kala/internal/ent/logs"
+	"github.com/hossein1376/kala/internal/ent/order"
+	"github.com/hossein1376/kala/internal/ent/seller"
+	"github.com/hossein1376/kala/internal/ent/user"
 )
 
 // UserCreate is the builder for creating a User entity.

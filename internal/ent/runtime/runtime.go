@@ -2,7 +2,7 @@
 
 package runtime
 
-// The schema-stitching logic is generated in kala/internal/ent/runtime.go
+// The schema-stitching logic is generated in github.com/hossein1376/kala/internal/ent/runtime.go
 
 const (
 	Version = "v0.12.3"                                         // Version of ent codegen.

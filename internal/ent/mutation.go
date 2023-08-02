@@ -6,27 +6,27 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"kala/internal/ent/address"
-	"kala/internal/ent/attribute"
-	"kala/internal/ent/attributevalue"
-	"kala/internal/ent/brand"
-	"kala/internal/ent/category"
-	"kala/internal/ent/comment"
-	"kala/internal/ent/cons"
-	"kala/internal/ent/image"
-	"kala/internal/ent/logs"
-	"kala/internal/ent/order"
-	"kala/internal/ent/predicate"
-	"kala/internal/ent/product"
-	"kala/internal/ent/pros"
-	"kala/internal/ent/seller"
-	"kala/internal/ent/subcategory"
-	"kala/internal/ent/user"
 	"sync"
 	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/hossein1376/kala/internal/ent/address"
+	"github.com/hossein1376/kala/internal/ent/attribute"
+	"github.com/hossein1376/kala/internal/ent/attributevalue"
+	"github.com/hossein1376/kala/internal/ent/brand"
+	"github.com/hossein1376/kala/internal/ent/category"
+	"github.com/hossein1376/kala/internal/ent/comment"
+	"github.com/hossein1376/kala/internal/ent/cons"
+	"github.com/hossein1376/kala/internal/ent/image"
+	"github.com/hossein1376/kala/internal/ent/logs"
+	"github.com/hossein1376/kala/internal/ent/order"
+	"github.com/hossein1376/kala/internal/ent/predicate"
+	"github.com/hossein1376/kala/internal/ent/product"
+	"github.com/hossein1376/kala/internal/ent/pros"
+	"github.com/hossein1376/kala/internal/ent/seller"
+	"github.com/hossein1376/kala/internal/ent/subcategory"
+	"github.com/hossein1376/kala/internal/ent/user"
 )
 
 const (
@@ -5573,8 +5573,8 @@ type ImageMutation struct {
 	caption             *string
 	width               *int32
 	addwidth            *int32
-	high                *int32
-	addhigh             *int32
+	height              *int32
+	addheight           *int32
 	size_kb             *float64
 	addsize_kb          *float64
 	uploaded_at         *time.Time
@@ -5877,60 +5877,60 @@ func (m *ImageMutation) ResetWidth() {
 	m.addwidth = nil
 }
 
-// SetHigh sets the "high" field.
-func (m *ImageMutation) SetHigh(i int32) {
-	m.high = &i
-	m.addhigh = nil
+// SetHeight sets the "height" field.
+func (m *ImageMutation) SetHeight(i int32) {
+	m.height = &i
+	m.addheight = nil
 }
 
-// High returns the value of the "high" field in the mutation.
-func (m *ImageMutation) High() (r int32, exists bool) {
-	v := m.high
+// Height returns the value of the "height" field in the mutation.
+func (m *ImageMutation) Height() (r int32, exists bool) {
+	v := m.height
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldHigh returns the old "high" field's value of the Image entity.
+// OldHeight returns the old "height" field's value of the Image entity.
 // If the Image object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ImageMutation) OldHigh(ctx context.Context) (v int32, err error) {
+func (m *ImageMutation) OldHeight(ctx context.Context) (v int32, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldHigh is only allowed on UpdateOne operations")
+		return v, errors.New("OldHeight is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldHigh requires an ID field in the mutation")
+		return v, errors.New("OldHeight requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldHigh: %w", err)
+		return v, fmt.Errorf("querying old value for OldHeight: %w", err)
 	}
-	return oldValue.High, nil
+	return oldValue.Height, nil
 }
 
-// AddHigh adds i to the "high" field.
-func (m *ImageMutation) AddHigh(i int32) {
-	if m.addhigh != nil {
-		*m.addhigh += i
+// AddHeight adds i to the "height" field.
+func (m *ImageMutation) AddHeight(i int32) {
+	if m.addheight != nil {
+		*m.addheight += i
 	} else {
-		m.addhigh = &i
+		m.addheight = &i
 	}
 }
 
-// AddedHigh returns the value that was added to the "high" field in this mutation.
-func (m *ImageMutation) AddedHigh() (r int32, exists bool) {
-	v := m.addhigh
+// AddedHeight returns the value that was added to the "height" field in this mutation.
+func (m *ImageMutation) AddedHeight() (r int32, exists bool) {
+	v := m.addheight
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ResetHigh resets all changes to the "high" field.
-func (m *ImageMutation) ResetHigh() {
-	m.high = nil
-	m.addhigh = nil
+// ResetHeight resets all changes to the "height" field.
+func (m *ImageMutation) ResetHeight() {
+	m.height = nil
+	m.addheight = nil
 }
 
 // SetSizeKB sets the "size_kb" field.
@@ -6396,8 +6396,8 @@ func (m *ImageMutation) Fields() []string {
 	if m.width != nil {
 		fields = append(fields, image.FieldWidth)
 	}
-	if m.high != nil {
-		fields = append(fields, image.FieldHigh)
+	if m.height != nil {
+		fields = append(fields, image.FieldHeight)
 	}
 	if m.size_kb != nil {
 		fields = append(fields, image.FieldSizeKB)
@@ -6421,8 +6421,8 @@ func (m *ImageMutation) Field(name string) (ent.Value, bool) {
 		return m.Caption()
 	case image.FieldWidth:
 		return m.Width()
-	case image.FieldHigh:
-		return m.High()
+	case image.FieldHeight:
+		return m.Height()
 	case image.FieldSizeKB:
 		return m.SizeKB()
 	case image.FieldUploadedAt:
@@ -6444,8 +6444,8 @@ func (m *ImageMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldCaption(ctx)
 	case image.FieldWidth:
 		return m.OldWidth(ctx)
-	case image.FieldHigh:
-		return m.OldHigh(ctx)
+	case image.FieldHeight:
+		return m.OldHeight(ctx)
 	case image.FieldSizeKB:
 		return m.OldSizeKB(ctx)
 	case image.FieldUploadedAt:
@@ -6487,12 +6487,12 @@ func (m *ImageMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetWidth(v)
 		return nil
-	case image.FieldHigh:
+	case image.FieldHeight:
 		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetHigh(v)
+		m.SetHeight(v)
 		return nil
 	case image.FieldSizeKB:
 		v, ok := value.(float64)
@@ -6519,8 +6519,8 @@ func (m *ImageMutation) AddedFields() []string {
 	if m.addwidth != nil {
 		fields = append(fields, image.FieldWidth)
 	}
-	if m.addhigh != nil {
-		fields = append(fields, image.FieldHigh)
+	if m.addheight != nil {
+		fields = append(fields, image.FieldHeight)
 	}
 	if m.addsize_kb != nil {
 		fields = append(fields, image.FieldSizeKB)
@@ -6535,8 +6535,8 @@ func (m *ImageMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
 	case image.FieldWidth:
 		return m.AddedWidth()
-	case image.FieldHigh:
-		return m.AddedHigh()
+	case image.FieldHeight:
+		return m.AddedHeight()
 	case image.FieldSizeKB:
 		return m.AddedSizeKB()
 	}
@@ -6555,12 +6555,12 @@ func (m *ImageMutation) AddField(name string, value ent.Value) error {
 		}
 		m.AddWidth(v)
 		return nil
-	case image.FieldHigh:
+	case image.FieldHeight:
 		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddHigh(v)
+		m.AddHeight(v)
 		return nil
 	case image.FieldSizeKB:
 		v, ok := value.(float64)
@@ -6617,8 +6617,8 @@ func (m *ImageMutation) ResetField(name string) error {
 	case image.FieldWidth:
 		m.ResetWidth()
 		return nil
-	case image.FieldHigh:
-		m.ResetHigh()
+	case image.FieldHeight:
+		m.ResetHeight()
 		return nil
 	case image.FieldSizeKB:
 		m.ResetSizeKB()

@@ -4,10 +4,10 @@ import (
 	"context"
 	"time"
 
-	"kala/internal/ent"
-	"kala/internal/ent/comment"
-	entProduct "kala/internal/ent/product"
-	"kala/internal/structure"
+	"github.com/hossein1376/kala/internal/ent"
+	entComment "github.com/hossein1376/kala/internal/ent/comment"
+	entProduct "github.com/hossein1376/kala/internal/ent/product"
+	"github.com/hossein1376/kala/internal/structure"
 )
 
 type ProductModel struct {
@@ -39,8 +39,8 @@ func (p *ProductModel) GetSingleProductByID(id int) (*ent.Product, error) {
 		WithBrand().
 		WithComment(func(query *ent.CommentQuery) {
 			query.
-				Where(comment.StatusEQ(comment.StatusPublished)).
-				Order(ent.Asc(comment.FieldID))
+				Where(entComment.StatusEQ(entComment.StatusPublished)).
+				Order(ent.Asc(entComment.FieldID))
 		}).
 		WithValues(func(query *ent.AttributeValueQuery) {
 			query.
@@ -55,8 +55,8 @@ func (p *ProductModel) GetAllProducts() ([]*ent.Product, error) {
 		WithBrand().
 		WithComment(func(query *ent.CommentQuery) {
 			query.
-				Where(comment.StatusEQ(comment.StatusPublished)).
-				Order(ent.Asc(comment.FieldID))
+				Where(entComment.StatusEQ(entComment.StatusPublished)).
+				Order(ent.Asc(entComment.FieldID))
 		}).
 		WithValues(func(query *ent.AttributeValueQuery) {
 			query.

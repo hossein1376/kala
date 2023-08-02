@@ -158,7 +158,7 @@ var (
 		{Name: "path", Type: field.TypeString},
 		{Name: "caption", Type: field.TypeString, Nullable: true},
 		{Name: "width", Type: field.TypeInt32},
-		{Name: "high", Type: field.TypeInt32},
+		{Name: "height", Type: field.TypeInt32},
 		{Name: "size_kb", Type: field.TypeFloat64},
 		{Name: "uploaded_at", Type: field.TypeTime},
 	}

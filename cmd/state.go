@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"kala/internal/data"
+	"github.com/hossein1376/kala/internal/data"
 
 	"golang.org/x/exp/slog"
 )

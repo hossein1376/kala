@@ -6,16 +6,16 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"kala/internal/ent/brand"
-	"kala/internal/ent/category"
-	"kala/internal/ent/image"
-	"kala/internal/ent/product"
-	"kala/internal/ent/seller"
-	"kala/internal/ent/subcategory"
 	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/hossein1376/kala/internal/ent/brand"
+	"github.com/hossein1376/kala/internal/ent/category"
+	"github.com/hossein1376/kala/internal/ent/image"
+	"github.com/hossein1376/kala/internal/ent/product"
+	"github.com/hossein1376/kala/internal/ent/seller"
+	"github.com/hossein1376/kala/internal/ent/subcategory"
 )
 
 // CategoryCreate is the builder for creating a Category entity.

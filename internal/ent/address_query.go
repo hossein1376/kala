@@ -5,15 +5,15 @@ package ent
 import (
 	"context"
 	"fmt"
-	"kala/internal/ent/address"
-	"kala/internal/ent/predicate"
-	"kala/internal/ent/seller"
-	"kala/internal/ent/user"
 	"math"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/hossein1376/kala/internal/ent/address"
+	"github.com/hossein1376/kala/internal/ent/predicate"
+	"github.com/hossein1376/kala/internal/ent/seller"
+	"github.com/hossein1376/kala/internal/ent/user"
 )
 
 // AddressQuery is the builder for querying Address entities.

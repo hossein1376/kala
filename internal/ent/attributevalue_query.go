@@ -5,15 +5,15 @@ package ent
 import (
 	"context"
 	"fmt"
-	"kala/internal/ent/attribute"
-	"kala/internal/ent/attributevalue"
-	"kala/internal/ent/predicate"
-	"kala/internal/ent/product"
 	"math"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/hossein1376/kala/internal/ent/attribute"
+	"github.com/hossein1376/kala/internal/ent/attributevalue"
+	"github.com/hossein1376/kala/internal/ent/predicate"
+	"github.com/hossein1376/kala/internal/ent/product"
 )
 
 // AttributeValueQuery is the builder for querying AttributeValue entities.

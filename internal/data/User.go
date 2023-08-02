@@ -3,9 +3,9 @@ package data
 import (
 	"context"
 
-	"kala/internal/ent"
-	entUser "kala/internal/ent/user"
-	"kala/internal/structure"
+	"github.com/hossein1376/kala/internal/ent"
+	entUser "github.com/hossein1376/kala/internal/ent/user"
+	"github.com/hossein1376/kala/internal/structure"
 )
 
 type UserModel struct {
