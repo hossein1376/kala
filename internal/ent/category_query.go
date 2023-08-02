@@ -16,22 +16,18 @@ import (
 	"github.com/hossein1376/kala/internal/ent/image"
 	"github.com/hossein1376/kala/internal/ent/predicate"
 	"github.com/hossein1376/kala/internal/ent/product"
-	"github.com/hossein1376/kala/internal/ent/seller"
-	"github.com/hossein1376/kala/internal/ent/subcategory"
 )
 
 // CategoryQuery is the builder for querying Category entities.
 type CategoryQuery struct {
 	config
-	ctx             *QueryContext
-	order           []category.OrderOption
-	inters          []Interceptor
-	predicates      []predicate.Category
-	withSubCategory *SubCategoryQuery
-	withImage       *ImageQuery
-	withProduct     *ProductQuery
-	withBrand       *BrandQuery
-	withSeller      *SellerQuery
+	ctx         *QueryContext
+	order       []category.OrderOption
+	inters      []Interceptor
+	predicates  []predicate.Category
+	withImage   *ImageQuery
+	withProduct *ProductQuery
+	withBrand   *BrandQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -66,28 +62,6 @@ func (cq *CategoryQuery) Unique(unique bool) *CategoryQuery {
 func (cq *CategoryQuery) Order(o ...category.OrderOption) *CategoryQuery {
 	cq.order = append(cq.order, o...)
 	return cq
-}
-
-// QuerySubCategory chains the current query on the "sub_category" edge.
-func (cq *CategoryQuery) QuerySubCategory() *SubCategoryQuery {
-	query := (&SubCategoryClient{config: cq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := cq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := cq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(category.Table, category.FieldID, selector),
-			sqlgraph.To(subcategory.Table, subcategory.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, category.SubCategoryTable, category.SubCategoryColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
 }
 
 // QueryImage chains the current query on the "image" edge.
@@ -149,28 +123,6 @@ func (cq *CategoryQuery) QueryBrand() *BrandQuery {
 			sqlgraph.From(category.Table, category.FieldID, selector),
 			sqlgraph.To(brand.Table, brand.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, true, category.BrandTable, category.BrandPrimaryKey...),
-		)
-		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QuerySeller chains the current query on the "seller" edge.
-func (cq *CategoryQuery) QuerySeller() *SellerQuery {
-	query := (&SellerClient{config: cq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := cq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := cq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(category.Table, category.FieldID, selector),
-			sqlgraph.To(seller.Table, seller.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, category.SellerTable, category.SellerPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -365,31 +317,18 @@ func (cq *CategoryQuery) Clone() *CategoryQuery {
 		return nil
 	}
 	return &CategoryQuery{
-		config:          cq.config,
-		ctx:             cq.ctx.Clone(),
-		order:           append([]category.OrderOption{}, cq.order...),
-		inters:          append([]Interceptor{}, cq.inters...),
-		predicates:      append([]predicate.Category{}, cq.predicates...),
-		withSubCategory: cq.withSubCategory.Clone(),
-		withImage:       cq.withImage.Clone(),
-		withProduct:     cq.withProduct.Clone(),
-		withBrand:       cq.withBrand.Clone(),
-		withSeller:      cq.withSeller.Clone(),
+		config:      cq.config,
+		ctx:         cq.ctx.Clone(),
+		order:       append([]category.OrderOption{}, cq.order...),
+		inters:      append([]Interceptor{}, cq.inters...),
+		predicates:  append([]predicate.Category{}, cq.predicates...),
+		withImage:   cq.withImage.Clone(),
+		withProduct: cq.withProduct.Clone(),
+		withBrand:   cq.withBrand.Clone(),
 		// clone intermediate query.
 		sql:  cq.sql.Clone(),
 		path: cq.path,
 	}
-}
-
-// WithSubCategory tells the query-builder to eager-load the nodes that are connected to
-// the "sub_category" edge. The optional arguments are used to configure the query builder of the edge.
-func (cq *CategoryQuery) WithSubCategory(opts ...func(*SubCategoryQuery)) *CategoryQuery {
-	query := (&SubCategoryClient{config: cq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	cq.withSubCategory = query
-	return cq
 }
 
 // WithImage tells the query-builder to eager-load the nodes that are connected to
@@ -422,17 +361,6 @@ func (cq *CategoryQuery) WithBrand(opts ...func(*BrandQuery)) *CategoryQuery {
 		opt(query)
 	}
 	cq.withBrand = query
-	return cq
-}
-
-// WithSeller tells the query-builder to eager-load the nodes that are connected to
-// the "seller" edge. The optional arguments are used to configure the query builder of the edge.
-func (cq *CategoryQuery) WithSeller(opts ...func(*SellerQuery)) *CategoryQuery {
-	query := (&SellerClient{config: cq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	cq.withSeller = query
 	return cq
 }
 
@@ -514,12 +442,10 @@ func (cq *CategoryQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Cat
 	var (
 		nodes       = []*Category{}
 		_spec       = cq.querySpec()
-		loadedTypes = [5]bool{
-			cq.withSubCategory != nil,
+		loadedTypes = [3]bool{
 			cq.withImage != nil,
 			cq.withProduct != nil,
 			cq.withBrand != nil,
-			cq.withSeller != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -539,13 +465,6 @@ func (cq *CategoryQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Cat
 	}
 	if len(nodes) == 0 {
 		return nodes, nil
-	}
-	if query := cq.withSubCategory; query != nil {
-		if err := cq.loadSubCategory(ctx, query, nodes,
-			func(n *Category) { n.Edges.SubCategory = []*SubCategory{} },
-			func(n *Category, e *SubCategory) { n.Edges.SubCategory = append(n.Edges.SubCategory, e) }); err != nil {
-			return nil, err
-		}
 	}
 	if query := cq.withImage; query != nil {
 		if err := cq.loadImage(ctx, query, nodes,
@@ -568,47 +487,9 @@ func (cq *CategoryQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Cat
 			return nil, err
 		}
 	}
-	if query := cq.withSeller; query != nil {
-		if err := cq.loadSeller(ctx, query, nodes,
-			func(n *Category) { n.Edges.Seller = []*Seller{} },
-			func(n *Category, e *Seller) { n.Edges.Seller = append(n.Edges.Seller, e) }); err != nil {
-			return nil, err
-		}
-	}
 	return nodes, nil
 }
 
-func (cq *CategoryQuery) loadSubCategory(ctx context.Context, query *SubCategoryQuery, nodes []*Category, init func(*Category), assign func(*Category, *SubCategory)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*Category)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
-	}
-	query.withFKs = true
-	query.Where(predicate.SubCategory(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(category.SubCategoryColumn), fks...))
-	}))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		fk := n.category
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "category" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
-		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "category" returned %v for node %v`, *fk, n.ID)
-		}
-		assign(node, n)
-	}
-	return nil
-}
 func (cq *CategoryQuery) loadImage(ctx context.Context, query *ImageQuery, nodes []*Category, init func(*Category), assign func(*Category, *Image)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[int]*Category)
@@ -785,67 +666,6 @@ func (cq *CategoryQuery) loadBrand(ctx context.Context, query *BrandQuery, nodes
 		nodes, ok := nids[n.ID]
 		if !ok {
 			return fmt.Errorf(`unexpected "brand" node returned %v`, n.ID)
-		}
-		for kn := range nodes {
-			assign(kn, n)
-		}
-	}
-	return nil
-}
-func (cq *CategoryQuery) loadSeller(ctx context.Context, query *SellerQuery, nodes []*Category, init func(*Category), assign func(*Category, *Seller)) error {
-	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[int]*Category)
-	nids := make(map[int]map[*Category]struct{})
-	for i, node := range nodes {
-		edgeIDs[i] = node.ID
-		byID[node.ID] = node
-		if init != nil {
-			init(node)
-		}
-	}
-	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(category.SellerTable)
-		s.Join(joinT).On(s.C(seller.FieldID), joinT.C(category.SellerPrimaryKey[0]))
-		s.Where(sql.InValues(joinT.C(category.SellerPrimaryKey[1]), edgeIDs...))
-		columns := s.SelectedColumns()
-		s.Select(joinT.C(category.SellerPrimaryKey[1]))
-		s.AppendSelect(columns...)
-		s.SetDistinct(false)
-	})
-	if err := query.prepareQuery(ctx); err != nil {
-		return err
-	}
-	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
-		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
-			assign := spec.Assign
-			values := spec.ScanValues
-			spec.ScanValues = func(columns []string) ([]any, error) {
-				values, err := values(columns[1:])
-				if err != nil {
-					return nil, err
-				}
-				return append([]any{new(sql.NullInt64)}, values...), nil
-			}
-			spec.Assign = func(columns []string, values []any) error {
-				outValue := int(values[0].(*sql.NullInt64).Int64)
-				inValue := int(values[1].(*sql.NullInt64).Int64)
-				if nids[inValue] == nil {
-					nids[inValue] = map[*Category]struct{}{byID[outValue]: {}}
-					return assign(columns[1:], values[1:])
-				}
-				nids[inValue][byID[outValue]] = struct{}{}
-				return nil
-			}
-		})
-	})
-	neighbors, err := withInterceptors[[]*Seller](ctx, query, qr, query.inters)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected "seller" node returned %v`, n.ID)
 		}
 		for kn := range nodes {
 			assign(kn, n)

@@ -22,25 +22,14 @@ const (
 	FieldName = "name"
 	// FieldDescription holds the string denoting the description field in the database.
 	FieldDescription = "description"
-	// EdgeSubCategory holds the string denoting the sub_category edge name in mutations.
-	EdgeSubCategory = "sub_category"
 	// EdgeImage holds the string denoting the image edge name in mutations.
 	EdgeImage = "image"
 	// EdgeProduct holds the string denoting the product edge name in mutations.
 	EdgeProduct = "product"
 	// EdgeBrand holds the string denoting the brand edge name in mutations.
 	EdgeBrand = "brand"
-	// EdgeSeller holds the string denoting the seller edge name in mutations.
-	EdgeSeller = "seller"
 	// Table holds the table name of the category in the database.
 	Table = "categories"
-	// SubCategoryTable is the table that holds the sub_category relation/edge.
-	SubCategoryTable = "sub_categories"
-	// SubCategoryInverseTable is the table name for the SubCategory entity.
-	// It exists in this package in order to avoid circular dependency with the "subcategory" package.
-	SubCategoryInverseTable = "sub_categories"
-	// SubCategoryColumn is the table column denoting the sub_category relation/edge.
-	SubCategoryColumn = "category"
 	// ImageTable is the table that holds the image relation/edge. The primary key declared below.
 	ImageTable = "category_images"
 	// ImageInverseTable is the table name for the Image entity.
@@ -56,11 +45,6 @@ const (
 	// BrandInverseTable is the table name for the Brand entity.
 	// It exists in this package in order to avoid circular dependency with the "brand" package.
 	BrandInverseTable = "brands"
-	// SellerTable is the table that holds the seller relation/edge. The primary key declared below.
-	SellerTable = "seller_category"
-	// SellerInverseTable is the table name for the Seller entity.
-	// It exists in this package in order to avoid circular dependency with the "seller" package.
-	SellerInverseTable = "sellers"
 )
 
 // Columns holds all SQL columns for category fields.
@@ -82,9 +66,6 @@ var (
 	// BrandPrimaryKey and BrandColumn2 are the table columns denoting the
 	// primary key for the brand relation (M2M).
 	BrandPrimaryKey = []string{"brand_id", "category_id"}
-	// SellerPrimaryKey and SellerColumn2 are the table columns denoting the
-	// primary key for the seller relation (M2M).
-	SellerPrimaryKey = []string{"seller_id", "category_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -138,20 +119,6 @@ func ByDescription(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDescription, opts...).ToFunc()
 }
 
-// BySubCategoryCount orders the results by sub_category count.
-func BySubCategoryCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newSubCategoryStep(), opts...)
-	}
-}
-
-// BySubCategory orders the results by sub_category terms.
-func BySubCategory(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newSubCategoryStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
 // ByImageCount orders the results by image count.
 func ByImageCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -193,27 +160,6 @@ func ByBrand(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newBrandStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
-
-// BySellerCount orders the results by seller count.
-func BySellerCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newSellerStep(), opts...)
-	}
-}
-
-// BySeller orders the results by seller terms.
-func BySeller(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newSellerStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-func newSubCategoryStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(SubCategoryInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, SubCategoryTable, SubCategoryColumn),
-	)
-}
 func newImageStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -233,12 +179,5 @@ func newBrandStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(BrandInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, true, BrandTable, BrandPrimaryKey...),
-	)
-}
-func newSellerStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(SellerInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, SellerTable, SellerPrimaryKey...),
 	)
 }

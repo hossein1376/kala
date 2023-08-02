@@ -493,29 +493,6 @@ func HasUserWith(preds ...predicate.User) predicate.Image {
 	})
 }
 
-// HasComment applies the HasEdge predicate on the "comment" edge.
-func HasComment() predicate.Image {
-	return predicate.Image(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, CommentTable, CommentPrimaryKey...),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasCommentWith applies the HasEdge predicate on the "comment" edge with a given conditions (other predicates).
-func HasCommentWith(preds ...predicate.Comment) predicate.Image {
-	return predicate.Image(func(s *sql.Selector) {
-		step := newCommentStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
 // HasBrand applies the HasEdge predicate on the "brand" edge.
 func HasBrand() predicate.Image {
 	return predicate.Image(func(s *sql.Selector) {
@@ -577,29 +554,6 @@ func HasCategory() predicate.Image {
 func HasCategoryWith(preds ...predicate.Category) predicate.Image {
 	return predicate.Image(func(s *sql.Selector) {
 		step := newCategoryStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasSubCategory applies the HasEdge predicate on the "sub_category" edge.
-func HasSubCategory() predicate.Image {
-	return predicate.Image(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, SubCategoryTable, SubCategoryPrimaryKey...),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasSubCategoryWith applies the HasEdge predicate on the "sub_category" edge with a given conditions (other predicates).
-func HasSubCategoryWith(preds ...predicate.SubCategory) predicate.Image {
-	return predicate.Image(func(s *sql.Selector) {
-		step := newSubCategoryStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

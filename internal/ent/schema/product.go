@@ -36,16 +36,12 @@ func (Product) Fields() []ent.Field {
 // Edges of the Product.
 func (Product) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("values", AttributeValue.Type),
-		edge.To("comment", Comment.Type).
-			StorageKey(edge.Table("product_comments")),
 		edge.To("image", Image.Type).
 			StorageKey(edge.Table("product_images"),
 				edge.Columns("product", "image"),
 				edge.Symbols("product_id", "image_id")),
 		edge.To("order", Order.Type),
 		edge.To("category", Category.Type),
-		edge.To("sub_category", SubCategory.Type),
 
 		edge.From("brand", Brand.Type).
 			Ref("product").

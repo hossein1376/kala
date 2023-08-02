@@ -35,37 +35,19 @@ const (
 	FieldRole = "role"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
-	// EdgeComment holds the string denoting the comment edge name in mutations.
-	EdgeComment = "comment"
 	// EdgeImage holds the string denoting the image edge name in mutations.
 	EdgeImage = "image"
-	// EdgeSeller holds the string denoting the seller edge name in mutations.
-	EdgeSeller = "seller"
 	// EdgeOrder holds the string denoting the order edge name in mutations.
 	EdgeOrder = "order"
 	// EdgeLogs holds the string denoting the logs edge name in mutations.
 	EdgeLogs = "logs"
-	// EdgeAddress holds the string denoting the address edge name in mutations.
-	EdgeAddress = "address"
 	// Table holds the table name of the user in the database.
 	Table = "users"
-	// CommentTable is the table that holds the comment relation/edge. The primary key declared below.
-	CommentTable = "user_comments"
-	// CommentInverseTable is the table name for the Comment entity.
-	// It exists in this package in order to avoid circular dependency with the "comment" package.
-	CommentInverseTable = "comments"
 	// ImageTable is the table that holds the image relation/edge. The primary key declared below.
 	ImageTable = "user_images"
 	// ImageInverseTable is the table name for the Image entity.
 	// It exists in this package in order to avoid circular dependency with the "image" package.
 	ImageInverseTable = "images"
-	// SellerTable is the table that holds the seller relation/edge.
-	SellerTable = "sellers"
-	// SellerInverseTable is the table name for the Seller entity.
-	// It exists in this package in order to avoid circular dependency with the "seller" package.
-	SellerInverseTable = "sellers"
-	// SellerColumn is the table column denoting the seller relation/edge.
-	SellerColumn = "user_id"
 	// OrderTable is the table that holds the order relation/edge.
 	OrderTable = "orders"
 	// OrderInverseTable is the table name for the Order entity.
@@ -80,13 +62,6 @@ const (
 	LogsInverseTable = "logs"
 	// LogsColumn is the table column denoting the logs relation/edge.
 	LogsColumn = "user"
-	// AddressTable is the table that holds the address relation/edge.
-	AddressTable = "addresses"
-	// AddressInverseTable is the table name for the Address entity.
-	// It exists in this package in order to avoid circular dependency with the "address" package.
-	AddressInverseTable = "addresses"
-	// AddressColumn is the table column denoting the address relation/edge.
-	AddressColumn = "user"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -105,9 +80,6 @@ var Columns = []string{
 }
 
 var (
-	// CommentPrimaryKey and CommentColumn2 are the table columns denoting the
-	// primary key for the comment relation (M2M).
-	CommentPrimaryKey = []string{"user", "comment"}
 	// ImagePrimaryKey and ImageColumn2 are the table columns denoting the
 	// primary key for the image relation (M2M).
 	ImagePrimaryKey = []string{"user", "image"}
@@ -214,20 +186,6 @@ func ByStatus(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStatus, opts...).ToFunc()
 }
 
-// ByCommentCount orders the results by comment count.
-func ByCommentCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newCommentStep(), opts...)
-	}
-}
-
-// ByComment orders the results by comment terms.
-func ByComment(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newCommentStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
 // ByImageCount orders the results by image count.
 func ByImageCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -239,20 +197,6 @@ func ByImageCount(opts ...sql.OrderTermOption) OrderOption {
 func ByImage(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newImageStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
-// BySellerCount orders the results by seller count.
-func BySellerCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newSellerStep(), opts...)
-	}
-}
-
-// BySeller orders the results by seller terms.
-func BySeller(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newSellerStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -283,39 +227,11 @@ func ByLogs(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newLogsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
-
-// ByAddressCount orders the results by address count.
-func ByAddressCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newAddressStep(), opts...)
-	}
-}
-
-// ByAddress orders the results by address terms.
-func ByAddress(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newAddressStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-func newCommentStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(CommentInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, CommentTable, CommentPrimaryKey...),
-	)
-}
 func newImageStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ImageInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, false, ImageTable, ImagePrimaryKey...),
-	)
-}
-func newSellerStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(SellerInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, SellerTable, SellerColumn),
 	)
 }
 func newOrderStep() *sqlgraph.Step {
@@ -330,12 +246,5 @@ func newLogsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(LogsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, LogsTable, LogsColumn),
-	)
-}
-func newAddressStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(AddressInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, AddressTable, AddressColumn),
 	)
 }

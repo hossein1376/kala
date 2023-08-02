@@ -285,29 +285,6 @@ func DescriptionContainsFold(v string) predicate.Category {
 	return predicate.Category(sql.FieldContainsFold(FieldDescription, v))
 }
 
-// HasSubCategory applies the HasEdge predicate on the "sub_category" edge.
-func HasSubCategory() predicate.Category {
-	return predicate.Category(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, SubCategoryTable, SubCategoryColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasSubCategoryWith applies the HasEdge predicate on the "sub_category" edge with a given conditions (other predicates).
-func HasSubCategoryWith(preds ...predicate.SubCategory) predicate.Category {
-	return predicate.Category(func(s *sql.Selector) {
-		step := newSubCategoryStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
 // HasImage applies the HasEdge predicate on the "image" edge.
 func HasImage() predicate.Category {
 	return predicate.Category(func(s *sql.Selector) {
@@ -369,29 +346,6 @@ func HasBrand() predicate.Category {
 func HasBrandWith(preds ...predicate.Brand) predicate.Category {
 	return predicate.Category(func(s *sql.Selector) {
 		step := newBrandStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasSeller applies the HasEdge predicate on the "seller" edge.
-func HasSeller() predicate.Category {
-	return predicate.Category(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, SellerTable, SellerPrimaryKey...),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasSellerWith applies the HasEdge predicate on the "seller" edge with a given conditions (other predicates).
-func HasSellerWith(preds ...predicate.Seller) predicate.Category {
-	return predicate.Category(func(s *sql.Selector) {
-		step := newSellerStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

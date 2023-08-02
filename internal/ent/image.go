@@ -41,19 +41,15 @@ type Image struct {
 type ImageEdges struct {
 	// User holds the value of the user edge.
 	User []*User `json:"user,omitempty"`
-	// Comment holds the value of the comment edge.
-	Comment []*Comment `json:"comment,omitempty"`
 	// Brand holds the value of the brand edge.
 	Brand []*Brand `json:"brand,omitempty"`
 	// Product holds the value of the product edge.
 	Product []*Product `json:"product,omitempty"`
 	// Category holds the value of the category edge.
 	Category []*Category `json:"category,omitempty"`
-	// SubCategory holds the value of the sub_category edge.
-	SubCategory []*SubCategory `json:"sub_category,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [6]bool
+	loadedTypes [4]bool
 }
 
 // UserOrErr returns the User value or an error if the edge
@@ -65,19 +61,10 @@ func (e ImageEdges) UserOrErr() ([]*User, error) {
 	return nil, &NotLoadedError{edge: "user"}
 }
 
-// CommentOrErr returns the Comment value or an error if the edge
-// was not loaded in eager-loading.
-func (e ImageEdges) CommentOrErr() ([]*Comment, error) {
-	if e.loadedTypes[1] {
-		return e.Comment, nil
-	}
-	return nil, &NotLoadedError{edge: "comment"}
-}
-
 // BrandOrErr returns the Brand value or an error if the edge
 // was not loaded in eager-loading.
 func (e ImageEdges) BrandOrErr() ([]*Brand, error) {
-	if e.loadedTypes[2] {
+	if e.loadedTypes[1] {
 		return e.Brand, nil
 	}
 	return nil, &NotLoadedError{edge: "brand"}
@@ -86,7 +73,7 @@ func (e ImageEdges) BrandOrErr() ([]*Brand, error) {
 // ProductOrErr returns the Product value or an error if the edge
 // was not loaded in eager-loading.
 func (e ImageEdges) ProductOrErr() ([]*Product, error) {
-	if e.loadedTypes[3] {
+	if e.loadedTypes[2] {
 		return e.Product, nil
 	}
 	return nil, &NotLoadedError{edge: "product"}
@@ -95,19 +82,10 @@ func (e ImageEdges) ProductOrErr() ([]*Product, error) {
 // CategoryOrErr returns the Category value or an error if the edge
 // was not loaded in eager-loading.
 func (e ImageEdges) CategoryOrErr() ([]*Category, error) {
-	if e.loadedTypes[4] {
+	if e.loadedTypes[3] {
 		return e.Category, nil
 	}
 	return nil, &NotLoadedError{edge: "category"}
-}
-
-// SubCategoryOrErr returns the SubCategory value or an error if the edge
-// was not loaded in eager-loading.
-func (e ImageEdges) SubCategoryOrErr() ([]*SubCategory, error) {
-	if e.loadedTypes[5] {
-		return e.SubCategory, nil
-	}
-	return nil, &NotLoadedError{edge: "sub_category"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -204,11 +182,6 @@ func (i *Image) QueryUser() *UserQuery {
 	return NewImageClient(i.config).QueryUser(i)
 }
 
-// QueryComment queries the "comment" edge of the Image entity.
-func (i *Image) QueryComment() *CommentQuery {
-	return NewImageClient(i.config).QueryComment(i)
-}
-
 // QueryBrand queries the "brand" edge of the Image entity.
 func (i *Image) QueryBrand() *BrandQuery {
 	return NewImageClient(i.config).QueryBrand(i)
@@ -222,11 +195,6 @@ func (i *Image) QueryProduct() *ProductQuery {
 // QueryCategory queries the "category" edge of the Image entity.
 func (i *Image) QueryCategory() *CategoryQuery {
 	return NewImageClient(i.config).QueryCategory(i)
-}
-
-// QuerySubCategory queries the "sub_category" edge of the Image entity.
-func (i *Image) QuerySubCategory() *SubCategoryQuery {
-	return NewImageClient(i.config).QuerySubCategory(i)
 }
 
 // Update returns a builder for updating this Image.

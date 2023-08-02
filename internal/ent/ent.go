@@ -12,20 +12,12 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"github.com/hossein1376/kala/internal/ent/address"
-	"github.com/hossein1376/kala/internal/ent/attribute"
-	"github.com/hossein1376/kala/internal/ent/attributevalue"
 	"github.com/hossein1376/kala/internal/ent/brand"
 	"github.com/hossein1376/kala/internal/ent/category"
-	"github.com/hossein1376/kala/internal/ent/comment"
-	"github.com/hossein1376/kala/internal/ent/cons"
 	"github.com/hossein1376/kala/internal/ent/image"
 	"github.com/hossein1376/kala/internal/ent/logs"
 	"github.com/hossein1376/kala/internal/ent/order"
 	"github.com/hossein1376/kala/internal/ent/product"
-	"github.com/hossein1376/kala/internal/ent/pros"
-	"github.com/hossein1376/kala/internal/ent/seller"
-	"github.com/hossein1376/kala/internal/ent/subcategory"
 	"github.com/hossein1376/kala/internal/ent/user"
 )
 
@@ -87,21 +79,13 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			address.Table:        address.ValidColumn,
-			attribute.Table:      attribute.ValidColumn,
-			attributevalue.Table: attributevalue.ValidColumn,
-			brand.Table:          brand.ValidColumn,
-			category.Table:       category.ValidColumn,
-			comment.Table:        comment.ValidColumn,
-			cons.Table:           cons.ValidColumn,
-			image.Table:          image.ValidColumn,
-			logs.Table:           logs.ValidColumn,
-			order.Table:          order.ValidColumn,
-			product.Table:        product.ValidColumn,
-			pros.Table:           pros.ValidColumn,
-			seller.Table:         seller.ValidColumn,
-			subcategory.Table:    subcategory.ValidColumn,
-			user.Table:           user.ValidColumn,
+			brand.Table:    brand.ValidColumn,
+			category.Table: category.ValidColumn,
+			image.Table:    image.ValidColumn,
+			logs.Table:     logs.ValidColumn,
+			order.Table:    order.ValidColumn,
+			product.Table:  product.ValidColumn,
+			user.Table:     user.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

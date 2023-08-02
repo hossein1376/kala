@@ -12,10 +12,8 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/hossein1376/kala/internal/ent/brand"
 	"github.com/hossein1376/kala/internal/ent/category"
-	"github.com/hossein1376/kala/internal/ent/comment"
 	"github.com/hossein1376/kala/internal/ent/image"
 	"github.com/hossein1376/kala/internal/ent/product"
-	"github.com/hossein1376/kala/internal/ent/subcategory"
 	"github.com/hossein1376/kala/internal/ent/user"
 )
 
@@ -91,21 +89,6 @@ func (ic *ImageCreate) AddUser(u ...*User) *ImageCreate {
 	return ic.AddUserIDs(ids...)
 }
 
-// AddCommentIDs adds the "comment" edge to the Comment entity by IDs.
-func (ic *ImageCreate) AddCommentIDs(ids ...int) *ImageCreate {
-	ic.mutation.AddCommentIDs(ids...)
-	return ic
-}
-
-// AddComment adds the "comment" edges to the Comment entity.
-func (ic *ImageCreate) AddComment(c ...*Comment) *ImageCreate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return ic.AddCommentIDs(ids...)
-}
-
 // AddBrandIDs adds the "brand" edge to the Brand entity by IDs.
 func (ic *ImageCreate) AddBrandIDs(ids ...int) *ImageCreate {
 	ic.mutation.AddBrandIDs(ids...)
@@ -149,21 +132,6 @@ func (ic *ImageCreate) AddCategory(c ...*Category) *ImageCreate {
 		ids[i] = c[i].ID
 	}
 	return ic.AddCategoryIDs(ids...)
-}
-
-// AddSubCategoryIDs adds the "sub_category" edge to the SubCategory entity by IDs.
-func (ic *ImageCreate) AddSubCategoryIDs(ids ...int) *ImageCreate {
-	ic.mutation.AddSubCategoryIDs(ids...)
-	return ic
-}
-
-// AddSubCategory adds the "sub_category" edges to the SubCategory entity.
-func (ic *ImageCreate) AddSubCategory(s ...*SubCategory) *ImageCreate {
-	ids := make([]int, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
-	}
-	return ic.AddSubCategoryIDs(ids...)
 }
 
 // Mutation returns the ImageMutation object of the builder.
@@ -313,22 +281,6 @@ func (ic *ImageCreate) createSpec() (*Image, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ic.mutation.CommentIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   image.CommentTable,
-			Columns: image.CommentPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
 	if nodes := ic.mutation.BrandIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -370,22 +322,6 @@ func (ic *ImageCreate) createSpec() (*Image, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := ic.mutation.SubCategoryIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   image.SubCategoryTable,
-			Columns: image.SubCategoryPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(subcategory.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

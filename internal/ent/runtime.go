@@ -5,20 +5,12 @@ package ent
 import (
 	"time"
 
-	"github.com/hossein1376/kala/internal/ent/address"
-	"github.com/hossein1376/kala/internal/ent/attribute"
-	"github.com/hossein1376/kala/internal/ent/attributevalue"
 	"github.com/hossein1376/kala/internal/ent/brand"
 	"github.com/hossein1376/kala/internal/ent/category"
-	"github.com/hossein1376/kala/internal/ent/comment"
-	"github.com/hossein1376/kala/internal/ent/cons"
 	"github.com/hossein1376/kala/internal/ent/image"
 	"github.com/hossein1376/kala/internal/ent/order"
 	"github.com/hossein1376/kala/internal/ent/product"
-	"github.com/hossein1376/kala/internal/ent/pros"
 	"github.com/hossein1376/kala/internal/ent/schema"
-	"github.com/hossein1376/kala/internal/ent/seller"
-	"github.com/hossein1376/kala/internal/ent/subcategory"
 	"github.com/hossein1376/kala/internal/ent/user"
 )
 
@@ -26,48 +18,6 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
-	addressFields := schema.Address{}.Fields()
-	_ = addressFields
-	// addressDescAddress is the schema descriptor for address field.
-	addressDescAddress := addressFields[0].Descriptor()
-	// address.AddressValidator is a validator for the "address" field. It is called by the builders before save.
-	address.AddressValidator = addressDescAddress.Validators[0].(func(string) error)
-	// addressDescCity is the schema descriptor for city field.
-	addressDescCity := addressFields[1].Descriptor()
-	// address.CityValidator is a validator for the "city" field. It is called by the builders before save.
-	address.CityValidator = addressDescCity.Validators[0].(func(string) error)
-	// addressDescState is the schema descriptor for state field.
-	addressDescState := addressFields[2].Descriptor()
-	// address.StateValidator is a validator for the "state" field. It is called by the builders before save.
-	address.StateValidator = addressDescState.Validators[0].(func(string) error)
-	// addressDescPhone is the schema descriptor for phone field.
-	addressDescPhone := addressFields[5].Descriptor()
-	// address.PhoneValidator is a validator for the "phone" field. It is called by the builders before save.
-	address.PhoneValidator = addressDescPhone.Validators[0].(func(string) error)
-	// addressDescZipCode is the schema descriptor for zip_code field.
-	addressDescZipCode := addressFields[6].Descriptor()
-	// address.ZipCodeValidator is a validator for the "zip_code" field. It is called by the builders before save.
-	address.ZipCodeValidator = addressDescZipCode.Validators[0].(func(string) error)
-	// addressDescCoordinates is the schema descriptor for coordinates field.
-	addressDescCoordinates := addressFields[7].Descriptor()
-	// address.CoordinatesValidator is a validator for the "coordinates" field. It is called by the builders before save.
-	address.CoordinatesValidator = addressDescCoordinates.Validators[0].(func(string) error)
-	// addressDescIsSeller is the schema descriptor for is_seller field.
-	addressDescIsSeller := addressFields[8].Descriptor()
-	// address.DefaultIsSeller holds the default value on creation for the is_seller field.
-	address.DefaultIsSeller = addressDescIsSeller.Default.(bool)
-	attributeFields := schema.Attribute{}.Fields()
-	_ = attributeFields
-	// attributeDescName is the schema descriptor for name field.
-	attributeDescName := attributeFields[0].Descriptor()
-	// attribute.NameValidator is a validator for the "name" field. It is called by the builders before save.
-	attribute.NameValidator = attributeDescName.Validators[0].(func(string) error)
-	attributevalueFields := schema.AttributeValue{}.Fields()
-	_ = attributevalueFields
-	// attributevalueDescValue is the schema descriptor for value field.
-	attributevalueDescValue := attributevalueFields[0].Descriptor()
-	// attributevalue.ValueValidator is a validator for the "value" field. It is called by the builders before save.
-	attributevalue.ValueValidator = attributevalueDescValue.Validators[0].(func(string) error)
 	brandMixin := schema.Brand{}.Mixin()
 	brandMixinFields0 := brandMixin[0].Fields()
 	_ = brandMixinFields0
@@ -106,53 +56,6 @@ func init() {
 	categoryDescDescription := categoryFields[1].Descriptor()
 	// category.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
 	category.DescriptionValidator = categoryDescDescription.Validators[0].(func(string) error)
-	commentMixin := schema.Comment{}.Mixin()
-	commentMixinFields0 := commentMixin[0].Fields()
-	_ = commentMixinFields0
-	commentFields := schema.Comment{}.Fields()
-	_ = commentFields
-	// commentDescCreateTime is the schema descriptor for create_time field.
-	commentDescCreateTime := commentMixinFields0[0].Descriptor()
-	// comment.DefaultCreateTime holds the default value on creation for the create_time field.
-	comment.DefaultCreateTime = commentDescCreateTime.Default.(func() time.Time)
-	// commentDescUpdateTime is the schema descriptor for update_time field.
-	commentDescUpdateTime := commentMixinFields0[1].Descriptor()
-	// comment.DefaultUpdateTime holds the default value on creation for the update_time field.
-	comment.DefaultUpdateTime = commentDescUpdateTime.Default.(func() time.Time)
-	// comment.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
-	comment.UpdateDefaultUpdateTime = commentDescUpdateTime.UpdateDefault.(func() time.Time)
-	// commentDescContent is the schema descriptor for content field.
-	commentDescContent := commentFields[0].Descriptor()
-	// comment.ContentValidator is a validator for the "content" field. It is called by the builders before save.
-	comment.ContentValidator = commentDescContent.Validators[0].(func(string) error)
-	// commentDescLikes is the schema descriptor for likes field.
-	commentDescLikes := commentFields[2].Descriptor()
-	// comment.DefaultLikes holds the default value on creation for the likes field.
-	comment.DefaultLikes = commentDescLikes.Default.(int32)
-	// comment.LikesValidator is a validator for the "likes" field. It is called by the builders before save.
-	comment.LikesValidator = commentDescLikes.Validators[0].(func(int32) error)
-	// commentDescDislikes is the schema descriptor for dislikes field.
-	commentDescDislikes := commentFields[3].Descriptor()
-	// comment.DefaultDislikes holds the default value on creation for the dislikes field.
-	comment.DefaultDislikes = commentDescDislikes.Default.(int32)
-	// comment.DislikesValidator is a validator for the "dislikes" field. It is called by the builders before save.
-	comment.DislikesValidator = commentDescDislikes.Validators[0].(func(int32) error)
-	// commentDescRating is the schema descriptor for rating field.
-	commentDescRating := commentFields[4].Descriptor()
-	// comment.DefaultRating holds the default value on creation for the rating field.
-	comment.DefaultRating = commentDescRating.Default.(float64)
-	// comment.RatingValidator is a validator for the "rating" field. It is called by the builders before save.
-	comment.RatingValidator = commentDescRating.Validators[0].(func(float64) error)
-	// commentDescRatingCount is the schema descriptor for rating_count field.
-	commentDescRatingCount := commentFields[5].Descriptor()
-	// comment.RatingCountValidator is a validator for the "rating_count" field. It is called by the builders before save.
-	comment.RatingCountValidator = commentDescRatingCount.Validators[0].(func(int32) error)
-	consFields := schema.Cons{}.Fields()
-	_ = consFields
-	// consDescCon is the schema descriptor for con field.
-	consDescCon := consFields[0].Descriptor()
-	// cons.ConValidator is a validator for the "con" field. It is called by the builders before save.
-	cons.ConValidator = consDescCon.Validators[0].(func(string) error)
 	imageFields := schema.Image{}.Fields()
 	_ = imageFields
 	// imageDescName is the schema descriptor for name field.
@@ -229,66 +132,6 @@ func init() {
 	productDescQuantity := productFields[6].Descriptor()
 	// product.QuantityValidator is a validator for the "quantity" field. It is called by the builders before save.
 	product.QuantityValidator = productDescQuantity.Validators[0].(func(int32) error)
-	prosFields := schema.Pros{}.Fields()
-	_ = prosFields
-	// prosDescPro is the schema descriptor for pro field.
-	prosDescPro := prosFields[0].Descriptor()
-	// pros.ProValidator is a validator for the "pro" field. It is called by the builders before save.
-	pros.ProValidator = prosDescPro.Validators[0].(func(string) error)
-	sellerMixin := schema.Seller{}.Mixin()
-	sellerMixinFields0 := sellerMixin[0].Fields()
-	_ = sellerMixinFields0
-	sellerFields := schema.Seller{}.Fields()
-	_ = sellerFields
-	// sellerDescCreateTime is the schema descriptor for create_time field.
-	sellerDescCreateTime := sellerMixinFields0[0].Descriptor()
-	// seller.DefaultCreateTime holds the default value on creation for the create_time field.
-	seller.DefaultCreateTime = sellerDescCreateTime.Default.(func() time.Time)
-	// sellerDescUpdateTime is the schema descriptor for update_time field.
-	sellerDescUpdateTime := sellerMixinFields0[1].Descriptor()
-	// seller.DefaultUpdateTime holds the default value on creation for the update_time field.
-	seller.DefaultUpdateTime = sellerDescUpdateTime.Default.(func() time.Time)
-	// seller.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
-	seller.UpdateDefaultUpdateTime = sellerDescUpdateTime.UpdateDefault.(func() time.Time)
-	// sellerDescName is the schema descriptor for name field.
-	sellerDescName := sellerFields[0].Descriptor()
-	// seller.NameValidator is a validator for the "name" field. It is called by the builders before save.
-	seller.NameValidator = sellerDescName.Validators[0].(func(string) error)
-	// sellerDescRating is the schema descriptor for rating field.
-	sellerDescRating := sellerFields[2].Descriptor()
-	// seller.RatingValidator is a validator for the "rating" field. It is called by the builders before save.
-	seller.RatingValidator = sellerDescRating.Validators[0].(func(float64) error)
-	// sellerDescRatingCount is the schema descriptor for rating_count field.
-	sellerDescRatingCount := sellerFields[3].Descriptor()
-	// seller.RatingCountValidator is a validator for the "rating_count" field. It is called by the builders before save.
-	seller.RatingCountValidator = sellerDescRatingCount.Validators[0].(func(int32) error)
-	// sellerDescPhone is the schema descriptor for phone field.
-	sellerDescPhone := sellerFields[4].Descriptor()
-	// seller.PhoneValidator is a validator for the "phone" field. It is called by the builders before save.
-	seller.PhoneValidator = sellerDescPhone.Validators[0].(func(string) error)
-	subcategoryMixin := schema.SubCategory{}.Mixin()
-	subcategoryMixinFields0 := subcategoryMixin[0].Fields()
-	_ = subcategoryMixinFields0
-	subcategoryFields := schema.SubCategory{}.Fields()
-	_ = subcategoryFields
-	// subcategoryDescCreateTime is the schema descriptor for create_time field.
-	subcategoryDescCreateTime := subcategoryMixinFields0[0].Descriptor()
-	// subcategory.DefaultCreateTime holds the default value on creation for the create_time field.
-	subcategory.DefaultCreateTime = subcategoryDescCreateTime.Default.(func() time.Time)
-	// subcategoryDescUpdateTime is the schema descriptor for update_time field.
-	subcategoryDescUpdateTime := subcategoryMixinFields0[1].Descriptor()
-	// subcategory.DefaultUpdateTime holds the default value on creation for the update_time field.
-	subcategory.DefaultUpdateTime = subcategoryDescUpdateTime.Default.(func() time.Time)
-	// subcategory.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
-	subcategory.UpdateDefaultUpdateTime = subcategoryDescUpdateTime.UpdateDefault.(func() time.Time)
-	// subcategoryDescName is the schema descriptor for name field.
-	subcategoryDescName := subcategoryFields[0].Descriptor()
-	// subcategory.NameValidator is a validator for the "name" field. It is called by the builders before save.
-	subcategory.NameValidator = subcategoryDescName.Validators[0].(func(string) error)
-	// subcategoryDescDescription is the schema descriptor for description field.
-	subcategoryDescDescription := subcategoryFields[1].Descriptor()
-	// subcategory.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
-	subcategory.DescriptionValidator = subcategoryDescDescription.Validators[0].(func(string) error)
 	userMixin := schema.User{}.Mixin()
 	userMixinFields0 := userMixin[0].Fields()
 	_ = userMixinFields0

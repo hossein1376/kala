@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/hossein1376/kala/internal/ent"
-	entComment "github.com/hossein1376/kala/internal/ent/comment"
 	entProduct "github.com/hossein1376/kala/internal/ent/product"
 	"github.com/hossein1376/kala/internal/structure"
 )
@@ -27,7 +26,6 @@ func (p *ProductModel) CreateNewProduct(product structure.Product) (*ent.Product
 		SetQuantity(product.Quantity).
 		AddImage(product.Image...).
 		AddCategory(product.Category...).
-		AddSubCategory(product.SubCategory...).
 		SetCreateTime(time.Now()).
 		SetUpdateTime(time.Now()).
 		Save(context.Background())
@@ -37,15 +35,6 @@ func (p *ProductModel) GetSingleProductByID(id int) (*ent.Product, error) {
 	return p.client.Product.Query().
 		Where(entProduct.ID(id)).
 		WithBrand().
-		WithComment(func(query *ent.CommentQuery) {
-			query.
-				Where(entComment.StatusEQ(entComment.StatusPublished)).
-				Order(ent.Asc(entComment.FieldID))
-		}).
-		WithValues(func(query *ent.AttributeValueQuery) {
-			query.
-				WithAttributes()
-		}).
 		WithImage().
 		Only(context.Background())
 }
@@ -53,15 +42,6 @@ func (p *ProductModel) GetSingleProductByID(id int) (*ent.Product, error) {
 func (p *ProductModel) GetAllProducts() ([]*ent.Product, error) {
 	return p.client.Product.Query().
 		WithBrand().
-		WithComment(func(query *ent.CommentQuery) {
-			query.
-				Where(entComment.StatusEQ(entComment.StatusPublished)).
-				Order(ent.Asc(entComment.FieldID))
-		}).
-		WithValues(func(query *ent.AttributeValueQuery) {
-			query.
-				WithAttributes()
-		}).
 		WithImage().
 		All(context.Background())
 }
@@ -80,7 +60,6 @@ func (p *ProductModel) UpdateProductByID(prod *ent.Product, id int) error {
 		SetQuantity(prod.Quantity).
 		AddImage(prod.Edges.Image...).
 		AddCategory(prod.Edges.Category...).
-		AddSubCategory(prod.Edges.SubCategory...).
 		SetUpdateTime(time.Now()).
 		Save(context.Background())
 

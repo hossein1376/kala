@@ -44,53 +44,28 @@ type Product struct {
 	// The values are being populated by the ProductQuery when eager-loading is set.
 	Edges         ProductEdges `json:"edges"`
 	brand_product *int
-	product_id    *int
 	selectValues  sql.SelectValues
 }
 
 // ProductEdges holds the relations/edges for other nodes in the graph.
 type ProductEdges struct {
-	// Values holds the value of the values edge.
-	Values []*AttributeValue `json:"values,omitempty"`
-	// Comment holds the value of the comment edge.
-	Comment []*Comment `json:"comment,omitempty"`
 	// Image holds the value of the image edge.
 	Image []*Image `json:"image,omitempty"`
 	// Order holds the value of the order edge.
 	Order []*Order `json:"order,omitempty"`
 	// Category holds the value of the category edge.
 	Category []*Category `json:"category,omitempty"`
-	// SubCategory holds the value of the sub_category edge.
-	SubCategory []*SubCategory `json:"sub_category,omitempty"`
 	// Brand holds the value of the brand edge.
 	Brand *Brand `json:"brand,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [7]bool
-}
-
-// ValuesOrErr returns the Values value or an error if the edge
-// was not loaded in eager-loading.
-func (e ProductEdges) ValuesOrErr() ([]*AttributeValue, error) {
-	if e.loadedTypes[0] {
-		return e.Values, nil
-	}
-	return nil, &NotLoadedError{edge: "values"}
-}
-
-// CommentOrErr returns the Comment value or an error if the edge
-// was not loaded in eager-loading.
-func (e ProductEdges) CommentOrErr() ([]*Comment, error) {
-	if e.loadedTypes[1] {
-		return e.Comment, nil
-	}
-	return nil, &NotLoadedError{edge: "comment"}
+	loadedTypes [4]bool
 }
 
 // ImageOrErr returns the Image value or an error if the edge
 // was not loaded in eager-loading.
 func (e ProductEdges) ImageOrErr() ([]*Image, error) {
-	if e.loadedTypes[2] {
+	if e.loadedTypes[0] {
 		return e.Image, nil
 	}
 	return nil, &NotLoadedError{edge: "image"}
@@ -99,7 +74,7 @@ func (e ProductEdges) ImageOrErr() ([]*Image, error) {
 // OrderOrErr returns the Order value or an error if the edge
 // was not loaded in eager-loading.
 func (e ProductEdges) OrderOrErr() ([]*Order, error) {
-	if e.loadedTypes[3] {
+	if e.loadedTypes[1] {
 		return e.Order, nil
 	}
 	return nil, &NotLoadedError{edge: "order"}
@@ -108,25 +83,16 @@ func (e ProductEdges) OrderOrErr() ([]*Order, error) {
 // CategoryOrErr returns the Category value or an error if the edge
 // was not loaded in eager-loading.
 func (e ProductEdges) CategoryOrErr() ([]*Category, error) {
-	if e.loadedTypes[4] {
+	if e.loadedTypes[2] {
 		return e.Category, nil
 	}
 	return nil, &NotLoadedError{edge: "category"}
 }
 
-// SubCategoryOrErr returns the SubCategory value or an error if the edge
-// was not loaded in eager-loading.
-func (e ProductEdges) SubCategoryOrErr() ([]*SubCategory, error) {
-	if e.loadedTypes[5] {
-		return e.SubCategory, nil
-	}
-	return nil, &NotLoadedError{edge: "sub_category"}
-}
-
 // BrandOrErr returns the Brand value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e ProductEdges) BrandOrErr() (*Brand, error) {
-	if e.loadedTypes[6] {
+	if e.loadedTypes[3] {
 		if e.Brand == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: brand.Label}
@@ -152,8 +118,6 @@ func (*Product) scanValues(columns []string) ([]any, error) {
 		case product.FieldCreateTime, product.FieldUpdateTime:
 			values[i] = new(sql.NullTime)
 		case product.ForeignKeys[0]: // brand_product
-			values[i] = new(sql.NullInt64)
-		case product.ForeignKeys[1]: // product_id
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -249,13 +213,6 @@ func (pr *Product) assignValues(columns []string, values []any) error {
 				pr.brand_product = new(int)
 				*pr.brand_product = int(value.Int64)
 			}
-		case product.ForeignKeys[1]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field product_id", value)
-			} else if value.Valid {
-				pr.product_id = new(int)
-				*pr.product_id = int(value.Int64)
-			}
 		default:
 			pr.selectValues.Set(columns[i], values[i])
 		}
@@ -267,16 +224,6 @@ func (pr *Product) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (pr *Product) Value(name string) (ent.Value, error) {
 	return pr.selectValues.Get(name)
-}
-
-// QueryValues queries the "values" edge of the Product entity.
-func (pr *Product) QueryValues() *AttributeValueQuery {
-	return NewProductClient(pr.config).QueryValues(pr)
-}
-
-// QueryComment queries the "comment" edge of the Product entity.
-func (pr *Product) QueryComment() *CommentQuery {
-	return NewProductClient(pr.config).QueryComment(pr)
 }
 
 // QueryImage queries the "image" edge of the Product entity.
@@ -292,11 +239,6 @@ func (pr *Product) QueryOrder() *OrderQuery {
 // QueryCategory queries the "category" edge of the Product entity.
 func (pr *Product) QueryCategory() *CategoryQuery {
 	return NewProductClient(pr.config).QueryCategory(pr)
-}
-
-// QuerySubCategory queries the "sub_category" edge of the Product entity.
-func (pr *Product) QuerySubCategory() *SubCategoryQuery {
-	return NewProductClient(pr.config).QuerySubCategory(pr)
 }
 
 // QueryBrand queries the "brand" edge of the Product entity.

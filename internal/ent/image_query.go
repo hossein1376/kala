@@ -13,27 +13,23 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/hossein1376/kala/internal/ent/brand"
 	"github.com/hossein1376/kala/internal/ent/category"
-	"github.com/hossein1376/kala/internal/ent/comment"
 	"github.com/hossein1376/kala/internal/ent/image"
 	"github.com/hossein1376/kala/internal/ent/predicate"
 	"github.com/hossein1376/kala/internal/ent/product"
-	"github.com/hossein1376/kala/internal/ent/subcategory"
 	"github.com/hossein1376/kala/internal/ent/user"
 )
 
 // ImageQuery is the builder for querying Image entities.
 type ImageQuery struct {
 	config
-	ctx             *QueryContext
-	order           []image.OrderOption
-	inters          []Interceptor
-	predicates      []predicate.Image
-	withUser        *UserQuery
-	withComment     *CommentQuery
-	withBrand       *BrandQuery
-	withProduct     *ProductQuery
-	withCategory    *CategoryQuery
-	withSubCategory *SubCategoryQuery
+	ctx          *QueryContext
+	order        []image.OrderOption
+	inters       []Interceptor
+	predicates   []predicate.Image
+	withUser     *UserQuery
+	withBrand    *BrandQuery
+	withProduct  *ProductQuery
+	withCategory *CategoryQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -85,28 +81,6 @@ func (iq *ImageQuery) QueryUser() *UserQuery {
 			sqlgraph.From(image.Table, image.FieldID, selector),
 			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, true, image.UserTable, image.UserPrimaryKey...),
-		)
-		fromU = sqlgraph.SetNeighbors(iq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryComment chains the current query on the "comment" edge.
-func (iq *ImageQuery) QueryComment() *CommentQuery {
-	query := (&CommentClient{config: iq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := iq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := iq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(image.Table, image.FieldID, selector),
-			sqlgraph.To(comment.Table, comment.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, image.CommentTable, image.CommentPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(iq.driver.Dialect(), step)
 		return fromU, nil
@@ -173,28 +147,6 @@ func (iq *ImageQuery) QueryCategory() *CategoryQuery {
 			sqlgraph.From(image.Table, image.FieldID, selector),
 			sqlgraph.To(category.Table, category.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, true, image.CategoryTable, image.CategoryPrimaryKey...),
-		)
-		fromU = sqlgraph.SetNeighbors(iq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QuerySubCategory chains the current query on the "sub_category" edge.
-func (iq *ImageQuery) QuerySubCategory() *SubCategoryQuery {
-	query := (&SubCategoryClient{config: iq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := iq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := iq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(image.Table, image.FieldID, selector),
-			sqlgraph.To(subcategory.Table, subcategory.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, image.SubCategoryTable, image.SubCategoryPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(iq.driver.Dialect(), step)
 		return fromU, nil
@@ -389,17 +341,15 @@ func (iq *ImageQuery) Clone() *ImageQuery {
 		return nil
 	}
 	return &ImageQuery{
-		config:          iq.config,
-		ctx:             iq.ctx.Clone(),
-		order:           append([]image.OrderOption{}, iq.order...),
-		inters:          append([]Interceptor{}, iq.inters...),
-		predicates:      append([]predicate.Image{}, iq.predicates...),
-		withUser:        iq.withUser.Clone(),
-		withComment:     iq.withComment.Clone(),
-		withBrand:       iq.withBrand.Clone(),
-		withProduct:     iq.withProduct.Clone(),
-		withCategory:    iq.withCategory.Clone(),
-		withSubCategory: iq.withSubCategory.Clone(),
+		config:       iq.config,
+		ctx:          iq.ctx.Clone(),
+		order:        append([]image.OrderOption{}, iq.order...),
+		inters:       append([]Interceptor{}, iq.inters...),
+		predicates:   append([]predicate.Image{}, iq.predicates...),
+		withUser:     iq.withUser.Clone(),
+		withBrand:    iq.withBrand.Clone(),
+		withProduct:  iq.withProduct.Clone(),
+		withCategory: iq.withCategory.Clone(),
 		// clone intermediate query.
 		sql:  iq.sql.Clone(),
 		path: iq.path,
@@ -414,17 +364,6 @@ func (iq *ImageQuery) WithUser(opts ...func(*UserQuery)) *ImageQuery {
 		opt(query)
 	}
 	iq.withUser = query
-	return iq
-}
-
-// WithComment tells the query-builder to eager-load the nodes that are connected to
-// the "comment" edge. The optional arguments are used to configure the query builder of the edge.
-func (iq *ImageQuery) WithComment(opts ...func(*CommentQuery)) *ImageQuery {
-	query := (&CommentClient{config: iq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	iq.withComment = query
 	return iq
 }
 
@@ -458,17 +397,6 @@ func (iq *ImageQuery) WithCategory(opts ...func(*CategoryQuery)) *ImageQuery {
 		opt(query)
 	}
 	iq.withCategory = query
-	return iq
-}
-
-// WithSubCategory tells the query-builder to eager-load the nodes that are connected to
-// the "sub_category" edge. The optional arguments are used to configure the query builder of the edge.
-func (iq *ImageQuery) WithSubCategory(opts ...func(*SubCategoryQuery)) *ImageQuery {
-	query := (&SubCategoryClient{config: iq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	iq.withSubCategory = query
 	return iq
 }
 
@@ -550,13 +478,11 @@ func (iq *ImageQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Image,
 	var (
 		nodes       = []*Image{}
 		_spec       = iq.querySpec()
-		loadedTypes = [6]bool{
+		loadedTypes = [4]bool{
 			iq.withUser != nil,
-			iq.withComment != nil,
 			iq.withBrand != nil,
 			iq.withProduct != nil,
 			iq.withCategory != nil,
-			iq.withSubCategory != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -584,13 +510,6 @@ func (iq *ImageQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Image,
 			return nil, err
 		}
 	}
-	if query := iq.withComment; query != nil {
-		if err := iq.loadComment(ctx, query, nodes,
-			func(n *Image) { n.Edges.Comment = []*Comment{} },
-			func(n *Image, e *Comment) { n.Edges.Comment = append(n.Edges.Comment, e) }); err != nil {
-			return nil, err
-		}
-	}
 	if query := iq.withBrand; query != nil {
 		if err := iq.loadBrand(ctx, query, nodes,
 			func(n *Image) { n.Edges.Brand = []*Brand{} },
@@ -609,13 +528,6 @@ func (iq *ImageQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Image,
 		if err := iq.loadCategory(ctx, query, nodes,
 			func(n *Image) { n.Edges.Category = []*Category{} },
 			func(n *Image, e *Category) { n.Edges.Category = append(n.Edges.Category, e) }); err != nil {
-			return nil, err
-		}
-	}
-	if query := iq.withSubCategory; query != nil {
-		if err := iq.loadSubCategory(ctx, query, nodes,
-			func(n *Image) { n.Edges.SubCategory = []*SubCategory{} },
-			func(n *Image, e *SubCategory) { n.Edges.SubCategory = append(n.Edges.SubCategory, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -676,67 +588,6 @@ func (iq *ImageQuery) loadUser(ctx context.Context, query *UserQuery, nodes []*I
 		nodes, ok := nids[n.ID]
 		if !ok {
 			return fmt.Errorf(`unexpected "user" node returned %v`, n.ID)
-		}
-		for kn := range nodes {
-			assign(kn, n)
-		}
-	}
-	return nil
-}
-func (iq *ImageQuery) loadComment(ctx context.Context, query *CommentQuery, nodes []*Image, init func(*Image), assign func(*Image, *Comment)) error {
-	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[int]*Image)
-	nids := make(map[int]map[*Image]struct{})
-	for i, node := range nodes {
-		edgeIDs[i] = node.ID
-		byID[node.ID] = node
-		if init != nil {
-			init(node)
-		}
-	}
-	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(image.CommentTable)
-		s.Join(joinT).On(s.C(comment.FieldID), joinT.C(image.CommentPrimaryKey[0]))
-		s.Where(sql.InValues(joinT.C(image.CommentPrimaryKey[1]), edgeIDs...))
-		columns := s.SelectedColumns()
-		s.Select(joinT.C(image.CommentPrimaryKey[1]))
-		s.AppendSelect(columns...)
-		s.SetDistinct(false)
-	})
-	if err := query.prepareQuery(ctx); err != nil {
-		return err
-	}
-	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
-		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
-			assign := spec.Assign
-			values := spec.ScanValues
-			spec.ScanValues = func(columns []string) ([]any, error) {
-				values, err := values(columns[1:])
-				if err != nil {
-					return nil, err
-				}
-				return append([]any{new(sql.NullInt64)}, values...), nil
-			}
-			spec.Assign = func(columns []string, values []any) error {
-				outValue := int(values[0].(*sql.NullInt64).Int64)
-				inValue := int(values[1].(*sql.NullInt64).Int64)
-				if nids[inValue] == nil {
-					nids[inValue] = map[*Image]struct{}{byID[outValue]: {}}
-					return assign(columns[1:], values[1:])
-				}
-				nids[inValue][byID[outValue]] = struct{}{}
-				return nil
-			}
-		})
-	})
-	neighbors, err := withInterceptors[[]*Comment](ctx, query, qr, query.inters)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected "comment" node returned %v`, n.ID)
 		}
 		for kn := range nodes {
 			assign(kn, n)
@@ -920,67 +771,6 @@ func (iq *ImageQuery) loadCategory(ctx context.Context, query *CategoryQuery, no
 		nodes, ok := nids[n.ID]
 		if !ok {
 			return fmt.Errorf(`unexpected "category" node returned %v`, n.ID)
-		}
-		for kn := range nodes {
-			assign(kn, n)
-		}
-	}
-	return nil
-}
-func (iq *ImageQuery) loadSubCategory(ctx context.Context, query *SubCategoryQuery, nodes []*Image, init func(*Image), assign func(*Image, *SubCategory)) error {
-	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[int]*Image)
-	nids := make(map[int]map[*Image]struct{})
-	for i, node := range nodes {
-		edgeIDs[i] = node.ID
-		byID[node.ID] = node
-		if init != nil {
-			init(node)
-		}
-	}
-	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(image.SubCategoryTable)
-		s.Join(joinT).On(s.C(subcategory.FieldID), joinT.C(image.SubCategoryPrimaryKey[0]))
-		s.Where(sql.InValues(joinT.C(image.SubCategoryPrimaryKey[1]), edgeIDs...))
-		columns := s.SelectedColumns()
-		s.Select(joinT.C(image.SubCategoryPrimaryKey[1]))
-		s.AppendSelect(columns...)
-		s.SetDistinct(false)
-	})
-	if err := query.prepareQuery(ctx); err != nil {
-		return err
-	}
-	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
-		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
-			assign := spec.Assign
-			values := spec.ScanValues
-			spec.ScanValues = func(columns []string) ([]any, error) {
-				values, err := values(columns[1:])
-				if err != nil {
-					return nil, err
-				}
-				return append([]any{new(sql.NullInt64)}, values...), nil
-			}
-			spec.Assign = func(columns []string, values []any) error {
-				outValue := int(values[0].(*sql.NullInt64).Int64)
-				inValue := int(values[1].(*sql.NullInt64).Int64)
-				if nids[inValue] == nil {
-					nids[inValue] = map[*Image]struct{}{byID[outValue]: {}}
-					return assign(columns[1:], values[1:])
-				}
-				nids[inValue][byID[outValue]] = struct{}{}
-				return nil
-			}
-		})
-	})
-	neighbors, err := withInterceptors[[]*SubCategory](ctx, query, qr, query.inters)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected "sub_category" node returned %v`, n.ID)
 		}
 		for kn := range nodes {
 			assign(kn, n)

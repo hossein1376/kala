@@ -10,7 +10,6 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/hossein1376/kala/internal/ent/order"
-	"github.com/hossein1376/kala/internal/ent/seller"
 	"github.com/hossein1376/kala/internal/ent/user"
 )
 
@@ -26,41 +25,25 @@ type Order struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the OrderQuery when eager-loading is set.
 	Edges        OrderEdges `json:"edges"`
-	seller_id    *int
 	user_id      *int
 	selectValues sql.SelectValues
 }
 
 // OrderEdges holds the relations/edges for other nodes in the graph.
 type OrderEdges struct {
-	// Seller holds the value of the seller edge.
-	Seller *Seller `json:"seller,omitempty"`
 	// Product holds the value of the product edge.
 	Product []*Product `json:"product,omitempty"`
 	// User holds the value of the user edge.
 	User *User `json:"user,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
-}
-
-// SellerOrErr returns the Seller value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e OrderEdges) SellerOrErr() (*Seller, error) {
-	if e.loadedTypes[0] {
-		if e.Seller == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: seller.Label}
-		}
-		return e.Seller, nil
-	}
-	return nil, &NotLoadedError{edge: "seller"}
+	loadedTypes [2]bool
 }
 
 // ProductOrErr returns the Product value or an error if the edge
 // was not loaded in eager-loading.
 func (e OrderEdges) ProductOrErr() ([]*Product, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[0] {
 		return e.Product, nil
 	}
 	return nil, &NotLoadedError{edge: "product"}
@@ -69,7 +52,7 @@ func (e OrderEdges) ProductOrErr() ([]*Product, error) {
 // UserOrErr returns the User value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e OrderEdges) UserOrErr() (*User, error) {
-	if e.loadedTypes[2] {
+	if e.loadedTypes[1] {
 		if e.User == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: user.Label}
@@ -88,9 +71,7 @@ func (*Order) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case order.FieldCreateTime, order.FieldUpdateTime:
 			values[i] = new(sql.NullTime)
-		case order.ForeignKeys[0]: // seller_id
-			values[i] = new(sql.NullInt64)
-		case order.ForeignKeys[1]: // user_id
+		case order.ForeignKeys[0]: // user_id
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -127,13 +108,6 @@ func (o *Order) assignValues(columns []string, values []any) error {
 			}
 		case order.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field seller_id", value)
-			} else if value.Valid {
-				o.seller_id = new(int)
-				*o.seller_id = int(value.Int64)
-			}
-		case order.ForeignKeys[1]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field user_id", value)
 			} else if value.Valid {
 				o.user_id = new(int)
@@ -150,11 +124,6 @@ func (o *Order) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (o *Order) Value(name string) (ent.Value, error) {
 	return o.selectValues.Get(name)
-}
-
-// QuerySeller queries the "seller" edge of the Order entity.
-func (o *Order) QuerySeller() *SellerQuery {
-	return NewOrderClient(o.config).QuerySeller(o)
 }
 
 // QueryProduct queries the "product" edge of the Order entity.

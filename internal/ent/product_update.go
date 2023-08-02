@@ -11,15 +11,12 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/hossein1376/kala/internal/ent/attributevalue"
 	"github.com/hossein1376/kala/internal/ent/brand"
 	"github.com/hossein1376/kala/internal/ent/category"
-	"github.com/hossein1376/kala/internal/ent/comment"
 	"github.com/hossein1376/kala/internal/ent/image"
 	"github.com/hossein1376/kala/internal/ent/order"
 	"github.com/hossein1376/kala/internal/ent/predicate"
 	"github.com/hossein1376/kala/internal/ent/product"
-	"github.com/hossein1376/kala/internal/ent/subcategory"
 )
 
 // ProductUpdate is the builder for updating Product entities.
@@ -123,36 +120,6 @@ func (pu *ProductUpdate) SetStatus(b bool) *ProductUpdate {
 	return pu
 }
 
-// AddValueIDs adds the "values" edge to the AttributeValue entity by IDs.
-func (pu *ProductUpdate) AddValueIDs(ids ...int) *ProductUpdate {
-	pu.mutation.AddValueIDs(ids...)
-	return pu
-}
-
-// AddValues adds the "values" edges to the AttributeValue entity.
-func (pu *ProductUpdate) AddValues(a ...*AttributeValue) *ProductUpdate {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
-	}
-	return pu.AddValueIDs(ids...)
-}
-
-// AddCommentIDs adds the "comment" edge to the Comment entity by IDs.
-func (pu *ProductUpdate) AddCommentIDs(ids ...int) *ProductUpdate {
-	pu.mutation.AddCommentIDs(ids...)
-	return pu
-}
-
-// AddComment adds the "comment" edges to the Comment entity.
-func (pu *ProductUpdate) AddComment(c ...*Comment) *ProductUpdate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return pu.AddCommentIDs(ids...)
-}
-
 // AddImageIDs adds the "image" edge to the Image entity by IDs.
 func (pu *ProductUpdate) AddImageIDs(ids ...int) *ProductUpdate {
 	pu.mutation.AddImageIDs(ids...)
@@ -198,21 +165,6 @@ func (pu *ProductUpdate) AddCategory(c ...*Category) *ProductUpdate {
 	return pu.AddCategoryIDs(ids...)
 }
 
-// AddSubCategoryIDs adds the "sub_category" edge to the SubCategory entity by IDs.
-func (pu *ProductUpdate) AddSubCategoryIDs(ids ...int) *ProductUpdate {
-	pu.mutation.AddSubCategoryIDs(ids...)
-	return pu
-}
-
-// AddSubCategory adds the "sub_category" edges to the SubCategory entity.
-func (pu *ProductUpdate) AddSubCategory(s ...*SubCategory) *ProductUpdate {
-	ids := make([]int, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
-	}
-	return pu.AddSubCategoryIDs(ids...)
-}
-
 // SetBrandID sets the "brand" edge to the Brand entity by ID.
 func (pu *ProductUpdate) SetBrandID(id int) *ProductUpdate {
 	pu.mutation.SetBrandID(id)
@@ -235,48 +187,6 @@ func (pu *ProductUpdate) SetBrand(b *Brand) *ProductUpdate {
 // Mutation returns the ProductMutation object of the builder.
 func (pu *ProductUpdate) Mutation() *ProductMutation {
 	return pu.mutation
-}
-
-// ClearValues clears all "values" edges to the AttributeValue entity.
-func (pu *ProductUpdate) ClearValues() *ProductUpdate {
-	pu.mutation.ClearValues()
-	return pu
-}
-
-// RemoveValueIDs removes the "values" edge to AttributeValue entities by IDs.
-func (pu *ProductUpdate) RemoveValueIDs(ids ...int) *ProductUpdate {
-	pu.mutation.RemoveValueIDs(ids...)
-	return pu
-}
-
-// RemoveValues removes "values" edges to AttributeValue entities.
-func (pu *ProductUpdate) RemoveValues(a ...*AttributeValue) *ProductUpdate {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
-	}
-	return pu.RemoveValueIDs(ids...)
-}
-
-// ClearComment clears all "comment" edges to the Comment entity.
-func (pu *ProductUpdate) ClearComment() *ProductUpdate {
-	pu.mutation.ClearComment()
-	return pu
-}
-
-// RemoveCommentIDs removes the "comment" edge to Comment entities by IDs.
-func (pu *ProductUpdate) RemoveCommentIDs(ids ...int) *ProductUpdate {
-	pu.mutation.RemoveCommentIDs(ids...)
-	return pu
-}
-
-// RemoveComment removes "comment" edges to Comment entities.
-func (pu *ProductUpdate) RemoveComment(c ...*Comment) *ProductUpdate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return pu.RemoveCommentIDs(ids...)
 }
 
 // ClearImage clears all "image" edges to the Image entity.
@@ -340,27 +250,6 @@ func (pu *ProductUpdate) RemoveCategory(c ...*Category) *ProductUpdate {
 		ids[i] = c[i].ID
 	}
 	return pu.RemoveCategoryIDs(ids...)
-}
-
-// ClearSubCategory clears all "sub_category" edges to the SubCategory entity.
-func (pu *ProductUpdate) ClearSubCategory() *ProductUpdate {
-	pu.mutation.ClearSubCategory()
-	return pu
-}
-
-// RemoveSubCategoryIDs removes the "sub_category" edge to SubCategory entities by IDs.
-func (pu *ProductUpdate) RemoveSubCategoryIDs(ids ...int) *ProductUpdate {
-	pu.mutation.RemoveSubCategoryIDs(ids...)
-	return pu
-}
-
-// RemoveSubCategory removes "sub_category" edges to SubCategory entities.
-func (pu *ProductUpdate) RemoveSubCategory(s ...*SubCategory) *ProductUpdate {
-	ids := make([]int, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
-	}
-	return pu.RemoveSubCategoryIDs(ids...)
 }
 
 // ClearBrand clears the "brand" edge to the Brand entity.
@@ -494,96 +383,6 @@ func (pu *ProductUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := pu.mutation.Status(); ok {
 		_spec.SetField(product.FieldStatus, field.TypeBool, value)
 	}
-	if pu.mutation.ValuesCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   product.ValuesTable,
-			Columns: []string{product.ValuesColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(attributevalue.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := pu.mutation.RemovedValuesIDs(); len(nodes) > 0 && !pu.mutation.ValuesCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   product.ValuesTable,
-			Columns: []string{product.ValuesColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(attributevalue.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := pu.mutation.ValuesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   product.ValuesTable,
-			Columns: []string{product.ValuesColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(attributevalue.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if pu.mutation.CommentCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   product.CommentTable,
-			Columns: product.CommentPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := pu.mutation.RemovedCommentIDs(); len(nodes) > 0 && !pu.mutation.CommentCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   product.CommentTable,
-			Columns: product.CommentPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := pu.mutation.CommentIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   product.CommentTable,
-			Columns: product.CommentPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
 	if pu.mutation.ImageCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -712,51 +511,6 @@ func (pu *ProductUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if pu.mutation.SubCategoryCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   product.SubCategoryTable,
-			Columns: product.SubCategoryPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(subcategory.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := pu.mutation.RemovedSubCategoryIDs(); len(nodes) > 0 && !pu.mutation.SubCategoryCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   product.SubCategoryTable,
-			Columns: product.SubCategoryPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(subcategory.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := pu.mutation.SubCategoryIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   product.SubCategoryTable,
-			Columns: product.SubCategoryPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(subcategory.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -901,36 +655,6 @@ func (puo *ProductUpdateOne) SetStatus(b bool) *ProductUpdateOne {
 	return puo
 }
 
-// AddValueIDs adds the "values" edge to the AttributeValue entity by IDs.
-func (puo *ProductUpdateOne) AddValueIDs(ids ...int) *ProductUpdateOne {
-	puo.mutation.AddValueIDs(ids...)
-	return puo
-}
-
-// AddValues adds the "values" edges to the AttributeValue entity.
-func (puo *ProductUpdateOne) AddValues(a ...*AttributeValue) *ProductUpdateOne {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
-	}
-	return puo.AddValueIDs(ids...)
-}
-
-// AddCommentIDs adds the "comment" edge to the Comment entity by IDs.
-func (puo *ProductUpdateOne) AddCommentIDs(ids ...int) *ProductUpdateOne {
-	puo.mutation.AddCommentIDs(ids...)
-	return puo
-}
-
-// AddComment adds the "comment" edges to the Comment entity.
-func (puo *ProductUpdateOne) AddComment(c ...*Comment) *ProductUpdateOne {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return puo.AddCommentIDs(ids...)
-}
-
 // AddImageIDs adds the "image" edge to the Image entity by IDs.
 func (puo *ProductUpdateOne) AddImageIDs(ids ...int) *ProductUpdateOne {
 	puo.mutation.AddImageIDs(ids...)
@@ -976,21 +700,6 @@ func (puo *ProductUpdateOne) AddCategory(c ...*Category) *ProductUpdateOne {
 	return puo.AddCategoryIDs(ids...)
 }
 
-// AddSubCategoryIDs adds the "sub_category" edge to the SubCategory entity by IDs.
-func (puo *ProductUpdateOne) AddSubCategoryIDs(ids ...int) *ProductUpdateOne {
-	puo.mutation.AddSubCategoryIDs(ids...)
-	return puo
-}
-
-// AddSubCategory adds the "sub_category" edges to the SubCategory entity.
-func (puo *ProductUpdateOne) AddSubCategory(s ...*SubCategory) *ProductUpdateOne {
-	ids := make([]int, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
-	}
-	return puo.AddSubCategoryIDs(ids...)
-}
-
 // SetBrandID sets the "brand" edge to the Brand entity by ID.
 func (puo *ProductUpdateOne) SetBrandID(id int) *ProductUpdateOne {
 	puo.mutation.SetBrandID(id)
@@ -1013,48 +722,6 @@ func (puo *ProductUpdateOne) SetBrand(b *Brand) *ProductUpdateOne {
 // Mutation returns the ProductMutation object of the builder.
 func (puo *ProductUpdateOne) Mutation() *ProductMutation {
 	return puo.mutation
-}
-
-// ClearValues clears all "values" edges to the AttributeValue entity.
-func (puo *ProductUpdateOne) ClearValues() *ProductUpdateOne {
-	puo.mutation.ClearValues()
-	return puo
-}
-
-// RemoveValueIDs removes the "values" edge to AttributeValue entities by IDs.
-func (puo *ProductUpdateOne) RemoveValueIDs(ids ...int) *ProductUpdateOne {
-	puo.mutation.RemoveValueIDs(ids...)
-	return puo
-}
-
-// RemoveValues removes "values" edges to AttributeValue entities.
-func (puo *ProductUpdateOne) RemoveValues(a ...*AttributeValue) *ProductUpdateOne {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
-	}
-	return puo.RemoveValueIDs(ids...)
-}
-
-// ClearComment clears all "comment" edges to the Comment entity.
-func (puo *ProductUpdateOne) ClearComment() *ProductUpdateOne {
-	puo.mutation.ClearComment()
-	return puo
-}
-
-// RemoveCommentIDs removes the "comment" edge to Comment entities by IDs.
-func (puo *ProductUpdateOne) RemoveCommentIDs(ids ...int) *ProductUpdateOne {
-	puo.mutation.RemoveCommentIDs(ids...)
-	return puo
-}
-
-// RemoveComment removes "comment" edges to Comment entities.
-func (puo *ProductUpdateOne) RemoveComment(c ...*Comment) *ProductUpdateOne {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return puo.RemoveCommentIDs(ids...)
 }
 
 // ClearImage clears all "image" edges to the Image entity.
@@ -1118,27 +785,6 @@ func (puo *ProductUpdateOne) RemoveCategory(c ...*Category) *ProductUpdateOne {
 		ids[i] = c[i].ID
 	}
 	return puo.RemoveCategoryIDs(ids...)
-}
-
-// ClearSubCategory clears all "sub_category" edges to the SubCategory entity.
-func (puo *ProductUpdateOne) ClearSubCategory() *ProductUpdateOne {
-	puo.mutation.ClearSubCategory()
-	return puo
-}
-
-// RemoveSubCategoryIDs removes the "sub_category" edge to SubCategory entities by IDs.
-func (puo *ProductUpdateOne) RemoveSubCategoryIDs(ids ...int) *ProductUpdateOne {
-	puo.mutation.RemoveSubCategoryIDs(ids...)
-	return puo
-}
-
-// RemoveSubCategory removes "sub_category" edges to SubCategory entities.
-func (puo *ProductUpdateOne) RemoveSubCategory(s ...*SubCategory) *ProductUpdateOne {
-	ids := make([]int, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
-	}
-	return puo.RemoveSubCategoryIDs(ids...)
 }
 
 // ClearBrand clears the "brand" edge to the Brand entity.
@@ -1302,96 +948,6 @@ func (puo *ProductUpdateOne) sqlSave(ctx context.Context) (_node *Product, err e
 	if value, ok := puo.mutation.Status(); ok {
 		_spec.SetField(product.FieldStatus, field.TypeBool, value)
 	}
-	if puo.mutation.ValuesCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   product.ValuesTable,
-			Columns: []string{product.ValuesColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(attributevalue.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := puo.mutation.RemovedValuesIDs(); len(nodes) > 0 && !puo.mutation.ValuesCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   product.ValuesTable,
-			Columns: []string{product.ValuesColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(attributevalue.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := puo.mutation.ValuesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   product.ValuesTable,
-			Columns: []string{product.ValuesColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(attributevalue.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if puo.mutation.CommentCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   product.CommentTable,
-			Columns: product.CommentPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := puo.mutation.RemovedCommentIDs(); len(nodes) > 0 && !puo.mutation.CommentCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   product.CommentTable,
-			Columns: product.CommentPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := puo.mutation.CommentIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   product.CommentTable,
-			Columns: product.CommentPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
 	if puo.mutation.ImageCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -1520,51 +1076,6 @@ func (puo *ProductUpdateOne) sqlSave(ctx context.Context) (_node *Product, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if puo.mutation.SubCategoryCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   product.SubCategoryTable,
-			Columns: product.SubCategoryPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(subcategory.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := puo.mutation.RemovedSubCategoryIDs(); len(nodes) > 0 && !puo.mutation.SubCategoryCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   product.SubCategoryTable,
-			Columns: product.SubCategoryPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(subcategory.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := puo.mutation.SubCategoryIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   product.SubCategoryTable,
-			Columns: product.SubCategoryPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(subcategory.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

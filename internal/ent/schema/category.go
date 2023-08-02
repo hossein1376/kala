@@ -30,8 +30,6 @@ func (Category) Fields() []ent.Field {
 // Edges of the Category.
 func (Category) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("sub_category", SubCategory.Type).
-			StorageKey(edge.Column("category")),
 		edge.To("image", Image.Type).
 			StorageKey(edge.Table("category_images"),
 				edge.Columns("category", "image"),
@@ -39,6 +37,5 @@ func (Category) Edges() []ent.Edge {
 
 		edge.From("product", Product.Type).Ref("category"),
 		edge.From("brand", Brand.Type).Ref("category"),
-		edge.From("seller", Seller.Type).Ref("category"),
 	}
 }

@@ -565,52 +565,6 @@ func StatusNEQ(v bool) predicate.Product {
 	return predicate.Product(sql.FieldNEQ(FieldStatus, v))
 }
 
-// HasValues applies the HasEdge predicate on the "values" edge.
-func HasValues() predicate.Product {
-	return predicate.Product(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, ValuesTable, ValuesColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasValuesWith applies the HasEdge predicate on the "values" edge with a given conditions (other predicates).
-func HasValuesWith(preds ...predicate.AttributeValue) predicate.Product {
-	return predicate.Product(func(s *sql.Selector) {
-		step := newValuesStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasComment applies the HasEdge predicate on the "comment" edge.
-func HasComment() predicate.Product {
-	return predicate.Product(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, CommentTable, CommentPrimaryKey...),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasCommentWith applies the HasEdge predicate on the "comment" edge with a given conditions (other predicates).
-func HasCommentWith(preds ...predicate.Comment) predicate.Product {
-	return predicate.Product(func(s *sql.Selector) {
-		step := newCommentStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
 // HasImage applies the HasEdge predicate on the "image" edge.
 func HasImage() predicate.Product {
 	return predicate.Product(func(s *sql.Selector) {
@@ -672,29 +626,6 @@ func HasCategory() predicate.Product {
 func HasCategoryWith(preds ...predicate.Category) predicate.Product {
 	return predicate.Product(func(s *sql.Selector) {
 		step := newCategoryStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasSubCategory applies the HasEdge predicate on the "sub_category" edge.
-func HasSubCategory() predicate.Product {
-	return predicate.Product(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, SubCategoryTable, SubCategoryPrimaryKey...),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasSubCategoryWith applies the HasEdge predicate on the "sub_category" edge with a given conditions (other predicates).
-func HasSubCategoryWith(preds ...predicate.SubCategory) predicate.Product {
-	return predicate.Product(func(s *sql.Selector) {
-		step := newSubCategoryStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

@@ -8,7 +8,6 @@ type Category struct {
 	SubCategory []SubCategory `json:"subcategory"`
 	Product     []Product     `json:"product"`
 	Brand       []Brand       `json:"brand"`
-	Seller      []Seller      `json:"seller"`
 }
 
 type SubCategory struct {

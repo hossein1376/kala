@@ -128,9 +128,6 @@ func (h *handler) updateProductByIDHandler(w http.ResponseWriter, r *http.Reques
 	if input.Category != nil {
 		product.Edges.Category = input.Category
 	}
-	if input.SubCategory != nil {
-		product.Edges.SubCategory = input.SubCategory
-	}
 	if input.Brand != nil {
 		product.Edges.Brand = input.Brand
 	}

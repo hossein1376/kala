@@ -66,27 +66,6 @@ func (h *handler) Router() *chi.Mux {
 				r.Get("/{id}", h.getBrandByIDHandler)
 			})
 
-			// comment routes
-			r.Route("/comments", func(r chi.Router) {
-				r.Post("/{id}", h.createNewProductCommentHandler)
-				r.Get("/{id}", h.getAllProductCommentsHandler)
-				r.Get("/{id}/{commentID}", h.getProductCommentByIDHandler)
-			})
-
-			// seller routes
-			r.Route("/sellers", func(r chi.Router) {
-				r.Post("/", h.createNewSellerHandler)
-				r.Get("/", h.getAllSellersHandler)
-				r.Get("/{id}", h.getSellerByIDHandler)
-			})
-
-			// address routes
-			r.Route("/addresses", func(r chi.Router) {
-				r.Post("/", h.createNewAddressHandler)
-				r.Get("/", h.getAllAddressesHandler)
-				r.Get("/{id}", h.getAddressByIDHandler)
-			})
-
 			// image route
 			r.Route("/images", func(r chi.Router) {
 				r.Post("/", h.createNewImageHandler)

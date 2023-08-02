@@ -16,8 +16,6 @@ import (
 	"github.com/hossein1376/kala/internal/ent/image"
 	"github.com/hossein1376/kala/internal/ent/predicate"
 	"github.com/hossein1376/kala/internal/ent/product"
-	"github.com/hossein1376/kala/internal/ent/seller"
-	"github.com/hossein1376/kala/internal/ent/subcategory"
 )
 
 // CategoryUpdate is the builder for updating Category entities.
@@ -49,21 +47,6 @@ func (cu *CategoryUpdate) SetName(s string) *CategoryUpdate {
 func (cu *CategoryUpdate) SetDescription(s string) *CategoryUpdate {
 	cu.mutation.SetDescription(s)
 	return cu
-}
-
-// AddSubCategoryIDs adds the "sub_category" edge to the SubCategory entity by IDs.
-func (cu *CategoryUpdate) AddSubCategoryIDs(ids ...int) *CategoryUpdate {
-	cu.mutation.AddSubCategoryIDs(ids...)
-	return cu
-}
-
-// AddSubCategory adds the "sub_category" edges to the SubCategory entity.
-func (cu *CategoryUpdate) AddSubCategory(s ...*SubCategory) *CategoryUpdate {
-	ids := make([]int, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
-	}
-	return cu.AddSubCategoryIDs(ids...)
 }
 
 // AddImageIDs adds the "image" edge to the Image entity by IDs.
@@ -111,45 +94,9 @@ func (cu *CategoryUpdate) AddBrand(b ...*Brand) *CategoryUpdate {
 	return cu.AddBrandIDs(ids...)
 }
 
-// AddSellerIDs adds the "seller" edge to the Seller entity by IDs.
-func (cu *CategoryUpdate) AddSellerIDs(ids ...int) *CategoryUpdate {
-	cu.mutation.AddSellerIDs(ids...)
-	return cu
-}
-
-// AddSeller adds the "seller" edges to the Seller entity.
-func (cu *CategoryUpdate) AddSeller(s ...*Seller) *CategoryUpdate {
-	ids := make([]int, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
-	}
-	return cu.AddSellerIDs(ids...)
-}
-
 // Mutation returns the CategoryMutation object of the builder.
 func (cu *CategoryUpdate) Mutation() *CategoryMutation {
 	return cu.mutation
-}
-
-// ClearSubCategory clears all "sub_category" edges to the SubCategory entity.
-func (cu *CategoryUpdate) ClearSubCategory() *CategoryUpdate {
-	cu.mutation.ClearSubCategory()
-	return cu
-}
-
-// RemoveSubCategoryIDs removes the "sub_category" edge to SubCategory entities by IDs.
-func (cu *CategoryUpdate) RemoveSubCategoryIDs(ids ...int) *CategoryUpdate {
-	cu.mutation.RemoveSubCategoryIDs(ids...)
-	return cu
-}
-
-// RemoveSubCategory removes "sub_category" edges to SubCategory entities.
-func (cu *CategoryUpdate) RemoveSubCategory(s ...*SubCategory) *CategoryUpdate {
-	ids := make([]int, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
-	}
-	return cu.RemoveSubCategoryIDs(ids...)
 }
 
 // ClearImage clears all "image" edges to the Image entity.
@@ -213,27 +160,6 @@ func (cu *CategoryUpdate) RemoveBrand(b ...*Brand) *CategoryUpdate {
 		ids[i] = b[i].ID
 	}
 	return cu.RemoveBrandIDs(ids...)
-}
-
-// ClearSeller clears all "seller" edges to the Seller entity.
-func (cu *CategoryUpdate) ClearSeller() *CategoryUpdate {
-	cu.mutation.ClearSeller()
-	return cu
-}
-
-// RemoveSellerIDs removes the "seller" edge to Seller entities by IDs.
-func (cu *CategoryUpdate) RemoveSellerIDs(ids ...int) *CategoryUpdate {
-	cu.mutation.RemoveSellerIDs(ids...)
-	return cu
-}
-
-// RemoveSeller removes "seller" edges to Seller entities.
-func (cu *CategoryUpdate) RemoveSeller(s ...*Seller) *CategoryUpdate {
-	ids := make([]int, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
-	}
-	return cu.RemoveSellerIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -307,51 +233,6 @@ func (cu *CategoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := cu.mutation.Description(); ok {
 		_spec.SetField(category.FieldDescription, field.TypeString, value)
-	}
-	if cu.mutation.SubCategoryCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   category.SubCategoryTable,
-			Columns: []string{category.SubCategoryColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(subcategory.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cu.mutation.RemovedSubCategoryIDs(); len(nodes) > 0 && !cu.mutation.SubCategoryCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   category.SubCategoryTable,
-			Columns: []string{category.SubCategoryColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(subcategory.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cu.mutation.SubCategoryIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   category.SubCategoryTable,
-			Columns: []string{category.SubCategoryColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(subcategory.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if cu.mutation.ImageCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -488,51 +369,6 @@ func (cu *CategoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if cu.mutation.SellerCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   category.SellerTable,
-			Columns: category.SellerPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(seller.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cu.mutation.RemovedSellerIDs(); len(nodes) > 0 && !cu.mutation.SellerCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   category.SellerTable,
-			Columns: category.SellerPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(seller.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cu.mutation.SellerIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   category.SellerTable,
-			Columns: category.SellerPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(seller.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
 	if n, err = sqlgraph.UpdateNodes(ctx, cu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{category.Label}
@@ -569,21 +405,6 @@ func (cuo *CategoryUpdateOne) SetName(s string) *CategoryUpdateOne {
 func (cuo *CategoryUpdateOne) SetDescription(s string) *CategoryUpdateOne {
 	cuo.mutation.SetDescription(s)
 	return cuo
-}
-
-// AddSubCategoryIDs adds the "sub_category" edge to the SubCategory entity by IDs.
-func (cuo *CategoryUpdateOne) AddSubCategoryIDs(ids ...int) *CategoryUpdateOne {
-	cuo.mutation.AddSubCategoryIDs(ids...)
-	return cuo
-}
-
-// AddSubCategory adds the "sub_category" edges to the SubCategory entity.
-func (cuo *CategoryUpdateOne) AddSubCategory(s ...*SubCategory) *CategoryUpdateOne {
-	ids := make([]int, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
-	}
-	return cuo.AddSubCategoryIDs(ids...)
 }
 
 // AddImageIDs adds the "image" edge to the Image entity by IDs.
@@ -631,45 +452,9 @@ func (cuo *CategoryUpdateOne) AddBrand(b ...*Brand) *CategoryUpdateOne {
 	return cuo.AddBrandIDs(ids...)
 }
 
-// AddSellerIDs adds the "seller" edge to the Seller entity by IDs.
-func (cuo *CategoryUpdateOne) AddSellerIDs(ids ...int) *CategoryUpdateOne {
-	cuo.mutation.AddSellerIDs(ids...)
-	return cuo
-}
-
-// AddSeller adds the "seller" edges to the Seller entity.
-func (cuo *CategoryUpdateOne) AddSeller(s ...*Seller) *CategoryUpdateOne {
-	ids := make([]int, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
-	}
-	return cuo.AddSellerIDs(ids...)
-}
-
 // Mutation returns the CategoryMutation object of the builder.
 func (cuo *CategoryUpdateOne) Mutation() *CategoryMutation {
 	return cuo.mutation
-}
-
-// ClearSubCategory clears all "sub_category" edges to the SubCategory entity.
-func (cuo *CategoryUpdateOne) ClearSubCategory() *CategoryUpdateOne {
-	cuo.mutation.ClearSubCategory()
-	return cuo
-}
-
-// RemoveSubCategoryIDs removes the "sub_category" edge to SubCategory entities by IDs.
-func (cuo *CategoryUpdateOne) RemoveSubCategoryIDs(ids ...int) *CategoryUpdateOne {
-	cuo.mutation.RemoveSubCategoryIDs(ids...)
-	return cuo
-}
-
-// RemoveSubCategory removes "sub_category" edges to SubCategory entities.
-func (cuo *CategoryUpdateOne) RemoveSubCategory(s ...*SubCategory) *CategoryUpdateOne {
-	ids := make([]int, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
-	}
-	return cuo.RemoveSubCategoryIDs(ids...)
 }
 
 // ClearImage clears all "image" edges to the Image entity.
@@ -733,27 +518,6 @@ func (cuo *CategoryUpdateOne) RemoveBrand(b ...*Brand) *CategoryUpdateOne {
 		ids[i] = b[i].ID
 	}
 	return cuo.RemoveBrandIDs(ids...)
-}
-
-// ClearSeller clears all "seller" edges to the Seller entity.
-func (cuo *CategoryUpdateOne) ClearSeller() *CategoryUpdateOne {
-	cuo.mutation.ClearSeller()
-	return cuo
-}
-
-// RemoveSellerIDs removes the "seller" edge to Seller entities by IDs.
-func (cuo *CategoryUpdateOne) RemoveSellerIDs(ids ...int) *CategoryUpdateOne {
-	cuo.mutation.RemoveSellerIDs(ids...)
-	return cuo
-}
-
-// RemoveSeller removes "seller" edges to Seller entities.
-func (cuo *CategoryUpdateOne) RemoveSeller(s ...*Seller) *CategoryUpdateOne {
-	ids := make([]int, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
-	}
-	return cuo.RemoveSellerIDs(ids...)
 }
 
 // Where appends a list predicates to the CategoryUpdate builder.
@@ -857,51 +621,6 @@ func (cuo *CategoryUpdateOne) sqlSave(ctx context.Context) (_node *Category, err
 	}
 	if value, ok := cuo.mutation.Description(); ok {
 		_spec.SetField(category.FieldDescription, field.TypeString, value)
-	}
-	if cuo.mutation.SubCategoryCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   category.SubCategoryTable,
-			Columns: []string{category.SubCategoryColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(subcategory.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cuo.mutation.RemovedSubCategoryIDs(); len(nodes) > 0 && !cuo.mutation.SubCategoryCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   category.SubCategoryTable,
-			Columns: []string{category.SubCategoryColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(subcategory.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cuo.mutation.SubCategoryIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   category.SubCategoryTable,
-			Columns: []string{category.SubCategoryColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(subcategory.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if cuo.mutation.ImageCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -1031,51 +750,6 @@ func (cuo *CategoryUpdateOne) sqlSave(ctx context.Context) (_node *Category, err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(brand.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if cuo.mutation.SellerCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   category.SellerTable,
-			Columns: category.SellerPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(seller.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cuo.mutation.RemovedSellerIDs(); len(nodes) > 0 && !cuo.mutation.SellerCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   category.SellerTable,
-			Columns: category.SellerPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(seller.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cuo.mutation.SellerIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   category.SellerTable,
-			Columns: category.SellerPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(seller.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

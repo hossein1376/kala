@@ -12,20 +12,10 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
-	// Address is the client for interacting with the Address builders.
-	Address *AddressClient
-	// Attribute is the client for interacting with the Attribute builders.
-	Attribute *AttributeClient
-	// AttributeValue is the client for interacting with the AttributeValue builders.
-	AttributeValue *AttributeValueClient
 	// Brand is the client for interacting with the Brand builders.
 	Brand *BrandClient
 	// Category is the client for interacting with the Category builders.
 	Category *CategoryClient
-	// Comment is the client for interacting with the Comment builders.
-	Comment *CommentClient
-	// Cons is the client for interacting with the Cons builders.
-	Cons *ConsClient
 	// Image is the client for interacting with the Image builders.
 	Image *ImageClient
 	// Logs is the client for interacting with the Logs builders.
@@ -34,12 +24,6 @@ type Tx struct {
 	Order *OrderClient
 	// Product is the client for interacting with the Product builders.
 	Product *ProductClient
-	// Pros is the client for interacting with the Pros builders.
-	Pros *ProsClient
-	// Seller is the client for interacting with the Seller builders.
-	Seller *SellerClient
-	// SubCategory is the client for interacting with the SubCategory builders.
-	SubCategory *SubCategoryClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 
@@ -173,20 +157,12 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
-	tx.Address = NewAddressClient(tx.config)
-	tx.Attribute = NewAttributeClient(tx.config)
-	tx.AttributeValue = NewAttributeValueClient(tx.config)
 	tx.Brand = NewBrandClient(tx.config)
 	tx.Category = NewCategoryClient(tx.config)
-	tx.Comment = NewCommentClient(tx.config)
-	tx.Cons = NewConsClient(tx.config)
 	tx.Image = NewImageClient(tx.config)
 	tx.Logs = NewLogsClient(tx.config)
 	tx.Order = NewOrderClient(tx.config)
 	tx.Product = NewProductClient(tx.config)
-	tx.Pros = NewProsClient(tx.config)
-	tx.Seller = NewSellerClient(tx.config)
-	tx.SubCategory = NewSubCategoryClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 }
 
@@ -197,7 +173,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: Address.QueryXXX(), the query will be executed
+// applies a query, for example: Brand.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

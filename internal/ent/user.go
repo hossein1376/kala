@@ -45,54 +45,30 @@ type User struct {
 
 // UserEdges holds the relations/edges for other nodes in the graph.
 type UserEdges struct {
-	// Comment holds the value of the comment edge.
-	Comment []*Comment `json:"comment,omitempty"`
 	// Image holds the value of the image edge.
 	Image []*Image `json:"image,omitempty"`
-	// Seller holds the value of the seller edge.
-	Seller []*Seller `json:"seller,omitempty"`
 	// Order holds the value of the order edge.
 	Order []*Order `json:"order,omitempty"`
 	// Logs holds the value of the logs edge.
 	Logs []*Logs `json:"logs,omitempty"`
-	// Address holds the value of the address edge.
-	Address []*Address `json:"address,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [6]bool
-}
-
-// CommentOrErr returns the Comment value or an error if the edge
-// was not loaded in eager-loading.
-func (e UserEdges) CommentOrErr() ([]*Comment, error) {
-	if e.loadedTypes[0] {
-		return e.Comment, nil
-	}
-	return nil, &NotLoadedError{edge: "comment"}
+	loadedTypes [3]bool
 }
 
 // ImageOrErr returns the Image value or an error if the edge
 // was not loaded in eager-loading.
 func (e UserEdges) ImageOrErr() ([]*Image, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[0] {
 		return e.Image, nil
 	}
 	return nil, &NotLoadedError{edge: "image"}
 }
 
-// SellerOrErr returns the Seller value or an error if the edge
-// was not loaded in eager-loading.
-func (e UserEdges) SellerOrErr() ([]*Seller, error) {
-	if e.loadedTypes[2] {
-		return e.Seller, nil
-	}
-	return nil, &NotLoadedError{edge: "seller"}
-}
-
 // OrderOrErr returns the Order value or an error if the edge
 // was not loaded in eager-loading.
 func (e UserEdges) OrderOrErr() ([]*Order, error) {
-	if e.loadedTypes[3] {
+	if e.loadedTypes[1] {
 		return e.Order, nil
 	}
 	return nil, &NotLoadedError{edge: "order"}
@@ -101,19 +77,10 @@ func (e UserEdges) OrderOrErr() ([]*Order, error) {
 // LogsOrErr returns the Logs value or an error if the edge
 // was not loaded in eager-loading.
 func (e UserEdges) LogsOrErr() ([]*Logs, error) {
-	if e.loadedTypes[4] {
+	if e.loadedTypes[2] {
 		return e.Logs, nil
 	}
 	return nil, &NotLoadedError{edge: "logs"}
-}
-
-// AddressOrErr returns the Address value or an error if the edge
-// was not loaded in eager-loading.
-func (e UserEdges) AddressOrErr() ([]*Address, error) {
-	if e.loadedTypes[5] {
-		return e.Address, nil
-	}
-	return nil, &NotLoadedError{edge: "address"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -225,19 +192,9 @@ func (u *User) Value(name string) (ent.Value, error) {
 	return u.selectValues.Get(name)
 }
 
-// QueryComment queries the "comment" edge of the User entity.
-func (u *User) QueryComment() *CommentQuery {
-	return NewUserClient(u.config).QueryComment(u)
-}
-
 // QueryImage queries the "image" edge of the User entity.
 func (u *User) QueryImage() *ImageQuery {
 	return NewUserClient(u.config).QueryImage(u)
-}
-
-// QuerySeller queries the "seller" edge of the User entity.
-func (u *User) QuerySeller() *SellerQuery {
-	return NewUserClient(u.config).QuerySeller(u)
 }
 
 // QueryOrder queries the "order" edge of the User entity.
@@ -248,11 +205,6 @@ func (u *User) QueryOrder() *OrderQuery {
 // QueryLogs queries the "logs" edge of the User entity.
 func (u *User) QueryLogs() *LogsQuery {
 	return NewUserClient(u.config).QueryLogs(u)
-}
-
-// QueryAddress queries the "address" edge of the User entity.
-func (u *User) QueryAddress() *AddressQuery {
-	return NewUserClient(u.config).QueryAddress(u)
 }
 
 // Update returns a builder for updating this User.

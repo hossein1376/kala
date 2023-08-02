@@ -14,8 +14,6 @@ import (
 	"github.com/hossein1376/kala/internal/ent/category"
 	"github.com/hossein1376/kala/internal/ent/image"
 	"github.com/hossein1376/kala/internal/ent/product"
-	"github.com/hossein1376/kala/internal/ent/seller"
-	"github.com/hossein1376/kala/internal/ent/subcategory"
 )
 
 // CategoryCreate is the builder for creating a Category entity.
@@ -65,21 +63,6 @@ func (cc *CategoryCreate) SetDescription(s string) *CategoryCreate {
 	return cc
 }
 
-// AddSubCategoryIDs adds the "sub_category" edge to the SubCategory entity by IDs.
-func (cc *CategoryCreate) AddSubCategoryIDs(ids ...int) *CategoryCreate {
-	cc.mutation.AddSubCategoryIDs(ids...)
-	return cc
-}
-
-// AddSubCategory adds the "sub_category" edges to the SubCategory entity.
-func (cc *CategoryCreate) AddSubCategory(s ...*SubCategory) *CategoryCreate {
-	ids := make([]int, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
-	}
-	return cc.AddSubCategoryIDs(ids...)
-}
-
 // AddImageIDs adds the "image" edge to the Image entity by IDs.
 func (cc *CategoryCreate) AddImageIDs(ids ...int) *CategoryCreate {
 	cc.mutation.AddImageIDs(ids...)
@@ -123,21 +106,6 @@ func (cc *CategoryCreate) AddBrand(b ...*Brand) *CategoryCreate {
 		ids[i] = b[i].ID
 	}
 	return cc.AddBrandIDs(ids...)
-}
-
-// AddSellerIDs adds the "seller" edge to the Seller entity by IDs.
-func (cc *CategoryCreate) AddSellerIDs(ids ...int) *CategoryCreate {
-	cc.mutation.AddSellerIDs(ids...)
-	return cc
-}
-
-// AddSeller adds the "seller" edges to the Seller entity.
-func (cc *CategoryCreate) AddSeller(s ...*Seller) *CategoryCreate {
-	ids := make([]int, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
-	}
-	return cc.AddSellerIDs(ids...)
 }
 
 // Mutation returns the CategoryMutation object of the builder.
@@ -251,22 +219,6 @@ func (cc *CategoryCreate) createSpec() (*Category, *sqlgraph.CreateSpec) {
 		_spec.SetField(category.FieldDescription, field.TypeString, value)
 		_node.Description = value
 	}
-	if nodes := cc.mutation.SubCategoryIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   category.SubCategoryTable,
-			Columns: []string{category.SubCategoryColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(subcategory.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
 	if nodes := cc.mutation.ImageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -308,22 +260,6 @@ func (cc *CategoryCreate) createSpec() (*Category, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(brand.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := cc.mutation.SellerIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   category.SellerTable,
-			Columns: category.SellerPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(seller.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

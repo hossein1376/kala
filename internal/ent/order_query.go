@@ -14,7 +14,6 @@ import (
 	"github.com/hossein1376/kala/internal/ent/order"
 	"github.com/hossein1376/kala/internal/ent/predicate"
 	"github.com/hossein1376/kala/internal/ent/product"
-	"github.com/hossein1376/kala/internal/ent/seller"
 	"github.com/hossein1376/kala/internal/ent/user"
 )
 
@@ -25,7 +24,6 @@ type OrderQuery struct {
 	order       []order.OrderOption
 	inters      []Interceptor
 	predicates  []predicate.Order
-	withSeller  *SellerQuery
 	withProduct *ProductQuery
 	withUser    *UserQuery
 	withFKs     bool
@@ -63,28 +61,6 @@ func (oq *OrderQuery) Unique(unique bool) *OrderQuery {
 func (oq *OrderQuery) Order(o ...order.OrderOption) *OrderQuery {
 	oq.order = append(oq.order, o...)
 	return oq
-}
-
-// QuerySeller chains the current query on the "seller" edge.
-func (oq *OrderQuery) QuerySeller() *SellerQuery {
-	query := (&SellerClient{config: oq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := oq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := oq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(order.Table, order.FieldID, selector),
-			sqlgraph.To(seller.Table, seller.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, order.SellerTable, order.SellerColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(oq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
 }
 
 // QueryProduct chains the current query on the "product" edge.
@@ -323,24 +299,12 @@ func (oq *OrderQuery) Clone() *OrderQuery {
 		order:       append([]order.OrderOption{}, oq.order...),
 		inters:      append([]Interceptor{}, oq.inters...),
 		predicates:  append([]predicate.Order{}, oq.predicates...),
-		withSeller:  oq.withSeller.Clone(),
 		withProduct: oq.withProduct.Clone(),
 		withUser:    oq.withUser.Clone(),
 		// clone intermediate query.
 		sql:  oq.sql.Clone(),
 		path: oq.path,
 	}
-}
-
-// WithSeller tells the query-builder to eager-load the nodes that are connected to
-// the "seller" edge. The optional arguments are used to configure the query builder of the edge.
-func (oq *OrderQuery) WithSeller(opts ...func(*SellerQuery)) *OrderQuery {
-	query := (&SellerClient{config: oq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	oq.withSeller = query
-	return oq
 }
 
 // WithProduct tells the query-builder to eager-load the nodes that are connected to
@@ -444,13 +408,12 @@ func (oq *OrderQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Order,
 		nodes       = []*Order{}
 		withFKs     = oq.withFKs
 		_spec       = oq.querySpec()
-		loadedTypes = [3]bool{
-			oq.withSeller != nil,
+		loadedTypes = [2]bool{
 			oq.withProduct != nil,
 			oq.withUser != nil,
 		}
 	)
-	if oq.withSeller != nil || oq.withUser != nil {
+	if oq.withUser != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -474,12 +437,6 @@ func (oq *OrderQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Order,
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := oq.withSeller; query != nil {
-		if err := oq.loadSeller(ctx, query, nodes, nil,
-			func(n *Order, e *Seller) { n.Edges.Seller = e }); err != nil {
-			return nil, err
-		}
-	}
 	if query := oq.withProduct; query != nil {
 		if err := oq.loadProduct(ctx, query, nodes,
 			func(n *Order) { n.Edges.Product = []*Product{} },
@@ -496,38 +453,6 @@ func (oq *OrderQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Order,
 	return nodes, nil
 }
 
-func (oq *OrderQuery) loadSeller(ctx context.Context, query *SellerQuery, nodes []*Order, init func(*Order), assign func(*Order, *Seller)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*Order)
-	for i := range nodes {
-		if nodes[i].seller_id == nil {
-			continue
-		}
-		fk := *nodes[i].seller_id
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
-	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(seller.IDIn(ids...))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "seller_id" returned %v`, n.ID)
-		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
-	}
-	return nil
-}
 func (oq *OrderQuery) loadProduct(ctx context.Context, query *ProductQuery, nodes []*Order, init func(*Order), assign func(*Order, *Product)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[int]*Order)

@@ -10,12 +10,9 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/hossein1376/kala/internal/ent/address"
-	"github.com/hossein1376/kala/internal/ent/comment"
 	"github.com/hossein1376/kala/internal/ent/image"
 	"github.com/hossein1376/kala/internal/ent/logs"
 	"github.com/hossein1376/kala/internal/ent/order"
-	"github.com/hossein1376/kala/internal/ent/seller"
 	"github.com/hossein1376/kala/internal/ent/user"
 )
 
@@ -150,21 +147,6 @@ func (uc *UserCreate) SetNillableStatus(b *bool) *UserCreate {
 	return uc
 }
 
-// AddCommentIDs adds the "comment" edge to the Comment entity by IDs.
-func (uc *UserCreate) AddCommentIDs(ids ...int) *UserCreate {
-	uc.mutation.AddCommentIDs(ids...)
-	return uc
-}
-
-// AddComment adds the "comment" edges to the Comment entity.
-func (uc *UserCreate) AddComment(c ...*Comment) *UserCreate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return uc.AddCommentIDs(ids...)
-}
-
 // AddImageIDs adds the "image" edge to the Image entity by IDs.
 func (uc *UserCreate) AddImageIDs(ids ...int) *UserCreate {
 	uc.mutation.AddImageIDs(ids...)
@@ -178,21 +160,6 @@ func (uc *UserCreate) AddImage(i ...*Image) *UserCreate {
 		ids[j] = i[j].ID
 	}
 	return uc.AddImageIDs(ids...)
-}
-
-// AddSellerIDs adds the "seller" edge to the Seller entity by IDs.
-func (uc *UserCreate) AddSellerIDs(ids ...int) *UserCreate {
-	uc.mutation.AddSellerIDs(ids...)
-	return uc
-}
-
-// AddSeller adds the "seller" edges to the Seller entity.
-func (uc *UserCreate) AddSeller(s ...*Seller) *UserCreate {
-	ids := make([]int, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
-	}
-	return uc.AddSellerIDs(ids...)
 }
 
 // AddOrderIDs adds the "order" edge to the Order entity by IDs.
@@ -223,21 +190,6 @@ func (uc *UserCreate) AddLogs(l ...*Logs) *UserCreate {
 		ids[i] = l[i].ID
 	}
 	return uc.AddLogIDs(ids...)
-}
-
-// AddAddresIDs adds the "address" edge to the Address entity by IDs.
-func (uc *UserCreate) AddAddresIDs(ids ...int) *UserCreate {
-	uc.mutation.AddAddresIDs(ids...)
-	return uc
-}
-
-// AddAddress adds the "address" edges to the Address entity.
-func (uc *UserCreate) AddAddress(a ...*Address) *UserCreate {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
-	}
-	return uc.AddAddresIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -384,22 +336,6 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_spec.SetField(user.FieldStatus, field.TypeBool, value)
 		_node.Status = value
 	}
-	if nodes := uc.mutation.CommentIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   user.CommentTable,
-			Columns: user.CommentPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
 	if nodes := uc.mutation.ImageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -409,22 +345,6 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := uc.mutation.SellerIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.SellerTable,
-			Columns: []string{user.SellerColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(seller.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -457,22 +377,6 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(logs.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := uc.mutation.AddressIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.AddressTable,
-			Columns: []string{user.AddressColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(address.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

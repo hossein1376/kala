@@ -145,29 +145,6 @@ func UpdateTimeLTE(v time.Time) predicate.Order {
 	return predicate.Order(sql.FieldLTE(FieldUpdateTime, v))
 }
 
-// HasSeller applies the HasEdge predicate on the "seller" edge.
-func HasSeller() predicate.Order {
-	return predicate.Order(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, SellerTable, SellerColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasSellerWith applies the HasEdge predicate on the "seller" edge with a given conditions (other predicates).
-func HasSellerWith(preds ...predicate.Seller) predicate.Order {
-	return predicate.Order(func(s *sql.Selector) {
-		step := newSellerStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
 // HasProduct applies the HasEdge predicate on the "product" edge.
 func HasProduct() predicate.Order {
 	return predicate.Order(func(s *sql.Selector) {

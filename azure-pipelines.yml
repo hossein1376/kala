@@ -1,11 +1,11 @@
 trigger:
-- main
+  - main
 
 pool:
   vmImage: ubuntu-latest
 
 steps:
-- task: Go@0
-  inputs:
-    command: 'build'
-    arguments: '-o kala .'
+  - task: Go@0
+    inputs:
+      command: 'build'
+      arguments: '-o kala .'

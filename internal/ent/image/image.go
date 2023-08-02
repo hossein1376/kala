@@ -28,16 +28,12 @@ const (
 	FieldUploadedAt = "uploaded_at"
 	// EdgeUser holds the string denoting the user edge name in mutations.
 	EdgeUser = "user"
-	// EdgeComment holds the string denoting the comment edge name in mutations.
-	EdgeComment = "comment"
 	// EdgeBrand holds the string denoting the brand edge name in mutations.
 	EdgeBrand = "brand"
 	// EdgeProduct holds the string denoting the product edge name in mutations.
 	EdgeProduct = "product"
 	// EdgeCategory holds the string denoting the category edge name in mutations.
 	EdgeCategory = "category"
-	// EdgeSubCategory holds the string denoting the sub_category edge name in mutations.
-	EdgeSubCategory = "sub_category"
 	// Table holds the table name of the image in the database.
 	Table = "images"
 	// UserTable is the table that holds the user relation/edge. The primary key declared below.
@@ -45,11 +41,6 @@ const (
 	// UserInverseTable is the table name for the User entity.
 	// It exists in this package in order to avoid circular dependency with the "user" package.
 	UserInverseTable = "users"
-	// CommentTable is the table that holds the comment relation/edge. The primary key declared below.
-	CommentTable = "comment_images"
-	// CommentInverseTable is the table name for the Comment entity.
-	// It exists in this package in order to avoid circular dependency with the "comment" package.
-	CommentInverseTable = "comments"
 	// BrandTable is the table that holds the brand relation/edge. The primary key declared below.
 	BrandTable = "brand_images"
 	// BrandInverseTable is the table name for the Brand entity.
@@ -65,11 +56,6 @@ const (
 	// CategoryInverseTable is the table name for the Category entity.
 	// It exists in this package in order to avoid circular dependency with the "category" package.
 	CategoryInverseTable = "categories"
-	// SubCategoryTable is the table that holds the sub_category relation/edge. The primary key declared below.
-	SubCategoryTable = "sub_category_images"
-	// SubCategoryInverseTable is the table name for the SubCategory entity.
-	// It exists in this package in order to avoid circular dependency with the "subcategory" package.
-	SubCategoryInverseTable = "sub_categories"
 )
 
 // Columns holds all SQL columns for image fields.
@@ -88,9 +74,6 @@ var (
 	// UserPrimaryKey and UserColumn2 are the table columns denoting the
 	// primary key for the user relation (M2M).
 	UserPrimaryKey = []string{"user", "image"}
-	// CommentPrimaryKey and CommentColumn2 are the table columns denoting the
-	// primary key for the comment relation (M2M).
-	CommentPrimaryKey = []string{"comment", "image"}
 	// BrandPrimaryKey and BrandColumn2 are the table columns denoting the
 	// primary key for the brand relation (M2M).
 	BrandPrimaryKey = []string{"brand", "image"}
@@ -100,9 +83,6 @@ var (
 	// CategoryPrimaryKey and CategoryColumn2 are the table columns denoting the
 	// primary key for the category relation (M2M).
 	CategoryPrimaryKey = []string{"category", "image"}
-	// SubCategoryPrimaryKey and SubCategoryColumn2 are the table columns denoting the
-	// primary key for the sub_category relation (M2M).
-	SubCategoryPrimaryKey = []string{"sub_category", "image"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -185,20 +165,6 @@ func ByUser(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
-// ByCommentCount orders the results by comment count.
-func ByCommentCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newCommentStep(), opts...)
-	}
-}
-
-// ByComment orders the results by comment terms.
-func ByComment(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newCommentStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
 // ByBrandCount orders the results by brand count.
 func ByBrandCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -240,32 +206,11 @@ func ByCategory(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newCategoryStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
-
-// BySubCategoryCount orders the results by sub_category count.
-func BySubCategoryCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newSubCategoryStep(), opts...)
-	}
-}
-
-// BySubCategory orders the results by sub_category terms.
-func BySubCategory(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newSubCategoryStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
 func newUserStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(UserInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, true, UserTable, UserPrimaryKey...),
-	)
-}
-func newCommentStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(CommentInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, CommentTable, CommentPrimaryKey...),
 	)
 }
 func newBrandStep() *sqlgraph.Step {
@@ -287,12 +232,5 @@ func newCategoryStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(CategoryInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, true, CategoryTable, CategoryPrimaryKey...),
-	)
-}
-func newSubCategoryStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(SubCategoryInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, SubCategoryTable, SubCategoryPrimaryKey...),
 	)
 }
