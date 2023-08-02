@@ -15,28 +15,28 @@ import (
 func (h *handler) createNewImageHandler(w http.ResponseWriter, r *http.Request) {
 	file, header, err := r.FormFile("image")
 	if err != nil {
-		h.error.BadRequestResponse(w, r, err)
+		h.BadRequestResponse(w, r, err)
 		return
 	}
 	defer file.Close()
 
 	err = os.MkdirAll("/etc/www/images", os.ModePerm)
 	if err != nil {
-		h.error.InternalServerErrorResponse(w, r, err)
+		h.InternalServerErrorResponse(w, r, err)
 		return
 	}
 
 	path := fmt.Sprintf("/etc/www/images/%d%s", time.Now().UnixNano(), filepath.Ext(header.Filename))
 	dst, err := os.Create(path)
 	if err != nil {
-		h.error.InternalServerErrorResponse(w, r, err)
+		h.InternalServerErrorResponse(w, r, err)
 		return
 	}
 	defer dst.Close()
 
 	_, err = io.Copy(dst, file)
 	if err != nil {
-		h.error.InternalServerErrorResponse(w, r, err)
+		h.InternalServerErrorResponse(w, r, err)
 		return
 	}
 
@@ -50,15 +50,15 @@ func (h *handler) createNewImageHandler(w http.ResponseWriter, r *http.Request) 
 		Size:    float64(header.Size),
 		Owner:   0,
 	}
-	err = h.app.Models.Image.Insert(image)
+	err = h.Models.Image.Insert(image)
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
-			h.error.NotFoundResponse(w, r, err)
+			h.NotFoundResponse(w, r, err)
 		case ent.IsConstraintError(err):
-			h.error.BadRequestResponse(w, r, err)
+			h.BadRequestResponse(w, r, err)
 		default:
-			h.error.InternalServerErrorResponse(w, r, err)
+			h.InternalServerErrorResponse(w, r, err)
 		}
 		return
 	}

@@ -11,24 +11,24 @@ func (h *handler) createNewProductHandler(w http.ResponseWriter, r *http.Request
 	var input structure.Product
 	err := h.ReadJSONiter(w, r, &input)
 	if err != nil {
-		h.error.BadRequestResponse(w, r, err)
+		h.BadRequestResponse(w, r, err)
 		return
 	}
 
-	product, err := h.app.Models.Product.CreateNewProduct(input)
+	product, err := h.Models.Product.CreateNewProduct(input)
 	if err != nil {
 		switch {
 		case ent.IsConstraintError(err) || ent.IsValidationError(err):
-			h.error.BadRequestResponse(w, r, err)
+			h.BadRequestResponse(w, r, err)
 		default:
-			h.error.InternalServerErrorResponse(w, r, err)
+			h.InternalServerErrorResponse(w, r, err)
 		}
 		return
 	}
 
 	err = h.WriteJSONiter(w, http.StatusCreated, product, nil)
 	if err != nil {
-		h.error.InternalServerErrorResponse(w, r, err)
+		h.InternalServerErrorResponse(w, r, err)
 		return
 	}
 }
@@ -36,39 +36,39 @@ func (h *handler) createNewProductHandler(w http.ResponseWriter, r *http.Request
 func (h *handler) getProductByIDHandler(w http.ResponseWriter, r *http.Request) {
 	id := paramInt(r, "id")
 	if id == 0 {
-		h.error.NotFoundResponse(w, r, nil)
+		h.NotFoundResponse(w, r, nil)
 		return
 	}
 
-	product, err := h.app.Models.Product.GetSingleProductByID(id)
+	product, err := h.Models.Product.GetSingleProductByID(id)
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
-			h.error.NotFoundResponse(w, r, err)
+			h.NotFoundResponse(w, r, err)
 			return
 		default:
-			h.error.InternalServerErrorResponse(w, r, err)
+			h.InternalServerErrorResponse(w, r, err)
 			return
 		}
 	}
 
 	err = h.WriteJSONiter(w, http.StatusOK, product, nil)
 	if err != nil {
-		h.error.InternalServerErrorResponse(w, r, err)
+		h.InternalServerErrorResponse(w, r, err)
 		return
 	}
 }
 
 func (h *handler) getAllProductsHandler(w http.ResponseWriter, r *http.Request) {
-	products, err := h.app.Models.Product.GetAllProducts()
+	products, err := h.Models.Product.GetAllProducts()
 	if err != nil {
-		h.error.InternalServerErrorResponse(w, r, err)
+		h.InternalServerErrorResponse(w, r, err)
 		return
 	}
 
 	err = h.WriteJSONiter(w, http.StatusOK, products, nil)
 	if err != nil {
-		h.error.InternalServerErrorResponse(w, r, err)
+		h.InternalServerErrorResponse(w, r, err)
 		return
 	}
 }
@@ -76,24 +76,24 @@ func (h *handler) getAllProductsHandler(w http.ResponseWriter, r *http.Request) 
 func (h *handler) updateProductByIDHandler(w http.ResponseWriter, r *http.Request) {
 	id := paramInt(r, "id")
 	if id == 0 {
-		h.error.NotFoundResponse(w, r, nil)
+		h.NotFoundResponse(w, r, nil)
 		return
 	}
 
 	var input structure.ProductUpdate
 	err := h.ReadJSONiter(w, r, &input)
 	if err != nil {
-		h.error.BadRequestResponse(w, r, err)
+		h.BadRequestResponse(w, r, err)
 		return
 	}
 
-	product, err := h.app.Models.Product.GetSingleProductByID(id)
+	product, err := h.Models.Product.GetSingleProductByID(id)
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
-			h.error.NotFoundResponse(w, r, err)
+			h.NotFoundResponse(w, r, err)
 		default:
-			h.error.InternalServerErrorResponse(w, r, err)
+			h.InternalServerErrorResponse(w, r, err)
 		}
 		return
 	}
@@ -132,20 +132,20 @@ func (h *handler) updateProductByIDHandler(w http.ResponseWriter, r *http.Reques
 		product.Edges.Brand = input.Brand
 	}
 
-	err = h.app.Models.Product.UpdateProductByID(product, id)
+	err = h.Models.Product.UpdateProductByID(product, id)
 	if err != nil {
 		switch {
 		case ent.IsConstraintError(err) || ent.IsValidationError(err):
-			h.error.BadRequestResponse(w, r, err)
+			h.BadRequestResponse(w, r, err)
 		default:
-			h.error.InternalServerErrorResponse(w, r, err)
+			h.InternalServerErrorResponse(w, r, err)
 		}
 		return
 	}
 
 	err = h.WriteJSONiter(w, http.StatusNoContent, product, nil)
 	if err != nil {
-		h.error.InternalServerErrorResponse(w, r, err)
+		h.InternalServerErrorResponse(w, r, err)
 		return
 	}
 }
@@ -153,24 +153,24 @@ func (h *handler) updateProductByIDHandler(w http.ResponseWriter, r *http.Reques
 func (h *handler) deleteProductByIDHandler(w http.ResponseWriter, r *http.Request) {
 	id := paramInt(r, "id")
 	if id == 0 {
-		h.error.NotFoundResponse(w, r, nil)
+		h.NotFoundResponse(w, r, nil)
 		return
 	}
 
-	err := h.app.Models.Product.DeleteProductByID(id)
+	err := h.Models.Product.DeleteProductByID(id)
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
-			h.error.NotFoundResponse(w, r, err)
+			h.NotFoundResponse(w, r, err)
 		default:
-			h.error.InternalServerErrorResponse(w, r, err)
+			h.InternalServerErrorResponse(w, r, err)
 		}
 		return
 	}
 
 	err = h.WriteJSONiter(w, http.StatusOK, nil, nil)
 	if err != nil {
-		h.error.InternalServerErrorResponse(w, r, err)
+		h.InternalServerErrorResponse(w, r, err)
 		return
 	}
 

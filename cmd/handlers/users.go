@@ -13,7 +13,7 @@ func (h *handler) createNewUserHandler(w http.ResponseWriter, r *http.Request) {
 	var input structure.UserRequest
 	err := h.ReadJSONiter(w, r, &input)
 	if err != nil {
-		h.error.BadRequestResponse(w, r, err)
+		h.BadRequestResponse(w, r, err)
 		return
 	}
 
@@ -34,26 +34,26 @@ func (h *handler) createNewUserHandler(w http.ResponseWriter, r *http.Request) {
 
 	err = user.Password.ArgonSet(input.Password)
 	if err != nil {
-		h.error.InternalServerErrorResponse(w, r, err)
+		h.InternalServerErrorResponse(w, r, err)
 		return
 	}
 
 	// TODO: validations
 
-	err = h.app.Models.User.CreateNewUser(user)
+	err = h.Models.User.CreateNewUser(user)
 	if err != nil {
 		switch {
 		case ent.IsConstraintError(err) || ent.IsValidationError(err):
-			h.error.BadRequestResponse(w, r, err)
+			h.BadRequestResponse(w, r, err)
 		default:
-			h.error.InternalServerErrorResponse(w, r, err)
+			h.InternalServerErrorResponse(w, r, err)
 		}
 		return
 	}
 
 	err = h.WriteJSONiter(w, http.StatusCreated, user, nil)
 	if err != nil {
-		h.error.InternalServerErrorResponse(w, r, err)
+		h.InternalServerErrorResponse(w, r, err)
 		return
 	}
 }
@@ -61,38 +61,38 @@ func (h *handler) createNewUserHandler(w http.ResponseWriter, r *http.Request) {
 func (h *handler) getUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 	id := paramInt(r, "id")
 	if id == 0 {
-		h.error.NotFoundResponse(w, r, nil)
+		h.NotFoundResponse(w, r, nil)
 		return
 	}
 
-	user, err := h.app.Models.User.GetSingleUserByID(id)
+	user, err := h.Models.User.GetSingleUserByID(id)
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
-			h.error.NotFoundResponse(w, r, err)
+			h.NotFoundResponse(w, r, err)
 			return
 		default:
-			h.error.InternalServerErrorResponse(w, r, err)
+			h.InternalServerErrorResponse(w, r, err)
 			return
 		}
 	}
 
 	err = h.WriteJSONiter(w, http.StatusOK, user, nil)
 	if err != nil {
-		h.error.InternalServerErrorResponse(w, r, err)
+		h.InternalServerErrorResponse(w, r, err)
 		return
 	}
 }
 
 func (h *handler) getAllUsersHandler(w http.ResponseWriter, r *http.Request) {
-	users, err := h.app.Models.User.GetAllUsers()
+	users, err := h.Models.User.GetAllUsers()
 	if err != nil {
-		h.error.InternalServerErrorResponse(w, r, err)
+		h.InternalServerErrorResponse(w, r, err)
 		return
 	}
 	err = h.WriteJSONiter(w, http.StatusOK, users, nil)
 	if err != nil {
-		h.error.InternalServerErrorResponse(w, r, err)
+		h.InternalServerErrorResponse(w, r, err)
 		return
 	}
 }
@@ -100,29 +100,29 @@ func (h *handler) getAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 func (h *handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 	id := paramInt(r, "id")
 	if id == 0 {
-		h.error.NotFoundResponse(w, r, nil)
+		h.NotFoundResponse(w, r, nil)
 		return
 	}
 
 	var input structure.UserUpdateRequest
 	err := h.ReadJSONiter(w, r, &input)
 	if err != nil {
-		h.error.BadRequestResponse(w, r, err)
+		h.BadRequestResponse(w, r, err)
 		return
 	}
 
 	if input == (structure.UserUpdateRequest{}) {
-		h.error.BadRequestResponse(w, r, errors.New("empty request"))
+		h.BadRequestResponse(w, r, errors.New("empty request"))
 		return
 	}
 
-	user, err := h.app.Models.User.GetSingleUserByID(id)
+	user, err := h.Models.User.GetSingleUserByID(id)
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
-			h.error.NotFoundResponse(w, r, err)
+			h.NotFoundResponse(w, r, err)
 		default:
-			h.error.InternalServerErrorResponse(w, r, err)
+			h.InternalServerErrorResponse(w, r, err)
 		}
 		return
 	}
@@ -146,26 +146,26 @@ func (h *handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 		var p Password.Password
 		err = p.ArgonSet(*input.Password)
 		if err != nil {
-			h.error.InternalServerErrorResponse(w, r, err)
+			h.InternalServerErrorResponse(w, r, err)
 			return
 		}
 		user.Password = []byte(p.Hash)
 	}
 
-	err = h.app.Models.User.UpdateUserByID(id, user)
+	err = h.Models.User.UpdateUserByID(id, user)
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
-			h.error.NotFoundResponse(w, r, err)
+			h.NotFoundResponse(w, r, err)
 		default:
-			h.error.InternalServerErrorResponse(w, r, err)
+			h.InternalServerErrorResponse(w, r, err)
 		}
 		return
 	}
 
 	err = h.WriteJSONiter(w, http.StatusOK, user, nil)
 	if err != nil {
-		h.error.InternalServerErrorResponse(w, r, err)
+		h.InternalServerErrorResponse(w, r, err)
 		return
 	}
 }
@@ -173,24 +173,24 @@ func (h *handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 func (h *handler) deleteUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 	id := paramInt(r, "id")
 	if id == 0 {
-		h.error.NotFoundResponse(w, r, nil)
+		h.NotFoundResponse(w, r, nil)
 		return
 	}
 
-	err := h.app.Models.User.DeleteUserByID(id)
+	err := h.Models.User.DeleteUserByID(id)
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
-			h.error.NotFoundResponse(w, r, err)
+			h.NotFoundResponse(w, r, err)
 		default:
-			h.error.InternalServerErrorResponse(w, r, err)
+			h.InternalServerErrorResponse(w, r, err)
 		}
 		return
 	}
 
 	err = h.WriteJSONiter(w, http.StatusNoContent, nil, nil)
 	if err != nil {
-		h.error.InternalServerErrorResponse(w, r, err)
+		h.InternalServerErrorResponse(w, r, err)
 		return
 	}
 }

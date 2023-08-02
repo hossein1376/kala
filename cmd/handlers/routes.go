@@ -25,12 +25,13 @@ func (h *handler) Router() *chi.Mux {
 		r.Use(httprate.LimitByRealIP(10, time.Minute))
 
 		r.Get("/", h.homeHandler)
+		r.Post("/login", h.loginHandler)
 	})
 
 	// protected routes
 	r.Group(func(r chi.Router) {
 		// JWT middleware
-		r.Use(jwtauth.Verifier(h.app.Config.JWTToken))
+		r.Use(jwtauth.Verifier(h.Config.JWTToken))
 		r.Use(jwtauth.Authenticator)
 
 		r.Route("/api/v1", func(r chi.Router) {

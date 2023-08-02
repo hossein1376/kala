@@ -5,6 +5,11 @@ import (
 )
 
 func (h *handler) homeHandler(w http.ResponseWriter, r *http.Request) {
-	h.app.Logger.Info("received request!")
-	w.Write([]byte("Hello World"))
+	h.Info("received request!")
+
+	err := h.WriteJSON(w, http.StatusOK, "Hello World", nil)
+	if err != nil {
+		h.InternalServerErrorResponse(w, r, err)
+		return
+	}
 }

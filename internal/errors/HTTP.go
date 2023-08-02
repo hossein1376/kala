@@ -1,6 +1,6 @@
-// Package Errors provides common error responses.
+// Package errors provides common error responses.
 // Note that it relies on Json package.
-package Errors
+package errors
 
 import (
 	"fmt"
@@ -12,21 +12,21 @@ import (
 )
 
 type Errors struct {
-	logger *slog.Logger
-	json   Json.Json
+	*slog.Logger
+	Json.Json
 }
 
 func NewErrors(logger *slog.Logger) *Errors {
 	json := Json.NewJson()
 	return &Errors{
-		logger: logger,
-		json:   json,
+		Logger: logger,
+		Json:   json,
 	}
 }
 
 // logInternalError logs the error details to the standard logger
 func (e *Errors) logInternalError(r *http.Request, err error) {
-	e.logger.Error("internal error",
+	e.Error("internal error",
 		slog.String("error_message", err.Error()),
 		slog.String("request_method", r.Method),
 		slog.String("request_url", r.URL.String()))
@@ -34,7 +34,7 @@ func (e *Errors) logInternalError(r *http.Request, err error) {
 
 // errorResponse responses with the error message
 func (e *Errors) errorResponse(w http.ResponseWriter, r *http.Request, status int, message interface{}) {
-	err := e.json.WriteJSON(w, status, message, nil)
+	err := e.WriteJSON(w, status, message, nil)
 	if err != nil {
 		e.logInternalError(r, err)
 		w.WriteHeader(500)

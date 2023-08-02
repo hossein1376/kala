@@ -5,22 +5,26 @@ import (
 	"strconv"
 
 	"github.com/hossein1376/kala/cmd"
-	"github.com/hossein1376/kala/pkg/Errors"
+	"github.com/hossein1376/kala/internal/errors"
 	"github.com/hossein1376/kala/pkg/Json"
 
 	"github.com/go-chi/chi/v5"
 )
 
 type handler struct {
-	app   *cmd.Application
-	error *Errors.Errors
+	*cmd.Application
+	*errors.Errors
 	Json.Json
 }
 
 func NewHandlers(app *cmd.Application) *handler {
 	return &handler{
-		app:   app,
-		error: Errors.NewErrors(app.Logger),
+		Application: &cmd.Application{
+			Config: app.Config,
+			Logger: app.Logger,
+			Models: app.Models,
+		},
+		Errors: errors.NewErrors(app.Logger),
 	}
 }
 
