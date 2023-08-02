@@ -6,11 +6,12 @@
     <envs>
       <env name="ENVIRONMENT" value="dev" />
       <env name="SERVER_PORT" value="8000" />
-      <env name="SQL_USERNAME" value="postgres" />
-      <env name="SQL_PASSWORD" value="123456" />
       <env name="SQL_HOST" value="localhost" />
-      <env name="SQL_PORT" value="5432" />
       <env name="SQL_NAME" value="kala" />
+      <env name="SQL_PASSWORD" value="123456" />
+      <env name="SQL_PORT" value="5432" />
+      <env name="SQL_USERNAME" value="postgres" />
+      <env name="JWT_SECRET" value="super_secret_phrase" />
     </envs>
     <EXTENSION ID="software.aws.toolkits.jetbrains.core.execution.GoAwsConnectionRunConfigurationExtension">
       <option name="credential" />

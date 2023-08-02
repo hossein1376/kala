@@ -3,6 +3,8 @@ package api
 import (
 	"context"
 
+	"github.com/go-chi/jwtauth/v5"
+
 	"github.com/hossein1376/kala/cmd"
 	"github.com/hossein1376/kala/cmd/handlers"
 	"github.com/hossein1376/kala/internal/data"
@@ -14,7 +16,13 @@ import (
 func RunServer() {
 	logger := Logger.NewJsonLogger()
 
-	cfg := newConfig()
+	cfg, err := newConfig()
+	if err != nil {
+		logger.Error("failed to load configurations", slog.String("error", err.Error()))
+		return
+	}
+	logger.Info("configurations loaded successfully")
+
 	client, err := openSqlDB(cfg)
 	if err != nil {
 		logger.Error("failed to open sql connection", slog.String("error", err.Error()))
@@ -27,6 +35,9 @@ func RunServer() {
 		logger.Error("failed creating schema resources: %v", slog.String("error", err.Error()))
 		return
 	}
+
+	cfg.JWTToken = jwtauth.New("HS256", []byte(cfg.JWTSecret), nil)
+	logger.Info("JWT token generated")
 
 	app := &cmd.Application{
 		Config: cfg,
