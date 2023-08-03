@@ -35,13 +35,20 @@ func (p *Password) BcryptSet(plaintextPassword string) error {
 }
 
 // ArgonMatches compares the existing hash with the newly hashed password to see if they match
-func (p *Password) ArgonMatches(plaintextPassword string) (bool, error) {
-	return argon2id.ComparePasswordAndHash(plaintextPassword, p.Hash)
+func (p *Password) ArgonMatches() (bool, error) {
+	if p.Plaintext == nil {
+		return false, errors.New("'plaintext' field must be provided")
+	}
+	return argon2id.ComparePasswordAndHash(*p.Plaintext, p.Hash)
 }
 
 // BcryptMatches compares the existing hash with the newly hashed password to see if they match
-func (p *Password) BcryptMatches(plaintextPassword string) (bool, error) {
-	err := bcrypt.CompareHashAndPassword([]byte(p.Hash), []byte(plaintextPassword))
+func (p *Password) BcryptMatches() (bool, error) {
+	if p.Plaintext == nil {
+		return false, errors.New("'plaintext' field must be provided")
+	}
+
+	err := bcrypt.CompareHashAndPassword([]byte(p.Hash), []byte(*p.Plaintext))
 	if err != nil {
 		switch {
 		case errors.Is(err, bcrypt.ErrMismatchedHashAndPassword):

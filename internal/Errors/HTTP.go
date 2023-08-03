@@ -1,6 +1,6 @@
-// Package errors provides common error responses.
+// Package Errors provides common error responses.
 // Note that it relies on Json package.
-package errors
+package Errors
 
 import (
 	"fmt"
@@ -47,7 +47,8 @@ func (e *Errors) InternalServerErrorResponse(w http.ResponseWriter, r *http.Requ
 	e.errorResponse(w, r, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
 }
 
-// NotFoundResponse returns the classic 404
+// NotFoundResponse will return 404 with, if provided, the error message.
+// Otherwise, it'll return the classic 404 error message.
 func (e *Errors) NotFoundResponse(w http.ResponseWriter, r *http.Request, err error) {
 	if err == nil {
 		e.errorResponse(w, r, http.StatusNotFound, http.StatusText(http.StatusNotFound))

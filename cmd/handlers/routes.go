@@ -7,7 +7,28 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/httprate"
 	"github.com/go-chi/jwtauth/v5"
+
+	"github.com/hossein1376/kala/cmd"
+	"github.com/hossein1376/kala/internal/Errors"
+	"github.com/hossein1376/kala/pkg/Json"
 )
+
+type handler struct {
+	*cmd.Application
+	*Errors.Errors
+	Json.Json
+}
+
+func NewHandlers(app *cmd.Application) *handler {
+	return &handler{
+		Application: &cmd.Application{
+			Config: app.Config,
+			Logger: app.Logger,
+			Models: app.Models,
+		},
+		Errors: Errors.NewErrors(app.Logger),
+	}
+}
 
 func (h *handler) Router() *chi.Mux {
 	// create new router
@@ -32,7 +53,7 @@ func (h *handler) Router() *chi.Mux {
 	r.Group(func(r chi.Router) {
 		// JWT middlewares
 		r.Use(jwtauth.Verifier(h.Config.JWTToken))
-		r.Use(jwtauth.Authenticator)
+		r.Use(jwtauth.Authenticator, h.checkJWT)
 
 		r.Route("/api/v1", func(r chi.Router) {
 			// user routes

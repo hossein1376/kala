@@ -40,7 +40,7 @@ func (h *handler) createNewUserHandler(w http.ResponseWriter, r *http.Request) {
 
 	// TODO: validations
 
-	err = h.Models.User.CreateNewUser(user)
+	u, err := h.Models.User.Create(user)
 	if err != nil {
 		switch {
 		case ent.IsConstraintError(err) || ent.IsValidationError(err):
@@ -51,7 +51,7 @@ func (h *handler) createNewUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.WriteJSONiter(w, http.StatusCreated, user, nil)
+	err = h.WriteJSONiter(w, http.StatusCreated, u, nil)
 	if err != nil {
 		h.InternalServerErrorResponse(w, r, err)
 		return
@@ -65,7 +65,7 @@ func (h *handler) getUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := h.Models.User.GetSingleUserByID(id)
+	user, err := h.Models.User.GetByID(id)
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
@@ -85,7 +85,7 @@ func (h *handler) getUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *handler) getAllUsersHandler(w http.ResponseWriter, r *http.Request) {
-	users, err := h.Models.User.GetAllUsers()
+	users, err := h.Models.User.GetAll()
 	if err != nil {
 		h.InternalServerErrorResponse(w, r, err)
 		return
@@ -116,7 +116,7 @@ func (h *handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	user, err := h.Models.User.GetSingleUserByID(id)
+	user, err := h.Models.User.GetByID(id)
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
@@ -152,7 +152,7 @@ func (h *handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 		user.Password = []byte(p.Hash)
 	}
 
-	err = h.Models.User.UpdateUserByID(id, user)
+	err = h.Models.User.UpdateByID(id, user)
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
@@ -177,7 +177,7 @@ func (h *handler) deleteUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	err := h.Models.User.DeleteUserByID(id)
+	err := h.Models.User.DeleteByID(id)
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
