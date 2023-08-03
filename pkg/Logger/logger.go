@@ -1,19 +1,19 @@
 package Logger
 
 import (
-	"os"
+	"io"
 
 	"golang.org/x/exp/slog"
 )
 
-func NewJsonLogger() *slog.Logger {
-	jsonHandler := slog.NewJSONHandler(os.Stdout, nil)
+func NewJsonLogger(dst io.Writer) *slog.Logger {
+	jsonHandler := slog.NewJSONHandler(dst, nil)
 	logger := slog.New(jsonHandler)
 	return logger
 }
 
-func NewTextLogger() *slog.Logger {
-	textLogger := slog.NewTextHandler(os.Stdout, nil)
+func NewTextLogger(dst io.Writer) *slog.Logger {
+	textLogger := slog.NewTextHandler(dst, nil)
 	logger := slog.New(textLogger)
 	return logger
 }

@@ -10,10 +10,10 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/hossein1376/kala/cmd"
-
 	"github.com/go-chi/chi/v5"
 	"golang.org/x/exp/slog"
+
+	"github.com/hossein1376/kala/cmd"
 )
 
 func serve(app *cmd.Application, router *chi.Mux) error {

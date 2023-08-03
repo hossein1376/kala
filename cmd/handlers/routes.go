@@ -13,13 +13,13 @@ func (h *handler) Router() *chi.Mux {
 	// create new router
 	r := chi.NewRouter()
 
-	// standard middleware
+	// standard middlewares
 	r.Use(middleware.Logger, middleware.Recoverer)
 
 	// custom middlewares
 	r.Use(h.logger)
 
-	// open routes
+	// public routes
 	r.Group(func(r chi.Router) {
 		// rate limiter middleware
 		r.Use(httprate.LimitByRealIP(10, time.Minute))
@@ -28,9 +28,9 @@ func (h *handler) Router() *chi.Mux {
 		r.Post("/login", h.loginHandler)
 	})
 
-	// protected routes
+	// private routes
 	r.Group(func(r chi.Router) {
-		// JWT middleware
+		// JWT middlewares
 		r.Use(jwtauth.Verifier(h.Config.JWTToken))
 		r.Use(jwtauth.Authenticator)
 

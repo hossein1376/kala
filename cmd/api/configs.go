@@ -28,11 +28,11 @@ func newConfig() (*cmd.Config, error) {
 	flag.StringVar(&cfg.Port, "port", port, "Service Port")
 	flag.StringVar(&cfg.JWTSecret, "jwt-secret", jwtSecret, "JWT Secret")
 
-	flag.StringVar(&cfg.Sql.Port, "sql-port", sqlPort, "SQL Database Port")
-	flag.StringVar(&cfg.Sql.Username, "sql-username", sqlUsername, "SQL Database Username")
-	flag.StringVar(&cfg.Sql.Host, "sql-host", sqlHost, "SQL Database Host")
-	flag.StringVar(&cfg.Sql.Password, "sql-password", sqlPassword, "SQL Database Password")
-	flag.StringVar(&cfg.Sql.Name, "sql-name", sqlName, "SQL Database Name")
+	flag.StringVar(&cfg.DB.Sql.Port, "sql-port", sqlPort, "SQL Database Port")
+	flag.StringVar(&cfg.DB.Sql.Username, "sql-username", sqlUsername, "SQL Database Username")
+	flag.StringVar(&cfg.DB.Sql.Host, "sql-host", sqlHost, "SQL Database Host")
+	flag.StringVar(&cfg.DB.Sql.Password, "sql-password", sqlPassword, "SQL Database Password")
+	flag.StringVar(&cfg.DB.Sql.Name, "sql-name", sqlName, "SQL Database Name")
 
 	flag.Parse()
 
@@ -55,16 +55,16 @@ func verifyConfigs(cfg *cmd.Config) error {
 		return fmt.Errorf("JWT secret must be specified")
 	}
 
-	if cfg.Sql.Host == "" {
+	if cfg.DB.Sql.Host == "" {
 		return fmt.Errorf("sql host must be specified")
 	}
-	if cfg.Sql.Port == "" {
+	if cfg.DB.Sql.Port == "" {
 		return fmt.Errorf("sql port must be specified")
 	}
-	if cfg.Sql.Name == "" {
+	if cfg.DB.Sql.Name == "" {
 		return fmt.Errorf("sql name must be specified")
 	}
-	if cfg.Sql.Username == "" {
+	if cfg.DB.Sql.Username == "" {
 		return fmt.Errorf("sql username must be specified")
 	}
 

@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"os"
 
 	"github.com/go-chi/jwtauth/v5"
 
@@ -14,7 +15,7 @@ import (
 )
 
 func RunServer() {
-	logger := Logger.NewJsonLogger()
+	logger := Logger.NewJsonLogger(os.Stdout)
 
 	cfg, err := newConfig()
 	if err != nil {
@@ -29,7 +30,7 @@ func RunServer() {
 		return
 	}
 	defer client.Close()
-	logger.Info("database connection established")
+	logger.Info("sql database connection established")
 
 	if err = client.Schema.Create(context.Background()); err != nil {
 		logger.Error("failed creating schema resources: %v", slog.String("error", err.Error()))

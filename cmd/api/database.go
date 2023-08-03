@@ -3,19 +3,19 @@ package api
 import (
 	"fmt"
 
+	_ "github.com/lib/pq"
+
 	"github.com/hossein1376/kala/cmd"
 	"github.com/hossein1376/kala/internal/ent"
-
-	_ "github.com/lib/pq"
 )
 
 func openSqlDB(cfg *cmd.Config) (*ent.Client, error) {
 	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		cfg.Sql.Host,
-		cfg.Sql.Port,
-		cfg.Sql.Username,
-		cfg.Sql.Password,
-		cfg.Sql.Name)
+		cfg.DB.Sql.Host,
+		cfg.DB.Sql.Port,
+		cfg.DB.Sql.Username,
+		cfg.DB.Sql.Password,
+		cfg.DB.Sql.Name)
 
 	client, err := ent.Open("postgres", dsn)
 	if err != nil {

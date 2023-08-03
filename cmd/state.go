@@ -15,17 +15,29 @@ type Application struct {
 }
 
 type Config struct {
-	Sql         SqlDB
 	Environment string
 	Port        string
 	JWTSecret   string
 	JWTToken    *jwtauth.JWTAuth
+	DB          DB
 }
 
-type SqlDB struct {
+type DB struct {
+	Sql   Sql
+	NoSql NoSql
+	Redis Redis
+}
+
+type Sql struct {
 	Host     string
 	Port     string
 	Username string
 	Password string
 	Name     string
+}
+
+type NoSql struct {
+}
+
+type Redis struct {
 }
