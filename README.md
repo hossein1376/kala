@@ -7,13 +7,13 @@ It aims to be fast, simple and extensible. As well as a showcase of my personal 
 
 The general structure follows the guidelines I picked up
 from [Let's Go Further](https://lets-go-further.alexedwards.net/),
-but over time I found some shortcoming in that approach which left me to explore for my desired structure.  
-The following is the result of my experience of developing multiple Go projects, what I find more logical and extensible
+but over time I found some shortcoming in that approach, which led me to explore for my desired structure.  
+The following is the result of my experience of developing many Go projects, what I find more logical and extensible
 approach,
 compile-time checks (I'm looking at you, import cycle), my constant experiment with different designs and on top of all,
 my personal taste.
 
-While I find this overall structure to make sense the most, feel free to adapt it partially or completely for your
+While I find this overall structure to make sense the most, feel free to adapt it partially or completely for your own
 projects!
 
 ### In a look
@@ -46,24 +46,22 @@ projects!
 
 ### cmd/api
 
-Module `api` is tasked with retrieving the configurations, validation them, opening database connection and finally
-starting the server.  
-It also handles the graceful shutdown as well.
+Module `api` is tasked with retrieving the configurations, their validation, opening database connections and then finally
+starting the server. It also handles the graceful shutdown as well.
 
-Configurations, logger and an instance of `Model` will be passed to `handlers`.
+The configurations, logger and an instance of `Model` will be passed down to `handlers`.
 
 ### cmd/handlers
 
 `handlers` module feature the struct `handler` which all handlers are a receiver function to it. It has a single
 exported receiver function named `Router` witch will be called inside the `cmd/api/run.go` to instantiate the router.
 
-`handlers` module will embed multiple structs such as `Json`, `Errors` so they can be used directly inside the handlers.
+Multiple structs such as `Json` and `Errors` will be embedded inside the `handler` struct so they can be used directly by the handlers.
 
 ### cmd/state.go
 
 This file consist of multiple struct to define the configurations and the "Application" data that will be passed down
-to `handlers`
-from `cmd`.
+to `handlers` from `cmd`.
 
 The main reason to have this file here, instead of somewhere like `internal/structure`, is to avoid import cycle.
 
