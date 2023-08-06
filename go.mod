@@ -10,7 +10,7 @@ require (
 	github.com/go-chi/jwtauth/v5 v5.1.1
 	github.com/json-iterator/go v1.1.12
 	github.com/lib/pq v1.10.9
-	golang.org/x/crypto v0.11.0
+	golang.org/x/crypto v0.12.0
 	golang.org/x/exp v0.0.0-20230801115018-d63ba01acd4b
 )
 
@@ -37,6 +37,6 @@ require (
 	github.com/segmentio/asm v1.2.0 // indirect
 	github.com/zclconf/go-cty v1.13.2 // indirect
 	golang.org/x/mod v0.12.0 // indirect
-	golang.org/x/sys v0.10.0 // indirect
-	golang.org/x/text v0.11.0 // indirect
+	golang.org/x/sys v0.11.0 // indirect
+	golang.org/x/text v0.12.0 // indirect
 )
