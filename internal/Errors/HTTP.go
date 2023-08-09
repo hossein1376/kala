@@ -4,11 +4,10 @@ package Errors
 
 import (
 	"fmt"
+	"log/slog"
 	"net/http"
 
 	"github.com/hossein1376/kala/pkg/Json"
-
-	"golang.org/x/exp/slog"
 )
 
 type Errors struct {

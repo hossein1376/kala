@@ -2,8 +2,7 @@ package Logger
 
 import (
 	"io"
-
-	"golang.org/x/exp/slog"
+	"log/slog"
 )
 
 func NewJsonLogger(dst io.Writer) *slog.Logger {

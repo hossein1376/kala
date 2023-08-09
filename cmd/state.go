@@ -1,11 +1,11 @@
 package cmd
 
 import (
+	"log/slog"
+
 	"github.com/go-chi/jwtauth/v5"
 
 	"github.com/hossein1376/kala/internal/data"
-
-	"golang.org/x/exp/slog"
 )
 
 type Application struct {

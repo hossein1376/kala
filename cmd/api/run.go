@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"log/slog"
 	"os"
 
 	"github.com/go-chi/jwtauth/v5"
@@ -10,8 +11,6 @@ import (
 	"github.com/hossein1376/kala/cmd/handlers"
 	"github.com/hossein1376/kala/internal/data"
 	"github.com/hossein1376/kala/pkg/Logger"
-
-	"golang.org/x/exp/slog"
 )
 
 func RunServer() {

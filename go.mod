@@ -1,6 +1,6 @@
 module github.com/hossein1376/kala
 
-go 1.20
+go 1.21.0
 
 require (
 	entgo.io/ent v0.12.3
@@ -11,11 +11,10 @@ require (
 	github.com/json-iterator/go v1.1.12
 	github.com/lib/pq v1.10.9
 	golang.org/x/crypto v0.12.0
-	golang.org/x/exp v0.0.0-20230801115018-d63ba01acd4b
 )
 
 require (
-	ariga.io/atlas v0.12.1 // indirect
+	ariga.io/atlas v0.13.1 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
