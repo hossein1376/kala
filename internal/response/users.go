@@ -1,4 +1,4 @@
-package Errors
+package response
 
 import (
 	"fmt"

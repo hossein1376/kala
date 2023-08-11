@@ -9,14 +9,17 @@ import (
 	"github.com/go-chi/jwtauth/v5"
 
 	"github.com/hossein1376/kala/cmd"
-	"github.com/hossein1376/kala/internal/Errors"
+	"github.com/hossein1376/kala/internal/response"
 	"github.com/hossein1376/kala/pkg/Json"
 )
 
+// JsonHandler is alias for default json package
+type JsonHandler = Json.JSONiter
+
 type handler struct {
 	*cmd.Application
-	*Errors.Errors
-	Json.Json
+	*response.Response
+	JsonHandler
 }
 
 func NewHandlers(app *cmd.Application) *handler {
@@ -26,7 +29,7 @@ func NewHandlers(app *cmd.Application) *handler {
 			Logger: app.Logger,
 			Models: app.Models,
 		},
-		Errors: Errors.NewErrors(app.Logger),
+		Response: response.NewResponse(app.Logger, JsonHandler{}),
 	}
 }
 

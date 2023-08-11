@@ -8,19 +8,16 @@ import (
 	"net/http"
 	"strings"
 	"time"
+
+	jsoniter "github.com/json-iterator/go"
 )
 
-type Json interface {
-	Write(w http.ResponseWriter, status int, data any, headers http.Header) error
-	Read(w http.ResponseWriter, r *http.Request, dst any) error
-}
+type JSONiter struct{}
 
-type JSON struct{}
-
-func (JSON) Write(w http.ResponseWriter, status int, data any, headers http.Header) error {
-	js, err := json.Marshal(data)
+func (JSONiter) Write(w http.ResponseWriter, status int, data any, headers http.Header) error {
+	js, err := jsoniter.Marshal(data)
 	if err != nil {
-		return err
+		return nil
 	}
 
 	for key, value := range headers {
@@ -35,10 +32,10 @@ func (JSON) Write(w http.ResponseWriter, status int, data any, headers http.Head
 	return err
 }
 
-func (JSON) Read(w http.ResponseWriter, r *http.Request, dst any) error {
+func (JSONiter) Read(w http.ResponseWriter, r *http.Request, dst any) error {
 	maxBytes := 1_048_576
 	r.Body = http.MaxBytesReader(w, r.Body, int64(maxBytes))
-	dec := json.NewDecoder(r.Body)
+	dec := jsoniter.NewDecoder(r.Body)
 	dec.DisallowUnknownFields()
 
 	err := dec.Decode(dst)

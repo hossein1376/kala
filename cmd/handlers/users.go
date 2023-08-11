@@ -3,15 +3,17 @@ package handlers
 import (
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/hossein1376/kala/internal/ent"
+	"github.com/hossein1376/kala/internal/response"
 	"github.com/hossein1376/kala/internal/structure"
 	"github.com/hossein1376/kala/pkg/Password"
 )
 
 func (h *handler) createNewUserHandler(w http.ResponseWriter, r *http.Request) {
 	var input structure.UserRequest
-	err := h.ReadJSONiter(w, r, &input)
+	err := h.Read(w, r, &input)
 	if err != nil {
 		h.BadRequestResponse(w, r, err)
 		return
@@ -51,11 +53,13 @@ func (h *handler) createNewUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.WriteJSONiter(w, http.StatusCreated, u, nil)
-	if err != nil {
-		h.InternalServerErrorResponse(w, r, err)
-		return
+	resp := response.HttpResponse{
+		Status:     response.OK,
+		StatusCode: http.StatusCreated,
+		Data:       u,
+		Time:       time.Now().Format(time.RFC3339),
 	}
+	h.Respond(w, r, http.StatusCreated, resp)
 }
 
 func (h *handler) getUserByIDHandler(w http.ResponseWriter, r *http.Request) {
@@ -77,11 +81,13 @@ func (h *handler) getUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	err = h.WriteJSONiter(w, http.StatusOK, user, nil)
-	if err != nil {
-		h.InternalServerErrorResponse(w, r, err)
-		return
+	resp := response.HttpResponse{
+		Status:     response.OK,
+		StatusCode: http.StatusOK,
+		Data:       user,
+		Time:       time.Now().Format(time.RFC3339),
 	}
+	h.Respond(w, r, http.StatusOK, resp)
 }
 
 func (h *handler) getAllUsersHandler(w http.ResponseWriter, r *http.Request) {
@@ -90,11 +96,13 @@ func (h *handler) getAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 		h.InternalServerErrorResponse(w, r, err)
 		return
 	}
-	err = h.WriteJSONiter(w, http.StatusOK, users, nil)
-	if err != nil {
-		h.InternalServerErrorResponse(w, r, err)
-		return
+	resp := response.HttpResponse{
+		Status:     response.OK,
+		StatusCode: http.StatusOK,
+		Data:       users,
+		Time:       time.Now().Format(time.RFC3339),
 	}
+	h.Respond(w, r, http.StatusOK, resp)
 }
 
 func (h *handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) {
@@ -105,7 +113,7 @@ func (h *handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 	}
 
 	var input structure.UserUpdateRequest
-	err := h.ReadJSONiter(w, r, &input)
+	err := h.Read(w, r, &input)
 	if err != nil {
 		h.BadRequestResponse(w, r, err)
 		return
@@ -163,11 +171,13 @@ func (h *handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	err = h.WriteJSONiter(w, http.StatusOK, user, nil)
-	if err != nil {
-		h.InternalServerErrorResponse(w, r, err)
-		return
+	resp := response.HttpResponse{
+		Status:     response.OK,
+		StatusCode: http.StatusOK,
+		Data:       user,
+		Time:       time.Now().Format(time.RFC3339),
 	}
+	h.Respond(w, r, http.StatusOK, resp)
 }
 
 func (h *handler) deleteUserByIDHandler(w http.ResponseWriter, r *http.Request) {
@@ -188,9 +198,5 @@ func (h *handler) deleteUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	err = h.WriteJSONiter(w, http.StatusNoContent, nil, nil)
-	if err != nil {
-		h.InternalServerErrorResponse(w, r, err)
-		return
-	}
+	h.Respond(w, r, http.StatusNoContent, nil)
 }

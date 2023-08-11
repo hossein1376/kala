@@ -62,4 +62,6 @@ func (h *handler) createNewImageHandler(w http.ResponseWriter, r *http.Request) 
 		}
 		return
 	}
+
+	h.Respond(w, r, http.StatusCreated, nil)
 }

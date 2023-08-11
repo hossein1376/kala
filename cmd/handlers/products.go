@@ -9,7 +9,7 @@ import (
 
 func (h *handler) createNewProductHandler(w http.ResponseWriter, r *http.Request) {
 	var input structure.Product
-	err := h.ReadJSONiter(w, r, &input)
+	err := h.Read(w, r, &input)
 	if err != nil {
 		h.BadRequestResponse(w, r, err)
 		return
@@ -26,11 +26,7 @@ func (h *handler) createNewProductHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	err = h.WriteJSONiter(w, http.StatusCreated, product, nil)
-	if err != nil {
-		h.InternalServerErrorResponse(w, r, err)
-		return
-	}
+	h.Respond(w, r, http.StatusCreated, product)
 }
 
 func (h *handler) getProductByIDHandler(w http.ResponseWriter, r *http.Request) {
@@ -52,11 +48,7 @@ func (h *handler) getProductByIDHandler(w http.ResponseWriter, r *http.Request) 
 		}
 	}
 
-	err = h.WriteJSONiter(w, http.StatusOK, product, nil)
-	if err != nil {
-		h.InternalServerErrorResponse(w, r, err)
-		return
-	}
+	h.Respond(w, r, http.StatusOK, product)
 }
 
 func (h *handler) getAllProductsHandler(w http.ResponseWriter, r *http.Request) {
@@ -66,11 +58,7 @@ func (h *handler) getAllProductsHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	err = h.WriteJSONiter(w, http.StatusOK, products, nil)
-	if err != nil {
-		h.InternalServerErrorResponse(w, r, err)
-		return
-	}
+	h.Respond(w, r, http.StatusOK, products)
 }
 
 func (h *handler) updateProductByIDHandler(w http.ResponseWriter, r *http.Request) {
@@ -81,7 +69,7 @@ func (h *handler) updateProductByIDHandler(w http.ResponseWriter, r *http.Reques
 	}
 
 	var input structure.ProductUpdate
-	err := h.ReadJSONiter(w, r, &input)
+	err := h.Read(w, r, &input)
 	if err != nil {
 		h.BadRequestResponse(w, r, err)
 		return
@@ -143,11 +131,7 @@ func (h *handler) updateProductByIDHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	err = h.WriteJSONiter(w, http.StatusNoContent, product, nil)
-	if err != nil {
-		h.InternalServerErrorResponse(w, r, err)
-		return
-	}
+	h.Respond(w, r, http.StatusNoContent, product)
 }
 
 func (h *handler) deleteProductByIDHandler(w http.ResponseWriter, r *http.Request) {
@@ -168,10 +152,5 @@ func (h *handler) deleteProductByIDHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	err = h.WriteJSONiter(w, http.StatusOK, nil, nil)
-	if err != nil {
-		h.InternalServerErrorResponse(w, r, err)
-		return
-	}
-
+	h.Respond(w, r, http.StatusOK, nil)
 }

@@ -3,9 +3,9 @@ package data
 import (
 	"context"
 
-	"github.com/hossein1376/kala/internal/Errors"
 	"github.com/hossein1376/kala/internal/ent"
 	entUser "github.com/hossein1376/kala/internal/ent/user"
+	"github.com/hossein1376/kala/internal/response"
 	"github.com/hossein1376/kala/internal/structure"
 )
 
@@ -37,14 +37,14 @@ func (u *UserModel) GetByUsername(username string) (*ent.User, error) {
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
-			return nil, Errors.UserNotFound{Username: &username}
+			return nil, response.UserNotFound{Username: &username}
 		default:
 			return nil, err
 		}
 	}
 
 	if !user.Status {
-		return nil, Errors.UserDisabled{Username: &username}
+		return nil, response.UserDisabled{Username: &username}
 	}
 
 	return user, err
