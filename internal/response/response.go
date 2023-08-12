@@ -1,11 +1,10 @@
 package response
 
 import (
-	"log/slog"
 	"net/http"
-)
 
-type status string
+	"log/slog"
+)
 
 const (
 	OK    = "ok"
@@ -14,7 +13,7 @@ const (
 )
 
 type HttpResponse struct {
-	Status     status `json:"status"`
+	Status     string `json:"status"`
 	StatusCode uint   `json:"status_code,omitempty"`
 	Message    any    `json:"message,omitempty"`
 	Data       any    `json:"data,omitempty"`

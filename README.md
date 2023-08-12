@@ -25,6 +25,7 @@ projects!
 |   |   ├── run.go
 |   ├── handlers
 |   |   ├── routes.go
+|   |   ├── handlers.go
 |   |   ├── ...
 |   ├── state.go
 |
@@ -37,7 +38,7 @@ projects!
 |   ├── response
 |
 ├── pkg
-|   ├── json
+|   ├── Json
 |   ├── ...
 |
 ├── main.go
