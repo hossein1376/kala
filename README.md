@@ -34,7 +34,7 @@ projects!
 |   |   ├── Mocks.go
 |   |   ├── ...
 |   ├── structure
-|   ├── Errors
+|   ├── response
 |
 ├── pkg
 |   ├── json
@@ -54,9 +54,9 @@ The configurations, logger and an instance of `Model` will be passed down to `ha
 ### cmd/handlers
 
 `handlers` module feature the struct `handler` which all handlers are a receiver function to it. It has a single
-exported receiver function named `Router` witch will be called inside the `cmd/api/run.go` to instantiate the router.
+exported receiver function named `Router` which will be called inside the `cmd/api/run.go` to instantiate the router.
 
-Multiple structs such as `Json` and `Errors` will be embedded inside the `handler` struct so they can be used directly by the handlers.
+Multiple structs such as `Json` and `Response` will be embedded inside the `handler` struct so they can be used directly by the handlers.
 
 ### cmd/state.go
 
@@ -75,11 +75,12 @@ With the use of interfaces, it's easy to write mocks for test cases.
 
 This module consists of structs to define the request, response and data structure, hence the name.
 
-### internal/Errors
+### internal/response
 
-HTTP error responses reside here, as well as custom defined errors that mostly will be returned
-from `internal/data` to be switch-case-ed in `cmd/handlers` to differentiate between different error cases and
-situations.
+General response function (named `Respond`), as well as helper functions for specefic HTTP status codes reside here.  
+
+Also custom defined errors that will be used to differentiate between different error cases and
+situations are placed here; each has methods on them with varying degrees of information returned.
 
 ### pkg
 
