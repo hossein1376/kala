@@ -15,9 +15,9 @@ type Json interface {
 	Read(w http.ResponseWriter, r *http.Request, dst any) error
 }
 
-type JSON struct{}
+type StdJson struct{}
 
-func (JSON) Write(w http.ResponseWriter, status int, data any, headers http.Header) error {
+func (StdJson) Write(w http.ResponseWriter, status int, data any, headers http.Header) error {
 	js, err := json.Marshal(data)
 	if err != nil {
 		return err
@@ -35,7 +35,7 @@ func (JSON) Write(w http.ResponseWriter, status int, data any, headers http.Head
 	return err
 }
 
-func (JSON) Read(w http.ResponseWriter, r *http.Request, dst any) error {
+func (StdJson) Read(w http.ResponseWriter, r *http.Request, dst any) error {
 	maxBytes := 1_048_576
 	r.Body = http.MaxBytesReader(w, r.Body, int64(maxBytes))
 	dec := json.NewDecoder(r.Body)

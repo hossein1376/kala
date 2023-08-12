@@ -3,35 +3,9 @@ package handlers
 import (
 	"time"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/httprate"
-	"github.com/go-chi/jwtauth/v5"
-
-	"github.com/hossein1376/kala/cmd"
-	"github.com/hossein1376/kala/internal/response"
-	"github.com/hossein1376/kala/pkg/Json"
 )
-
-// JsonHandler is alias for default json package
-type JsonHandler = Json.JSONiter
-
-type handler struct {
-	*cmd.Application
-	*response.Response
-	JsonHandler
-}
-
-func NewHandlers(app *cmd.Application) *handler {
-	return &handler{
-		Application: &cmd.Application{
-			Config: app.Config,
-			Logger: app.Logger,
-			Models: app.Models,
-		},
-		Response: response.NewResponse(app.Logger, JsonHandler{}),
-	}
-}
 
 func (h *handler) Router() *chi.Mux {
 	// create new router

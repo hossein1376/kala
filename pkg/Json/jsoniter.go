@@ -12,9 +12,9 @@ import (
 	jsoniter "github.com/json-iterator/go"
 )
 
-type JSONiter struct{}
+type Jsoniter struct{}
 
-func (JSONiter) Write(w http.ResponseWriter, status int, data any, headers http.Header) error {
+func (Jsoniter) Write(w http.ResponseWriter, status int, data any, headers http.Header) error {
 	js, err := jsoniter.Marshal(data)
 	if err != nil {
 		return nil
@@ -32,7 +32,7 @@ func (JSONiter) Write(w http.ResponseWriter, status int, data any, headers http.
 	return err
 }
 
-func (JSONiter) Read(w http.ResponseWriter, r *http.Request, dst any) error {
+func (Jsoniter) Read(w http.ResponseWriter, r *http.Request, dst any) error {
 	maxBytes := 1_048_576
 	r.Body = http.MaxBytesReader(w, r.Body, int64(maxBytes))
 	dec := jsoniter.NewDecoder(r.Body)
