@@ -47,7 +47,8 @@ projects!
 
 ### cmd/api
 
-Module `api` is tasked with retrieving the configurations, their validation, opening database connections and then finally
+Module `api` is tasked with retrieving the configurations, their validation, opening database connections and then
+finally
 starting the server. It also handles the graceful shutdown as well.
 
 The configurations, logger and an instance of `Model` will be passed down to `handlers`.
@@ -57,7 +58,8 @@ The configurations, logger and an instance of `Model` will be passed down to `ha
 `handlers` module feature the struct `handler` which all handlers are a receiver function to it. It has a single
 exported receiver function named `Router` which will be called inside the `cmd/api/run.go` to instantiate the router.
 
-Multiple structs such as `Json` and `Response` will be embedded inside the `handler` struct so they can be used directly by the handlers.
+Multiple structs such as `Json` and `Response` will be embedded inside the `handler` struct so they can be used directly
+by the handlers.
 
 ### cmd/state.go
 
@@ -78,7 +80,7 @@ This module consists of structs to define the request, response and data structu
 
 ### internal/response
 
-General response function (named `Respond`), as well as helper functions for specefic HTTP status codes reside here.  
+General response function (named `Respond`), as well as helper functions for specefic HTTP status codes reside here.
 
 Also custom defined errors that will be used to differentiate between different error cases and
 situations are placed here; each has methods on them with varying degrees of information returned.

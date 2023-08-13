@@ -1,9 +1,8 @@
 package response
 
 import (
-	"net/http"
-
 	"log/slog"
+	"net/http"
 )
 
 const (
