@@ -3,8 +3,10 @@ package handlers
 import (
 	"time"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/httprate"
+	"github.com/go-chi/jwtauth/v5"
 )
 
 func (h *handler) Router() *chi.Mux {
