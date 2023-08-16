@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/hossein1376/kala/internal/ent"
 	"github.com/hossein1376/kala/internal/response"
 	"github.com/hossein1376/kala/internal/structure"
 	"github.com/hossein1376/kala/pkg/Password"
@@ -45,7 +44,7 @@ func (h *handler) createNewUserHandler(w http.ResponseWriter, r *http.Request) {
 	u, err := h.Models.User.Create(user)
 	if err != nil {
 		switch {
-		case ent.IsConstraintError(err) || ent.IsValidationError(err):
+		case errors.As(err, &response.UserCreationError{}):
 			h.BadRequestResponse(w, r, err)
 		default:
 			h.InternalServerErrorResponse(w, r, err)
@@ -72,7 +71,7 @@ func (h *handler) getUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 	user, err := h.Models.User.GetByID(id)
 	if err != nil {
 		switch {
-		case ent.IsNotFound(err):
+		case errors.As(err, &response.UserRetrievalError{}):
 			h.NotFoundResponse(w, r, err)
 			return
 		default:
@@ -127,7 +126,7 @@ func (h *handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 	user, err := h.Models.User.GetByID(id)
 	if err != nil {
 		switch {
-		case ent.IsNotFound(err):
+		case errors.As(err, &response.UserRetrievalError{}):
 			h.NotFoundResponse(w, r, err)
 		default:
 			h.InternalServerErrorResponse(w, r, err)
@@ -163,7 +162,7 @@ func (h *handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 	err = h.Models.User.UpdateByID(id, user)
 	if err != nil {
 		switch {
-		case ent.IsNotFound(err):
+		case errors.As(err, &response.UserUpdateError{}):
 			h.NotFoundResponse(w, r, err)
 		default:
 			h.InternalServerErrorResponse(w, r, err)
@@ -190,7 +189,7 @@ func (h *handler) deleteUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 	err := h.Models.User.DeleteByID(id)
 	if err != nil {
 		switch {
-		case ent.IsNotFound(err):
+		case errors.As(err, &response.UserDeleteError{}):
 			h.NotFoundResponse(w, r, err)
 		default:
 			h.InternalServerErrorResponse(w, r, err)

@@ -20,11 +20,11 @@ func NewModels(client *ent.Client) *Models {
 }
 
 type User interface {
-	Create(user structure.User) (*ent.User, error)
-	GetByID(id int) (*ent.User, error)
-	GetByUsername(username string) (*ent.User, error)
-	GetAll() ([]*ent.User, error)
-	UpdateByID(id int, user *ent.User) error
+	Create(user structure.User) (*structure.UserResponse, error)
+	GetByID(id int) (*structure.UserResponse, error)
+	GetByUsername(username string) (*structure.UserResponse, error)
+	GetAll() ([]*structure.UserResponse, error)
+	UpdateByID(id int, user *structure.UserResponse) error
 	DeleteByID(id int) error
 }
 

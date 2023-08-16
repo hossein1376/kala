@@ -38,11 +38,12 @@ type UserUpdateRequest struct {
 
 type UserResponse struct {
 	ID        int    `json:"id"`
-	FirstName string `json:"firstname"`
-	LastName  string `json:"lastname"`
 	Username  string `json:"username"`
-	Email     string `json:"email"`
-	Phone     string `json:"phone"`
+	Password  []byte `json:"-"`
+	FirstName string `json:"firstname,omitempty"`
+	LastName  string `json:"lastname,omitempty"`
+	Email     string `json:"email,omitempty"`
+	Phone     string `json:"phone,omitempty"`
 }
 
 type Address struct {
