@@ -73,11 +73,10 @@ func (h *handler) getUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 		switch {
 		case errors.As(err, &response.UserRetrievalError{}):
 			h.NotFoundResponse(w, r, err)
-			return
 		default:
 			h.InternalServerErrorResponse(w, r, err)
-			return
 		}
+		return
 	}
 
 	resp := response.HttpResponse{
