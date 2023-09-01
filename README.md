@@ -21,28 +21,29 @@ projects!
 ```
 .
 ├── cmd
-|   ├── api
-|   |   ├── run.go
-|   ├── handlers
-|   |   ├── routes.go
-|   |   ├── handlers.go
-|   |   ├── ...
-|   ├── state.go
-|
+│   ├── api
+│   │   ├── run.go
+│   │   └── ...
+│   ├── handlers
+│   │   ├── routes.go
+│   │   ├── handlers.go
+│   │   └── ...
+│   └──  state.go
 ├── internal
-|   ├── data
-|   |   ├── Models.go
-|   |   ├── Mocks.go
-|   |   ├── ...
-|   ├── structure
-|   ├── response
-|
+│   ├── data
+│   │   ├── Models.go
+│   │   ├── Mocks.go
+│   │   └── ...
+│   ├── structure
+│   ├── response
+│   └── ...
 ├── pkg
-|   ├── Json
-|   ├── ...
-|
+│   ├── Json
+│   ├── Logger
+│   └── ...
 ├── main.go
 ├── go.mod
+└── ...
 ```
 
 ### cmd/api
