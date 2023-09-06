@@ -10,7 +10,7 @@ require (
 	github.com/go-chi/jwtauth/v5 v5.1.1
 	github.com/json-iterator/go v1.1.12
 	github.com/lib/pq v1.10.9
-	golang.org/x/crypto v0.12.0
+	golang.org/x/crypto v0.13.0
 )
 
 require (
