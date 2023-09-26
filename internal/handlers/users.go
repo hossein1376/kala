@@ -7,6 +7,7 @@ import (
 
 	"github.com/hossein1376/kala/internal/response"
 	"github.com/hossein1376/kala/internal/structure"
+	est "github.com/hossein1376/kala/pkg/EST"
 	"github.com/hossein1376/kala/pkg/Password"
 )
 
@@ -43,12 +44,7 @@ func (h *handler) createNewUserHandler(w http.ResponseWriter, r *http.Request) {
 
 	u, err := h.Models.User.Create(user)
 	if err != nil {
-		switch {
-		case errors.As(err, &response.UserCreationError{}):
-			h.BadRequestResponse(w, r, err)
-		default:
-			h.InternalServerErrorResponse(w, r, err)
-		}
+		h.Respond(w, r, err.(est.Error).HTTPStatusCode, err.Error())
 		return
 	}
 
@@ -70,12 +66,7 @@ func (h *handler) getUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 
 	user, err := h.Models.User.GetByID(id)
 	if err != nil {
-		switch {
-		case errors.As(err, &response.UserRetrievalError{}):
-			h.NotFoundResponse(w, r, err)
-		default:
-			h.InternalServerErrorResponse(w, r, err)
-		}
+		h.Respond(w, r, err.(est.Error).HTTPStatusCode, err.Error())
 		return
 	}
 
@@ -124,12 +115,7 @@ func (h *handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 
 	user, err := h.Models.User.GetByID(id)
 	if err != nil {
-		switch {
-		case errors.As(err, &response.UserRetrievalError{}):
-			h.NotFoundResponse(w, r, err)
-		default:
-			h.InternalServerErrorResponse(w, r, err)
-		}
+		h.Respond(w, r, err.(est.Error).HTTPStatusCode, err.Error())
 		return
 	}
 
@@ -160,12 +146,7 @@ func (h *handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 
 	err = h.Models.User.UpdateByID(id, user)
 	if err != nil {
-		switch {
-		case errors.As(err, &response.UserUpdateError{}):
-			h.NotFoundResponse(w, r, err)
-		default:
-			h.InternalServerErrorResponse(w, r, err)
-		}
+		h.Respond(w, r, err.(est.Error).HTTPStatusCode, err.Error())
 		return
 	}
 
@@ -187,12 +168,7 @@ func (h *handler) deleteUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 
 	err := h.Models.User.DeleteByID(id)
 	if err != nil {
-		switch {
-		case errors.As(err, &response.UserDeleteError{}):
-			h.NotFoundResponse(w, r, err)
-		default:
-			h.InternalServerErrorResponse(w, r, err)
-		}
+		h.Respond(w, r, err.(est.Error).HTTPStatusCode, err.Error())
 		return
 	}
 

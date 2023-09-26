@@ -1,12 +1,12 @@
 package handlers
 
 import (
-	"errors"
 	"net/http"
 	"time"
 
 	"github.com/hossein1376/kala/internal/response"
 	"github.com/hossein1376/kala/internal/structure"
+	est "github.com/hossein1376/kala/pkg/EST"
 	"github.com/hossein1376/kala/pkg/Password"
 )
 
@@ -20,14 +20,7 @@ func (h *handler) loginHandler(w http.ResponseWriter, r *http.Request) {
 
 	user, err := h.Models.User.GetByUsername(input.Username)
 	if err != nil {
-		switch {
-		case errors.As(err, &response.UserNotFound{}):
-			h.UnauthorizedResponse(w, r)
-		case errors.As(err, &response.UserDisabled{}):
-			h.UnauthorizedResponse(w, r)
-		default:
-			h.InternalServerErrorResponse(w, r, err)
-		}
+		h.Respond(w, r, err.(est.Error).HTTPStatusCode, err.Error())
 		return
 	}
 

@@ -6,8 +6,8 @@ import (
 
 	"github.com/hossein1376/kala/internal/ent"
 	entUser "github.com/hossein1376/kala/internal/ent/user"
-	"github.com/hossein1376/kala/internal/response"
 	"github.com/hossein1376/kala/internal/structure"
+	est "github.com/hossein1376/kala/pkg/EST"
 )
 
 type UserModel struct {
@@ -27,9 +27,9 @@ func (u *UserModel) Create(data structure.User) (*structure.UserResponse, error)
 	if err != nil {
 		switch {
 		case ent.IsConstraintError(err) || ent.IsValidationError(err):
-			return nil, response.UserCreationError{Msg: err.Error()}
+			return nil, est.BadRequestError(err)
 		default:
-			return nil, err
+			return nil, est.InternalError(err)
 		}
 	}
 
@@ -48,9 +48,9 @@ func (u *UserModel) GetByID(id int) (*structure.UserResponse, error) {
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
-			return nil, response.UserRetrievalError{Msg: fmt.Sprintf("user with id '%v' was not found", id)}
+			return nil, est.NotFoundError(fmt.Errorf("user with id '%d' was not found", id))
 		default:
-			return nil, err
+			return nil, est.InternalError(err)
 		}
 	}
 
@@ -73,14 +73,14 @@ func (u *UserModel) GetByUsername(username string) (*structure.UserResponse, err
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
-			return nil, response.UserNotFound{Username: &username}
+			return nil, est.NotFoundError(fmt.Errorf("user with username '%s' was not found", username))
 		default:
-			return nil, err
+			return nil, est.InternalError(err)
 		}
 	}
 
 	if !user.Status {
-		return nil, response.UserDisabled{Username: &username}
+		return nil, est.ForbiddenError(nil)
 	}
 
 	return &structure.UserResponse{
@@ -91,13 +91,13 @@ func (u *UserModel) GetByUsername(username string) (*structure.UserResponse, err
 		LastName:  user.LastName,
 		Email:     user.Email,
 		Phone:     user.Phone,
-	}, err
+	}, nil
 }
 
 func (u *UserModel) GetAll() ([]*structure.UserResponse, error) {
 	users, err := u.client.User.Query().All(context.Background())
 	if err != nil {
-		return nil, err
+		return nil, est.InternalError(err)
 	}
 
 	resp := make([]*structure.UserResponse, 0, len(users))
@@ -113,7 +113,7 @@ func (u *UserModel) GetAll() ([]*structure.UserResponse, error) {
 		resp = append(resp, r)
 	}
 
-	return resp, err
+	return resp, nil
 }
 
 func (u *UserModel) UpdateByID(id int, user *structure.UserResponse) error {
@@ -128,9 +128,11 @@ func (u *UserModel) UpdateByID(id int, user *structure.UserResponse) error {
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
-			return response.UserUpdateError{Msg: fmt.Sprintf("failed to update user with id '%v'", id)}
+			return est.NotFoundError(fmt.Errorf("failed to update user with id '%d', %d", id, err))
+		case ent.IsConstraintError(err):
+			return est.BadRequestError(fmt.Errorf("failed to update user with id '%d', %d", id, err))
 		default:
-			return err
+			return est.InternalError(err)
 		}
 	}
 
@@ -144,9 +146,9 @@ func (u *UserModel) DeleteByID(id int) error {
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
-			return response.UserDeleteError{Msg: fmt.Sprintf("failed to delete user with id '%v'", id)}
+			return est.NotFoundError(fmt.Errorf("failed to delete user with id '%d'", id))
 		default:
-			return err
+			return est.InternalError(err)
 		}
 	}
 
