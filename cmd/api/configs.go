@@ -1,15 +1,15 @@
-package api
+package main
 
 import (
 	"flag"
 	"fmt"
 	"os"
 
-	"github.com/hossein1376/kala/cmd"
+	"github.com/hossein1376/kala/config"
 )
 
-func newConfig() (*cmd.Config, error) {
-	var cfg cmd.Config
+func newConfig() (*config.Config, error) {
+	var cfg config.Config
 
 	// getting settings from environment variables
 	env := os.Getenv("ENVIRONMENT")
@@ -44,7 +44,7 @@ func newConfig() (*cmd.Config, error) {
 	return &cfg, nil
 }
 
-func verifyConfigs(cfg *cmd.Config) error {
+func verifyConfigs(cfg *config.Config) error {
 	if cfg.Port == "" {
 		return fmt.Errorf("port must be specified")
 	}

@@ -1,4 +1,4 @@
-package api
+package main
 
 import (
 	"context"
@@ -7,13 +7,13 @@ import (
 
 	"github.com/go-chi/jwtauth/v5"
 
-	"github.com/hossein1376/kala/cmd"
-	"github.com/hossein1376/kala/cmd/handlers"
+	"github.com/hossein1376/kala/config"
 	"github.com/hossein1376/kala/internal/data"
+	"github.com/hossein1376/kala/internal/handlers"
 	"github.com/hossein1376/kala/pkg/Logger"
 )
 
-func RunServer() {
+func runServer() {
 	logger := Logger.NewJsonLogger(os.Stdout)
 
 	cfg, err := newConfig()
@@ -39,7 +39,7 @@ func RunServer() {
 	cfg.JWTToken = jwtauth.New("HS256", []byte(cfg.JWTSecret), nil)
 	logger.Info("JWT token generated")
 
-	app := &cmd.Application{
+	app := &config.Application{
 		Config: cfg,
 		Logger: logger,
 		Models: data.NewModels(client),

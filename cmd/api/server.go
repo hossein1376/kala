@@ -1,4 +1,4 @@
-package api
+package main
 
 import (
 	"context"
@@ -13,10 +13,10 @@ import (
 
 	"github.com/go-chi/chi/v5"
 
-	"github.com/hossein1376/kala/cmd"
+	"github.com/hossein1376/kala/config"
 )
 
-func serve(app *cmd.Application, router *chi.Mux) error {
+func serve(app *config.Application, router *chi.Mux) error {
 	server := &http.Server{
 		Addr:         fmt.Sprintf(":%s", app.Config.Port),
 		Handler:      router,
