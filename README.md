@@ -16,23 +16,27 @@ my personal taste.
 While I find this overall structure to make sense the most, feel free to adapt it partially or completely for your own
 projects!
 
+(For older iterations and alternative structures, they can be found on other branches)
+
 ### In a look
 
 ```
 .
 ├── cmd
-│   ├── api
-│   │   ├── run.go
-│   │   └── ...
-│   ├── handlers
-│   │   ├── routes.go
-│   │   ├── handlers.go
-│   │   └── ...
+│   └── api
+│      ├── main.go
+│      ├── run.go
+│      └── ...
+├── config
 │   └──  state.go
 ├── internal
 │   ├── data
 │   │   ├── Models.go
 │   │   ├── Mocks.go
+│   │   └── ...
+│   ├── handlers
+│   │   ├── routes.go
+│   │   ├── handlers.go
 │   │   └── ...
 │   ├── structure
 │   ├── response
@@ -41,33 +45,30 @@ projects!
 │   ├── Json
 │   ├── Logger
 │   └── ...
-├── main.go
 ├── go.mod
 └── ...
 ```
 
 ### cmd/api
 
-Module `api` is tasked with retrieving the configurations, their validation, opening database connections and then
-finally
-starting the server. It also handles the graceful shutdown as well.
+This module will compile to the application API binary. It is tasked with retrieving the configurations, their
+validation, opening database connections and then finally starting the server.  
+It also handles the graceful shutdown as well.
 
-The configurations, logger and an instance of `Model` will be passed down to `handlers`.
+The configurations, logger and an instance of `Model` will be passed down from here to the `handlers` module.
 
-### cmd/handlers
+### config
+
+The configuration and setting structures are defined here, as they'll be used in the API to control the application's
+behaviour.
+
+### internal/handlers
 
 `handlers` module feature the struct `handler` which all handlers are a receiver function to it. It has a single
 exported receiver function named `Router` which will be called inside the `cmd/api/run.go` to instantiate the router.
 
 Multiple structs such as `Json` and `Response` will be embedded inside the `handler` struct so they can be used directly
 by the handlers.
-
-### cmd/state.go
-
-This file consist of multiple struct to define the configurations and the "Application" data that will be passed down
-to `handlers` from `cmd`.
-
-The main reason to have this file here, instead of somewhere like `internal/structure`, is to avoid import cycle.
 
 ### internal/data
 
@@ -77,19 +78,41 @@ With the use of interfaces, it's easy to write mocks for test cases.
 
 ### internal/structure
 
-This module consists of structs to define the request, response and data structure, hence the name.
+This module consists of structs to define the request, response and data structure; hence the name.  
+It's equivalent of `dto` in some other architectures.
 
 ### internal/response
 
-General response function (named `Respond`), as well as helper functions for specefic HTTP status codes reside here.
+A general response function (named `Respond`) resides here, along with other helper functions for specific HTTP status
+codes.
 
-Also custom defined errors that will be used to differentiate between different error cases and
-situations are placed here; each has methods on them with varying degrees of information returned.
+Also custom defined errors that will be used to differentiate between different error cases and situations are placed
+here; each has methods attached to them with varying degrees of information returned.
 
 ### pkg
 
 The purpose of this folder is to copy-paste the commonly used packages that get used often and yet, have no dependency
 to the project and can be plugged in or out based on various needs.
+
+This folder is the home of some crucial packages such as `Json` and `Logger`.
+
+## Running
+
+Install dependencies:
+
+```shell
+go mod tidy
+```
+
+Then, run the application:
+
+```shell
+go run ./cmd/api 
+```
+
+Pass the configurations as flag arguments, or provide them as environmental variables.
+
+To run in development mode, add the following flag: `-env dev`
 
 ## Ent
 
@@ -104,3 +127,14 @@ go generate ./internal/ent
 ```shell
 go run -mod=mod entgo.io/ent/cmd/ent new --target internal/ent/schema <Name>
 ```
+
+## TODOs:
+
+- [ ] Load configurations from a file as an option
+- [ ] Defining the log-level from the configurations
+- [ ] Add more logs to the application
+- [ ] Add a new layer between the `handlers` and `data` packages
+- [ ] Improve error handling, maybe move them out of the `response`?
+- [ ] Differentiate between the Data Models, DTOs and request/response structs
+- [ ] Simplify the application login
+- [ ] Integrate Websocket and gRPC
