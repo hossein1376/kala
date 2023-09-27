@@ -24,7 +24,6 @@ func (h *handler) Router() *chi.Mux {
 		// rate limiter middleware
 		r.Use(httprate.LimitByRealIP(10, time.Minute))
 
-		r.Get("/", h.homeHandler)
 		r.Post("/login", h.loginHandler)
 	})
 
@@ -51,25 +50,6 @@ func (h *handler) Router() *chi.Mux {
 				r.Get("/{id}", h.getProductByIDHandler)
 				r.Patch("/{id}", h.updateProductByIDHandler)
 				r.Delete("/{id}", h.deleteProductByIDHandler)
-			})
-
-			// category routes
-			r.Route("/categories", func(r chi.Router) {
-				r.Post("/", h.createNewCategoryHandler)
-				r.Get("/", h.getAllCategoriesHandler)
-				r.Get("/{id}", h.getCategoryByIDHandler)
-			})
-
-			// brand routes
-			r.Route("/brands", func(r chi.Router) {
-				r.Post("/", h.createNewBrandHandler)
-				r.Get("/", h.getAllBrandsHandler)
-				r.Get("/{id}", h.getBrandByIDHandler)
-			})
-
-			// image route
-			r.Route("/images", func(r chi.Router) {
-				r.Post("/", h.createNewImageHandler)
 			})
 		})
 	})

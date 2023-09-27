@@ -35,19 +35,12 @@ const (
 	FieldRole = "role"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
-	// EdgeImage holds the string denoting the image edge name in mutations.
-	EdgeImage = "image"
 	// EdgeOrder holds the string denoting the order edge name in mutations.
 	EdgeOrder = "order"
 	// EdgeLogs holds the string denoting the logs edge name in mutations.
 	EdgeLogs = "logs"
 	// Table holds the table name of the user in the database.
 	Table = "users"
-	// ImageTable is the table that holds the image relation/edge. The primary key declared below.
-	ImageTable = "user_images"
-	// ImageInverseTable is the table name for the Image entity.
-	// It exists in this package in order to avoid circular dependency with the "image" package.
-	ImageInverseTable = "images"
 	// OrderTable is the table that holds the order relation/edge.
 	OrderTable = "orders"
 	// OrderInverseTable is the table name for the Order entity.
@@ -78,12 +71,6 @@ var Columns = []string{
 	FieldRole,
 	FieldStatus,
 }
-
-var (
-	// ImagePrimaryKey and ImageColumn2 are the table columns denoting the
-	// primary key for the image relation (M2M).
-	ImagePrimaryKey = []string{"user", "image"}
-)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -186,20 +173,6 @@ func ByStatus(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStatus, opts...).ToFunc()
 }
 
-// ByImageCount orders the results by image count.
-func ByImageCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newImageStep(), opts...)
-	}
-}
-
-// ByImage orders the results by image terms.
-func ByImage(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newImageStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
 // ByOrderCount orders the results by order count.
 func ByOrderCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -226,13 +199,6 @@ func ByLogs(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newLogsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
-}
-func newImageStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ImageInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, ImageTable, ImagePrimaryKey...),
-	)
 }
 func newOrderStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(

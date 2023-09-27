@@ -45,30 +45,19 @@ type User struct {
 
 // UserEdges holds the relations/edges for other nodes in the graph.
 type UserEdges struct {
-	// Image holds the value of the image edge.
-	Image []*Image `json:"image,omitempty"`
 	// Order holds the value of the order edge.
 	Order []*Order `json:"order,omitempty"`
 	// Logs holds the value of the logs edge.
 	Logs []*Logs `json:"logs,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
-}
-
-// ImageOrErr returns the Image value or an error if the edge
-// was not loaded in eager-loading.
-func (e UserEdges) ImageOrErr() ([]*Image, error) {
-	if e.loadedTypes[0] {
-		return e.Image, nil
-	}
-	return nil, &NotLoadedError{edge: "image"}
+	loadedTypes [2]bool
 }
 
 // OrderOrErr returns the Order value or an error if the edge
 // was not loaded in eager-loading.
 func (e UserEdges) OrderOrErr() ([]*Order, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[0] {
 		return e.Order, nil
 	}
 	return nil, &NotLoadedError{edge: "order"}
@@ -77,7 +66,7 @@ func (e UserEdges) OrderOrErr() ([]*Order, error) {
 // LogsOrErr returns the Logs value or an error if the edge
 // was not loaded in eager-loading.
 func (e UserEdges) LogsOrErr() ([]*Logs, error) {
-	if e.loadedTypes[2] {
+	if e.loadedTypes[1] {
 		return e.Logs, nil
 	}
 	return nil, &NotLoadedError{edge: "logs"}
@@ -190,11 +179,6 @@ func (u *User) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (u *User) Value(name string) (ent.Value, error) {
 	return u.selectValues.Get(name)
-}
-
-// QueryImage queries the "image" edge of the User entity.
-func (u *User) QueryImage() *ImageQuery {
-	return NewUserClient(u.config).QueryImage(u)
 }
 
 // QueryOrder queries the "order" edge of the User entity.

@@ -11,8 +11,8 @@ import (
 )
 
 func (h *handler) createNewUserHandler(w http.ResponseWriter, r *http.Request) {
-	var input structure.UserRequest
-	err := h.Read(w, r, &input)
+	var input structure.UserCreationRequest
+	err := h.ReadJson(w, r, &input)
 	if err != nil {
 		h.BadRequestResponse(w, r, err)
 		return
@@ -111,7 +111,7 @@ func (h *handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 	}
 
 	var input structure.UserUpdateRequest
-	err := h.Read(w, r, &input)
+	err := h.ReadJson(w, r, &input)
 	if err != nil {
 		h.BadRequestResponse(w, r, err)
 		return

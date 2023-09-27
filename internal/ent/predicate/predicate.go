@@ -6,15 +6,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
-// Brand is the predicate function for brand builders.
-type Brand func(*sql.Selector)
-
-// Category is the predicate function for category builders.
-type Category func(*sql.Selector)
-
-// Image is the predicate function for image builders.
-type Image func(*sql.Selector)
-
 // Logs is the predicate function for logs builders.
 type Logs func(*sql.Selector)
 

@@ -10,9 +10,6 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/hossein1376/kala/internal/ent/brand"
-	"github.com/hossein1376/kala/internal/ent/category"
-	"github.com/hossein1376/kala/internal/ent/image"
 	"github.com/hossein1376/kala/internal/ent/order"
 	"github.com/hossein1376/kala/internal/ent/product"
 )
@@ -106,21 +103,6 @@ func (pc *ProductCreate) SetStatus(b bool) *ProductCreate {
 	return pc
 }
 
-// AddImageIDs adds the "image" edge to the Image entity by IDs.
-func (pc *ProductCreate) AddImageIDs(ids ...int) *ProductCreate {
-	pc.mutation.AddImageIDs(ids...)
-	return pc
-}
-
-// AddImage adds the "image" edges to the Image entity.
-func (pc *ProductCreate) AddImage(i ...*Image) *ProductCreate {
-	ids := make([]int, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
-	}
-	return pc.AddImageIDs(ids...)
-}
-
 // AddOrderIDs adds the "order" edge to the Order entity by IDs.
 func (pc *ProductCreate) AddOrderIDs(ids ...int) *ProductCreate {
 	pc.mutation.AddOrderIDs(ids...)
@@ -134,40 +116,6 @@ func (pc *ProductCreate) AddOrder(o ...*Order) *ProductCreate {
 		ids[i] = o[i].ID
 	}
 	return pc.AddOrderIDs(ids...)
-}
-
-// AddCategoryIDs adds the "category" edge to the Category entity by IDs.
-func (pc *ProductCreate) AddCategoryIDs(ids ...int) *ProductCreate {
-	pc.mutation.AddCategoryIDs(ids...)
-	return pc
-}
-
-// AddCategory adds the "category" edges to the Category entity.
-func (pc *ProductCreate) AddCategory(c ...*Category) *ProductCreate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return pc.AddCategoryIDs(ids...)
-}
-
-// SetBrandID sets the "brand" edge to the Brand entity by ID.
-func (pc *ProductCreate) SetBrandID(id int) *ProductCreate {
-	pc.mutation.SetBrandID(id)
-	return pc
-}
-
-// SetNillableBrandID sets the "brand" edge to the Brand entity by ID if the given value is not nil.
-func (pc *ProductCreate) SetNillableBrandID(id *int) *ProductCreate {
-	if id != nil {
-		pc = pc.SetBrandID(*id)
-	}
-	return pc
-}
-
-// SetBrand sets the "brand" edge to the Brand entity.
-func (pc *ProductCreate) SetBrand(b *Brand) *ProductCreate {
-	return pc.SetBrandID(b.ID)
 }
 
 // Mutation returns the ProductMutation object of the builder.
@@ -350,22 +298,6 @@ func (pc *ProductCreate) createSpec() (*Product, *sqlgraph.CreateSpec) {
 		_spec.SetField(product.FieldStatus, field.TypeBool, value)
 		_node.Status = value
 	}
-	if nodes := pc.mutation.ImageIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   product.ImageTable,
-			Columns: product.ImagePrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
 	if nodes := pc.mutation.OrderIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -382,50 +314,21 @@ func (pc *ProductCreate) createSpec() (*Product, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := pc.mutation.CategoryIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   product.CategoryTable,
-			Columns: product.CategoryPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := pc.mutation.BrandIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   product.BrandTable,
-			Columns: []string{product.BrandColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(brand.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.brand_product = &nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
-	}
 	return _node, _spec
 }
 
 // ProductCreateBulk is the builder for creating many Product entities in bulk.
 type ProductCreateBulk struct {
 	config
+	err      error
 	builders []*ProductCreate
 }
 
 // Save creates the Product entities in the database.
 func (pcb *ProductCreateBulk) Save(ctx context.Context) ([]*Product, error) {
+	if pcb.err != nil {
+		return nil, pcb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(pcb.builders))
 	nodes := make([]*Product, len(pcb.builders))
 	mutators := make([]Mutator, len(pcb.builders))

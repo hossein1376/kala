@@ -9,7 +9,6 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/hossein1376/kala/internal/ent/brand"
 	"github.com/hossein1376/kala/internal/ent/product"
 )
 
@@ -42,64 +41,26 @@ type Product struct {
 	Status bool `json:"status,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ProductQuery when eager-loading is set.
-	Edges         ProductEdges `json:"edges"`
-	brand_product *int
-	selectValues  sql.SelectValues
+	Edges        ProductEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // ProductEdges holds the relations/edges for other nodes in the graph.
 type ProductEdges struct {
-	// Image holds the value of the image edge.
-	Image []*Image `json:"image,omitempty"`
 	// Order holds the value of the order edge.
 	Order []*Order `json:"order,omitempty"`
-	// Category holds the value of the category edge.
-	Category []*Category `json:"category,omitempty"`
-	// Brand holds the value of the brand edge.
-	Brand *Brand `json:"brand,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [4]bool
-}
-
-// ImageOrErr returns the Image value or an error if the edge
-// was not loaded in eager-loading.
-func (e ProductEdges) ImageOrErr() ([]*Image, error) {
-	if e.loadedTypes[0] {
-		return e.Image, nil
-	}
-	return nil, &NotLoadedError{edge: "image"}
+	loadedTypes [1]bool
 }
 
 // OrderOrErr returns the Order value or an error if the edge
 // was not loaded in eager-loading.
 func (e ProductEdges) OrderOrErr() ([]*Order, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[0] {
 		return e.Order, nil
 	}
 	return nil, &NotLoadedError{edge: "order"}
-}
-
-// CategoryOrErr returns the Category value or an error if the edge
-// was not loaded in eager-loading.
-func (e ProductEdges) CategoryOrErr() ([]*Category, error) {
-	if e.loadedTypes[2] {
-		return e.Category, nil
-	}
-	return nil, &NotLoadedError{edge: "category"}
-}
-
-// BrandOrErr returns the Brand value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e ProductEdges) BrandOrErr() (*Brand, error) {
-	if e.loadedTypes[3] {
-		if e.Brand == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: brand.Label}
-		}
-		return e.Brand, nil
-	}
-	return nil, &NotLoadedError{edge: "brand"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -117,8 +78,6 @@ func (*Product) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case product.FieldCreateTime, product.FieldUpdateTime:
 			values[i] = new(sql.NullTime)
-		case product.ForeignKeys[0]: // brand_product
-			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -206,13 +165,6 @@ func (pr *Product) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				pr.Status = value.Bool
 			}
-		case product.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field brand_product", value)
-			} else if value.Valid {
-				pr.brand_product = new(int)
-				*pr.brand_product = int(value.Int64)
-			}
 		default:
 			pr.selectValues.Set(columns[i], values[i])
 		}
@@ -226,24 +178,9 @@ func (pr *Product) Value(name string) (ent.Value, error) {
 	return pr.selectValues.Get(name)
 }
 
-// QueryImage queries the "image" edge of the Product entity.
-func (pr *Product) QueryImage() *ImageQuery {
-	return NewProductClient(pr.config).QueryImage(pr)
-}
-
 // QueryOrder queries the "order" edge of the Product entity.
 func (pr *Product) QueryOrder() *OrderQuery {
 	return NewProductClient(pr.config).QueryOrder(pr)
-}
-
-// QueryCategory queries the "category" edge of the Product entity.
-func (pr *Product) QueryCategory() *CategoryQuery {
-	return NewProductClient(pr.config).QueryCategory(pr)
-}
-
-// QueryBrand queries the "brand" edge of the Product entity.
-func (pr *Product) QueryBrand() *BrandQuery {
-	return NewProductClient(pr.config).QueryBrand(pr)
 }
 
 // Update returns a builder for updating this Product.

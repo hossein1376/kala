@@ -12,9 +12,6 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"github.com/hossein1376/kala/internal/ent/brand"
-	"github.com/hossein1376/kala/internal/ent/category"
-	"github.com/hossein1376/kala/internal/ent/image"
 	"github.com/hossein1376/kala/internal/ent/logs"
 	"github.com/hossein1376/kala/internal/ent/order"
 	"github.com/hossein1376/kala/internal/ent/product"
@@ -79,13 +76,10 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			brand.Table:    brand.ValidColumn,
-			category.Table: category.ValidColumn,
-			image.Table:    image.ValidColumn,
-			logs.Table:     logs.ValidColumn,
-			order.Table:    order.ValidColumn,
-			product.Table:  product.ValidColumn,
-			user.Table:     user.ValidColumn,
+			logs.Table:    logs.ValidColumn,
+			order.Table:   order.ValidColumn,
+			product.Table: product.ValidColumn,
+			user.Table:    user.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

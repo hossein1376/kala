@@ -13,8 +13,6 @@ type User struct {
 	Email     string            `json:"email"`
 	Phone     string            `json:"phone"`
 	Role      string            `json:"role"`
-	Profile   []Image           `json:"profile"`
-	Addresses []Address         `json:"addresses"`
 	Orders    []Order           `json:"orders"`
 }
 
@@ -44,18 +42,4 @@ type UserResponse struct {
 	LastName  string `json:"lastname,omitempty"`
 	Email     string `json:"email,omitempty"`
 	Phone     string `json:"phone,omitempty"`
-}
-
-type Address struct {
-	ID          int     `json:"id"`
-	UserID      int     `json:"user_id"`
-	FirstName   *string `json:"first_name"`
-	LastName    *string `json:"last_name"`
-	Address     string  `json:"address"`
-	City        string  `json:"city"`
-	State       string  `json:"state"`
-	Phone       string  `json:"phone"`
-	ZipCode     string  `json:"zip_code"`
-	Coordinates string  `json:"coordinates"`
-	Seller      bool    `json:"seller"`
 }

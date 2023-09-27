@@ -9,42 +9,6 @@ import (
 	"github.com/hossein1376/kala/internal/ent"
 )
 
-// The BrandFunc type is an adapter to allow the use of ordinary
-// function as Brand mutator.
-type BrandFunc func(context.Context, *ent.BrandMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f BrandFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.BrandMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.BrandMutation", m)
-}
-
-// The CategoryFunc type is an adapter to allow the use of ordinary
-// function as Category mutator.
-type CategoryFunc func(context.Context, *ent.CategoryMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f CategoryFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.CategoryMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CategoryMutation", m)
-}
-
-// The ImageFunc type is an adapter to allow the use of ordinary
-// function as Image mutator.
-type ImageFunc func(context.Context, *ent.ImageMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f ImageFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.ImageMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ImageMutation", m)
-}
-
 // The LogsFunc type is an adapter to allow the use of ordinary
 // function as Logs mutator.
 type LogsFunc func(context.Context, *ent.LogsMutation) (ent.Value, error)

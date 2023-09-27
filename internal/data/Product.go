@@ -20,12 +20,9 @@ func (p *ProductModel) CreateNewProduct(product structure.Product) (*ent.Product
 		SetStatus(product.Status).
 		SetAvailable(product.Available).
 		SetDescription(product.Description).
-		SetBrand(product.Brand).
 		SetRating(product.Rating).
 		SetRatingCount(product.RatingCount).
 		SetQuantity(product.Quantity).
-		AddImage(product.Image...).
-		AddCategory(product.Category...).
 		SetCreateTime(time.Now()).
 		SetUpdateTime(time.Now()).
 		Save(context.Background())
@@ -34,15 +31,11 @@ func (p *ProductModel) CreateNewProduct(product structure.Product) (*ent.Product
 func (p *ProductModel) GetSingleProductByID(id int) (*ent.Product, error) {
 	return p.client.Product.Query().
 		Where(entProduct.ID(id)).
-		WithBrand().
-		WithImage().
 		Only(context.Background())
 }
 
 func (p *ProductModel) GetAllProducts() ([]*ent.Product, error) {
 	return p.client.Product.Query().
-		WithBrand().
-		WithImage().
 		All(context.Background())
 }
 
@@ -54,12 +47,9 @@ func (p *ProductModel) UpdateProductByID(prod *ent.Product, id int) error {
 		SetStatus(prod.Status).
 		SetAvailable(prod.Available).
 		SetDescription(prod.Description).
-		SetBrand(prod.Edges.Brand).
 		SetRating(prod.Rating).
 		SetRatingCount(prod.RatingCount).
 		SetQuantity(prod.Quantity).
-		AddImage(prod.Edges.Image...).
-		AddCategory(prod.Edges.Category...).
 		SetUpdateTime(time.Now()).
 		Save(context.Background())
 

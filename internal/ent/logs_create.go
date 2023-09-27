@@ -180,11 +180,15 @@ func (lc *LogsCreate) createSpec() (*Logs, *sqlgraph.CreateSpec) {
 // LogsCreateBulk is the builder for creating many Logs entities in bulk.
 type LogsCreateBulk struct {
 	config
+	err      error
 	builders []*LogsCreate
 }
 
 // Save creates the Logs entities in the database.
 func (lcb *LogsCreateBulk) Save(ctx context.Context) ([]*Logs, error) {
+	if lcb.err != nil {
+		return nil, lcb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(lcb.builders))
 	nodes := make([]*Logs, len(lcb.builders))
 	mutators := make([]Mutator, len(lcb.builders))

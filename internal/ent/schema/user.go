@@ -38,10 +38,6 @@ func (User) Fields() []ent.Field {
 // Edges of the User.
 func (User) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("image", Image.Type).
-			StorageKey(edge.Table("user_images"),
-				edge.Columns("user", "image"),
-				edge.Symbols("user_id", "image_id")),
 		edge.To("order", Order.Type).
 			StorageKey(edge.Column("user_id")),
 		edge.To("logs", Logs.Type).

@@ -5,9 +5,6 @@ package ent
 import (
 	"time"
 
-	"github.com/hossein1376/kala/internal/ent/brand"
-	"github.com/hossein1376/kala/internal/ent/category"
-	"github.com/hossein1376/kala/internal/ent/image"
 	"github.com/hossein1376/kala/internal/ent/order"
 	"github.com/hossein1376/kala/internal/ent/product"
 	"github.com/hossein1376/kala/internal/ent/schema"
@@ -18,66 +15,6 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
-	brandMixin := schema.Brand{}.Mixin()
-	brandMixinFields0 := brandMixin[0].Fields()
-	_ = brandMixinFields0
-	brandFields := schema.Brand{}.Fields()
-	_ = brandFields
-	// brandDescCreateTime is the schema descriptor for create_time field.
-	brandDescCreateTime := brandMixinFields0[0].Descriptor()
-	// brand.DefaultCreateTime holds the default value on creation for the create_time field.
-	brand.DefaultCreateTime = brandDescCreateTime.Default.(func() time.Time)
-	// brandDescUpdateTime is the schema descriptor for update_time field.
-	brandDescUpdateTime := brandMixinFields0[1].Descriptor()
-	// brand.DefaultUpdateTime holds the default value on creation for the update_time field.
-	brand.DefaultUpdateTime = brandDescUpdateTime.Default.(func() time.Time)
-	// brand.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
-	brand.UpdateDefaultUpdateTime = brandDescUpdateTime.UpdateDefault.(func() time.Time)
-	categoryMixin := schema.Category{}.Mixin()
-	categoryMixinFields0 := categoryMixin[0].Fields()
-	_ = categoryMixinFields0
-	categoryFields := schema.Category{}.Fields()
-	_ = categoryFields
-	// categoryDescCreateTime is the schema descriptor for create_time field.
-	categoryDescCreateTime := categoryMixinFields0[0].Descriptor()
-	// category.DefaultCreateTime holds the default value on creation for the create_time field.
-	category.DefaultCreateTime = categoryDescCreateTime.Default.(func() time.Time)
-	// categoryDescUpdateTime is the schema descriptor for update_time field.
-	categoryDescUpdateTime := categoryMixinFields0[1].Descriptor()
-	// category.DefaultUpdateTime holds the default value on creation for the update_time field.
-	category.DefaultUpdateTime = categoryDescUpdateTime.Default.(func() time.Time)
-	// category.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
-	category.UpdateDefaultUpdateTime = categoryDescUpdateTime.UpdateDefault.(func() time.Time)
-	// categoryDescName is the schema descriptor for name field.
-	categoryDescName := categoryFields[0].Descriptor()
-	// category.NameValidator is a validator for the "name" field. It is called by the builders before save.
-	category.NameValidator = categoryDescName.Validators[0].(func(string) error)
-	// categoryDescDescription is the schema descriptor for description field.
-	categoryDescDescription := categoryFields[1].Descriptor()
-	// category.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
-	category.DescriptionValidator = categoryDescDescription.Validators[0].(func(string) error)
-	imageFields := schema.Image{}.Fields()
-	_ = imageFields
-	// imageDescName is the schema descriptor for name field.
-	imageDescName := imageFields[0].Descriptor()
-	// image.NameValidator is a validator for the "name" field. It is called by the builders before save.
-	image.NameValidator = imageDescName.Validators[0].(func(string) error)
-	// imageDescPath is the schema descriptor for path field.
-	imageDescPath := imageFields[1].Descriptor()
-	// image.PathValidator is a validator for the "path" field. It is called by the builders before save.
-	image.PathValidator = imageDescPath.Validators[0].(func(string) error)
-	// imageDescWidth is the schema descriptor for width field.
-	imageDescWidth := imageFields[3].Descriptor()
-	// image.WidthValidator is a validator for the "width" field. It is called by the builders before save.
-	image.WidthValidator = imageDescWidth.Validators[0].(func(int32) error)
-	// imageDescHeight is the schema descriptor for height field.
-	imageDescHeight := imageFields[4].Descriptor()
-	// image.HeightValidator is a validator for the "height" field. It is called by the builders before save.
-	image.HeightValidator = imageDescHeight.Validators[0].(func(int32) error)
-	// imageDescSizeKB is the schema descriptor for size_kb field.
-	imageDescSizeKB := imageFields[5].Descriptor()
-	// image.SizeKBValidator is a validator for the "size_kb" field. It is called by the builders before save.
-	image.SizeKBValidator = imageDescSizeKB.Validators[0].(func(float64) error)
 	orderMixin := schema.Order{}.Mixin()
 	orderMixinFields0 := orderMixin[0].Fields()
 	_ = orderMixinFields0

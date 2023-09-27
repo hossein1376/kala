@@ -10,7 +10,6 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/hossein1376/kala/internal/ent/image"
 	"github.com/hossein1376/kala/internal/ent/logs"
 	"github.com/hossein1376/kala/internal/ent/order"
 	"github.com/hossein1376/kala/internal/ent/user"
@@ -145,21 +144,6 @@ func (uc *UserCreate) SetNillableStatus(b *bool) *UserCreate {
 		uc.SetStatus(*b)
 	}
 	return uc
-}
-
-// AddImageIDs adds the "image" edge to the Image entity by IDs.
-func (uc *UserCreate) AddImageIDs(ids ...int) *UserCreate {
-	uc.mutation.AddImageIDs(ids...)
-	return uc
-}
-
-// AddImage adds the "image" edges to the Image entity.
-func (uc *UserCreate) AddImage(i ...*Image) *UserCreate {
-	ids := make([]int, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
-	}
-	return uc.AddImageIDs(ids...)
 }
 
 // AddOrderIDs adds the "order" edge to the Order entity by IDs.
@@ -336,22 +320,6 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_spec.SetField(user.FieldStatus, field.TypeBool, value)
 		_node.Status = value
 	}
-	if nodes := uc.mutation.ImageIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   user.ImageTable,
-			Columns: user.ImagePrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
 	if nodes := uc.mutation.OrderIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -390,11 +358,15 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 // UserCreateBulk is the builder for creating many User entities in bulk.
 type UserCreateBulk struct {
 	config
+	err      error
 	builders []*UserCreate
 }
 
 // Save creates the User entities in the database.
 func (ucb *UserCreateBulk) Save(ctx context.Context) ([]*User, error) {
+	if ucb.err != nil {
+		return nil, ucb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(ucb.builders))
 	nodes := make([]*User, len(ucb.builders))
 	mutators := make([]Mutator, len(ucb.builders))

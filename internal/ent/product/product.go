@@ -36,38 +36,15 @@ const (
 	FieldAvailable = "available"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
-	// EdgeImage holds the string denoting the image edge name in mutations.
-	EdgeImage = "image"
 	// EdgeOrder holds the string denoting the order edge name in mutations.
 	EdgeOrder = "order"
-	// EdgeCategory holds the string denoting the category edge name in mutations.
-	EdgeCategory = "category"
-	// EdgeBrand holds the string denoting the brand edge name in mutations.
-	EdgeBrand = "brand"
 	// Table holds the table name of the product in the database.
 	Table = "products"
-	// ImageTable is the table that holds the image relation/edge. The primary key declared below.
-	ImageTable = "product_images"
-	// ImageInverseTable is the table name for the Image entity.
-	// It exists in this package in order to avoid circular dependency with the "image" package.
-	ImageInverseTable = "images"
 	// OrderTable is the table that holds the order relation/edge. The primary key declared below.
 	OrderTable = "product_order"
 	// OrderInverseTable is the table name for the Order entity.
 	// It exists in this package in order to avoid circular dependency with the "order" package.
 	OrderInverseTable = "orders"
-	// CategoryTable is the table that holds the category relation/edge. The primary key declared below.
-	CategoryTable = "product_category"
-	// CategoryInverseTable is the table name for the Category entity.
-	// It exists in this package in order to avoid circular dependency with the "category" package.
-	CategoryInverseTable = "categories"
-	// BrandTable is the table that holds the brand relation/edge.
-	BrandTable = "products"
-	// BrandInverseTable is the table name for the Brand entity.
-	// It exists in this package in order to avoid circular dependency with the "brand" package.
-	BrandInverseTable = "brands"
-	// BrandColumn is the table column denoting the brand relation/edge.
-	BrandColumn = "brand_product"
 )
 
 // Columns holds all SQL columns for product fields.
@@ -86,33 +63,16 @@ var Columns = []string{
 	FieldStatus,
 }
 
-// ForeignKeys holds the SQL foreign-keys that are owned by the "products"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"brand_product",
-}
-
 var (
-	// ImagePrimaryKey and ImageColumn2 are the table columns denoting the
-	// primary key for the image relation (M2M).
-	ImagePrimaryKey = []string{"product", "image"}
 	// OrderPrimaryKey and OrderColumn2 are the table columns denoting the
 	// primary key for the order relation (M2M).
 	OrderPrimaryKey = []string{"product_id", "order_id"}
-	// CategoryPrimaryKey and CategoryColumn2 are the table columns denoting the
-	// primary key for the category relation (M2M).
-	CategoryPrimaryKey = []string{"product_id", "category_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -203,20 +163,6 @@ func ByStatus(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStatus, opts...).ToFunc()
 }
 
-// ByImageCount orders the results by image count.
-func ByImageCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newImageStep(), opts...)
-	}
-}
-
-// ByImage orders the results by image terms.
-func ByImage(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newImageStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
 // ByOrderCount orders the results by order count.
 func ByOrderCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -230,52 +176,10 @@ func ByOrder(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newOrderStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
-
-// ByCategoryCount orders the results by category count.
-func ByCategoryCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newCategoryStep(), opts...)
-	}
-}
-
-// ByCategory orders the results by category terms.
-func ByCategory(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newCategoryStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
-// ByBrandField orders the results by brand field.
-func ByBrandField(field string, opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newBrandStep(), sql.OrderByField(field, opts...))
-	}
-}
-func newImageStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ImageInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, ImageTable, ImagePrimaryKey...),
-	)
-}
 func newOrderStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(OrderInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, false, OrderTable, OrderPrimaryKey...),
-	)
-}
-func newCategoryStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(CategoryInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, CategoryTable, CategoryPrimaryKey...),
-	)
-}
-func newBrandStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(BrandInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, BrandTable, BrandColumn),
 	)
 }

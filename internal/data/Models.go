@@ -8,14 +8,12 @@ import (
 type Models struct {
 	User    User
 	Product Product
-	Image   Image
 }
 
 func NewModels(client *ent.Client) *Models {
 	return &Models{
 		User:    &UserModel{client: client},
 		Product: &ProductModel{client: client},
-		Image:   &ImageModel{client: client},
 	}
 }
 
@@ -34,9 +32,4 @@ type Product interface {
 	GetAllProducts() ([]*ent.Product, error)
 	UpdateProductByID(prod *ent.Product, id int) error
 	DeleteProductByID(id int) error
-}
-
-type Image interface {
-	Get(id ...int) ([]*ent.Image, error)
-	Insert(image *structure.Image) error
 }

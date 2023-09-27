@@ -565,29 +565,6 @@ func StatusNEQ(v bool) predicate.Product {
 	return predicate.Product(sql.FieldNEQ(FieldStatus, v))
 }
 
-// HasImage applies the HasEdge predicate on the "image" edge.
-func HasImage() predicate.Product {
-	return predicate.Product(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, ImageTable, ImagePrimaryKey...),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasImageWith applies the HasEdge predicate on the "image" edge with a given conditions (other predicates).
-func HasImageWith(preds ...predicate.Image) predicate.Product {
-	return predicate.Product(func(s *sql.Selector) {
-		step := newImageStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
 // HasOrder applies the HasEdge predicate on the "order" edge.
 func HasOrder() predicate.Product {
 	return predicate.Product(func(s *sql.Selector) {
@@ -611,80 +588,17 @@ func HasOrderWith(preds ...predicate.Order) predicate.Product {
 	})
 }
 
-// HasCategory applies the HasEdge predicate on the "category" edge.
-func HasCategory() predicate.Product {
-	return predicate.Product(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, CategoryTable, CategoryPrimaryKey...),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasCategoryWith applies the HasEdge predicate on the "category" edge with a given conditions (other predicates).
-func HasCategoryWith(preds ...predicate.Category) predicate.Product {
-	return predicate.Product(func(s *sql.Selector) {
-		step := newCategoryStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasBrand applies the HasEdge predicate on the "brand" edge.
-func HasBrand() predicate.Product {
-	return predicate.Product(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, BrandTable, BrandColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasBrandWith applies the HasEdge predicate on the "brand" edge with a given conditions (other predicates).
-func HasBrandWith(preds ...predicate.Brand) predicate.Product {
-	return predicate.Product(func(s *sql.Selector) {
-		step := newBrandStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Product) predicate.Product {
-	return predicate.Product(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for _, p := range predicates {
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.Product(sql.AndPredicates(predicates...))
 }
 
 // Or groups predicates with the OR operator between them.
 func Or(predicates ...predicate.Product) predicate.Product {
-	return predicate.Product(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for i, p := range predicates {
-			if i > 0 {
-				s1.Or()
-			}
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.Product(sql.OrPredicates(predicates...))
 }
 
 // Not applies the not operator on the given predicate.
 func Not(p predicate.Product) predicate.Product {
-	return predicate.Product(func(s *sql.Selector) {
-		p(s.Not())
-	})
+	return predicate.Product(sql.NotPredicates(p))
 }

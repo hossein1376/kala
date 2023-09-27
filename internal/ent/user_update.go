@@ -11,7 +11,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/hossein1376/kala/internal/ent/image"
 	"github.com/hossein1376/kala/internal/ent/logs"
 	"github.com/hossein1376/kala/internal/ent/order"
 	"github.com/hossein1376/kala/internal/ent/predicate"
@@ -157,21 +156,6 @@ func (uu *UserUpdate) SetNillableStatus(b *bool) *UserUpdate {
 	return uu
 }
 
-// AddImageIDs adds the "image" edge to the Image entity by IDs.
-func (uu *UserUpdate) AddImageIDs(ids ...int) *UserUpdate {
-	uu.mutation.AddImageIDs(ids...)
-	return uu
-}
-
-// AddImage adds the "image" edges to the Image entity.
-func (uu *UserUpdate) AddImage(i ...*Image) *UserUpdate {
-	ids := make([]int, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
-	}
-	return uu.AddImageIDs(ids...)
-}
-
 // AddOrderIDs adds the "order" edge to the Order entity by IDs.
 func (uu *UserUpdate) AddOrderIDs(ids ...int) *UserUpdate {
 	uu.mutation.AddOrderIDs(ids...)
@@ -205,27 +189,6 @@ func (uu *UserUpdate) AddLogs(l ...*Logs) *UserUpdate {
 // Mutation returns the UserMutation object of the builder.
 func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
-}
-
-// ClearImage clears all "image" edges to the Image entity.
-func (uu *UserUpdate) ClearImage() *UserUpdate {
-	uu.mutation.ClearImage()
-	return uu
-}
-
-// RemoveImageIDs removes the "image" edge to Image entities by IDs.
-func (uu *UserUpdate) RemoveImageIDs(ids ...int) *UserUpdate {
-	uu.mutation.RemoveImageIDs(ids...)
-	return uu
-}
-
-// RemoveImage removes "image" edges to Image entities.
-func (uu *UserUpdate) RemoveImage(i ...*Image) *UserUpdate {
-	ids := make([]int, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
-	}
-	return uu.RemoveImageIDs(ids...)
 }
 
 // ClearOrder clears all "order" edges to the Order entity.
@@ -366,51 +329,6 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := uu.mutation.Status(); ok {
 		_spec.SetField(user.FieldStatus, field.TypeBool, value)
-	}
-	if uu.mutation.ImageCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   user.ImageTable,
-			Columns: user.ImagePrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := uu.mutation.RemovedImageIDs(); len(nodes) > 0 && !uu.mutation.ImageCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   user.ImageTable,
-			Columns: user.ImagePrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := uu.mutation.ImageIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   user.ImageTable,
-			Columns: user.ImagePrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if uu.mutation.OrderCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -648,21 +566,6 @@ func (uuo *UserUpdateOne) SetNillableStatus(b *bool) *UserUpdateOne {
 	return uuo
 }
 
-// AddImageIDs adds the "image" edge to the Image entity by IDs.
-func (uuo *UserUpdateOne) AddImageIDs(ids ...int) *UserUpdateOne {
-	uuo.mutation.AddImageIDs(ids...)
-	return uuo
-}
-
-// AddImage adds the "image" edges to the Image entity.
-func (uuo *UserUpdateOne) AddImage(i ...*Image) *UserUpdateOne {
-	ids := make([]int, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
-	}
-	return uuo.AddImageIDs(ids...)
-}
-
 // AddOrderIDs adds the "order" edge to the Order entity by IDs.
 func (uuo *UserUpdateOne) AddOrderIDs(ids ...int) *UserUpdateOne {
 	uuo.mutation.AddOrderIDs(ids...)
@@ -696,27 +599,6 @@ func (uuo *UserUpdateOne) AddLogs(l ...*Logs) *UserUpdateOne {
 // Mutation returns the UserMutation object of the builder.
 func (uuo *UserUpdateOne) Mutation() *UserMutation {
 	return uuo.mutation
-}
-
-// ClearImage clears all "image" edges to the Image entity.
-func (uuo *UserUpdateOne) ClearImage() *UserUpdateOne {
-	uuo.mutation.ClearImage()
-	return uuo
-}
-
-// RemoveImageIDs removes the "image" edge to Image entities by IDs.
-func (uuo *UserUpdateOne) RemoveImageIDs(ids ...int) *UserUpdateOne {
-	uuo.mutation.RemoveImageIDs(ids...)
-	return uuo
-}
-
-// RemoveImage removes "image" edges to Image entities.
-func (uuo *UserUpdateOne) RemoveImage(i ...*Image) *UserUpdateOne {
-	ids := make([]int, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
-	}
-	return uuo.RemoveImageIDs(ids...)
 }
 
 // ClearOrder clears all "order" edges to the Order entity.
@@ -887,51 +769,6 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	}
 	if value, ok := uuo.mutation.Status(); ok {
 		_spec.SetField(user.FieldStatus, field.TypeBool, value)
-	}
-	if uuo.mutation.ImageCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   user.ImageTable,
-			Columns: user.ImagePrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := uuo.mutation.RemovedImageIDs(); len(nodes) > 0 && !uuo.mutation.ImageCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   user.ImageTable,
-			Columns: user.ImagePrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := uuo.mutation.ImageIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   user.ImageTable,
-			Columns: user.ImagePrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if uuo.mutation.OrderCleared() {
 		edge := &sqlgraph.EdgeSpec{
