@@ -3,10 +3,9 @@ package handlers
 import (
 	"errors"
 	"net/http"
-	"time"
 
-	"github.com/hossein1376/kala/internal/response"
 	"github.com/hossein1376/kala/internal/structure"
+	"github.com/hossein1376/kala/internal/transfer"
 	"github.com/hossein1376/kala/pkg/Password"
 )
 
@@ -44,7 +43,7 @@ func (h *handler) createNewUserHandler(w http.ResponseWriter, r *http.Request) {
 	u, err := h.Models.User.Create(user)
 	if err != nil {
 		switch {
-		case errors.As(err, &response.UserCreationError{}):
+		case errors.As(err, &transfer.BadRequestError{}):
 			h.BadRequestResponse(w, r, err)
 		default:
 			h.InternalServerErrorResponse(w, r, err)
@@ -52,13 +51,7 @@ func (h *handler) createNewUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp := response.HttpResponse{
-		Status:     response.OK,
-		StatusCode: http.StatusCreated,
-		Data:       u,
-		Time:       time.Now().Format(time.RFC3339),
-	}
-	h.Respond(w, r, http.StatusCreated, resp)
+	h.StatusCreatedResponse(w, r, transfer.HttpResponse{Data: u})
 }
 
 func (h *handler) getUserByIDHandler(w http.ResponseWriter, r *http.Request) {
@@ -71,7 +64,7 @@ func (h *handler) getUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 	user, err := h.Models.User.GetByID(id)
 	if err != nil {
 		switch {
-		case errors.As(err, &response.UserRetrievalError{}):
+		case errors.As(err, &transfer.NotFoundError{}):
 			h.NotFoundResponse(w, r, err)
 		default:
 			h.InternalServerErrorResponse(w, r, err)
@@ -79,13 +72,7 @@ func (h *handler) getUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp := response.HttpResponse{
-		Status:     response.OK,
-		StatusCode: http.StatusOK,
-		Data:       user,
-		Time:       time.Now().Format(time.RFC3339),
-	}
-	h.Respond(w, r, http.StatusOK, resp)
+	h.StatusOKResponse(w, r, transfer.HttpResponse{Data: user})
 }
 
 func (h *handler) getAllUsersHandler(w http.ResponseWriter, r *http.Request) {
@@ -94,13 +81,8 @@ func (h *handler) getAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 		h.InternalServerErrorResponse(w, r, err)
 		return
 	}
-	resp := response.HttpResponse{
-		Status:     response.OK,
-		StatusCode: http.StatusOK,
-		Data:       users,
-		Time:       time.Now().Format(time.RFC3339),
-	}
-	h.Respond(w, r, http.StatusOK, resp)
+
+	h.StatusOKResponse(w, r, transfer.HttpResponse{Data: users})
 }
 
 func (h *handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) {
@@ -125,7 +107,7 @@ func (h *handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 	user, err := h.Models.User.GetByID(id)
 	if err != nil {
 		switch {
-		case errors.As(err, &response.UserRetrievalError{}):
+		case errors.As(err, &transfer.NotFoundError{}):
 			h.NotFoundResponse(w, r, err)
 		default:
 			h.InternalServerErrorResponse(w, r, err)
@@ -161,7 +143,7 @@ func (h *handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 	err = h.Models.User.UpdateByID(id, user)
 	if err != nil {
 		switch {
-		case errors.As(err, &response.UserUpdateError{}):
+		case errors.As(err, &transfer.NotFoundError{}):
 			h.NotFoundResponse(w, r, err)
 		default:
 			h.InternalServerErrorResponse(w, r, err)
@@ -169,13 +151,7 @@ func (h *handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	resp := response.HttpResponse{
-		Status:     response.OK,
-		StatusCode: http.StatusOK,
-		Data:       user,
-		Time:       time.Now().Format(time.RFC3339),
-	}
-	h.Respond(w, r, http.StatusOK, resp)
+	h.StatusOKResponse(w, r, transfer.HttpResponse{Data: user})
 }
 
 func (h *handler) deleteUserByIDHandler(w http.ResponseWriter, r *http.Request) {
@@ -188,7 +164,7 @@ func (h *handler) deleteUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 	err := h.Models.User.DeleteByID(id)
 	if err != nil {
 		switch {
-		case errors.As(err, &response.UserDeleteError{}):
+		case errors.As(err, &transfer.NotFoundError{}):
 			h.NotFoundResponse(w, r, err)
 		default:
 			h.InternalServerErrorResponse(w, r, err)
@@ -196,5 +172,5 @@ func (h *handler) deleteUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	h.Respond(w, r, http.StatusNoContent, nil)
+	h.StatusNoContentResponse(w, r)
 }

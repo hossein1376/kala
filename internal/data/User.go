@@ -2,12 +2,11 @@ package data
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/hossein1376/kala/internal/ent"
 	entUser "github.com/hossein1376/kala/internal/ent/user"
-	"github.com/hossein1376/kala/internal/response"
 	"github.com/hossein1376/kala/internal/structure"
+	"github.com/hossein1376/kala/internal/transfer"
 	"github.com/hossein1376/kala/pkg/Password"
 )
 
@@ -28,7 +27,7 @@ func (u *UserModel) Create(data structure.User) (*structure.User, error) {
 	if err != nil {
 		switch {
 		case ent.IsConstraintError(err) || ent.IsValidationError(err):
-			return nil, response.UserCreationError{Msg: err.Error()}
+			return nil, transfer.BadRequestError{Err: err}
 		default:
 			return nil, err
 		}
@@ -49,7 +48,7 @@ func (u *UserModel) GetByID(id int) (*structure.User, error) {
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
-			return nil, response.UserRetrievalError{Msg: fmt.Sprintf("user with id '%v' was not found", id)}
+			return nil, transfer.NotFoundError{Err: err}
 		default:
 			return nil, err
 		}
@@ -74,14 +73,14 @@ func (u *UserModel) GetByUsername(username string) (*structure.User, error) {
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
-			return nil, response.UserNotFound{Username: &username}
+			return nil, transfer.NotFoundError{Err: err}
 		default:
 			return nil, err
 		}
 	}
 
 	if !user.Status {
-		return nil, response.UserDisabled{Username: &username}
+		return nil, transfer.ForbiddenError{}
 	}
 
 	return &structure.User{
@@ -129,7 +128,7 @@ func (u *UserModel) UpdateByID(id int, user *structure.User) error {
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
-			return response.UserUpdateError{Msg: fmt.Sprintf("failed to update user with id '%v'", id)}
+			return transfer.NotFoundError{Err: err}
 		default:
 			return err
 		}
@@ -145,7 +144,7 @@ func (u *UserModel) DeleteByID(id int) error {
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
-			return response.UserDeleteError{Msg: fmt.Sprintf("failed to delete user with id '%v'", id)}
+			return transfer.NotFoundError{Err: err}
 		default:
 			return err
 		}

@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"github.com/hossein1376/kala/config"
-	"github.com/hossein1376/kala/internal/response"
+	"github.com/hossein1376/kala/internal/transfer"
 	"github.com/hossein1376/kala/pkg/Json"
 )
 
@@ -11,7 +11,7 @@ type JsonHandler = Json.Jsoniter
 
 type handler struct {
 	*config.Application
-	*response.Response
+	*transfer.Response
 	JsonHandler
 }
 
@@ -22,6 +22,6 @@ func NewHandlers(app *config.Application) *handler {
 			Logger: app.Logger,
 			Models: app.Models,
 		},
-		Response: response.NewResponse(app.Logger, JsonHandler{}),
+		Response: transfer.NewResponse(app.Logger, JsonHandler{}),
 	}
 }

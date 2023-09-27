@@ -26,7 +26,7 @@ func (h *handler) createNewProductHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	h.Respond(w, r, http.StatusCreated, product)
+	h.StatusCreatedResponse(w, r, product)
 }
 
 func (h *handler) getProductByIDHandler(w http.ResponseWriter, r *http.Request) {
@@ -48,7 +48,7 @@ func (h *handler) getProductByIDHandler(w http.ResponseWriter, r *http.Request) 
 		}
 	}
 
-	h.Respond(w, r, http.StatusOK, product)
+	h.StatusOKResponse(w, r, product)
 }
 
 func (h *handler) getAllProductsHandler(w http.ResponseWriter, r *http.Request) {
@@ -58,7 +58,7 @@ func (h *handler) getAllProductsHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	h.Respond(w, r, http.StatusOK, products)
+	h.StatusOKResponse(w, r, products)
 }
 
 func (h *handler) updateProductByIDHandler(w http.ResponseWriter, r *http.Request) {
@@ -122,7 +122,7 @@ func (h *handler) updateProductByIDHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	h.Respond(w, r, http.StatusNoContent, product)
+	h.StatusNoContentResponse(w, r)
 }
 
 func (h *handler) deleteProductByIDHandler(w http.ResponseWriter, r *http.Request) {
@@ -143,5 +143,5 @@ func (h *handler) deleteProductByIDHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	h.Respond(w, r, http.StatusOK, nil)
+	h.StatusNoContentResponse(w, r)
 }
