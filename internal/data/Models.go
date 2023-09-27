@@ -18,18 +18,18 @@ func NewModels(client *ent.Client) *Models {
 }
 
 type User interface {
-	Create(user structure.User) (*structure.UserResponse, error)
-	GetByID(id int) (*structure.UserResponse, error)
-	GetByUsername(username string) (*structure.UserResponse, error)
-	GetAll() ([]*structure.UserResponse, error)
-	UpdateByID(id int, user *structure.UserResponse) error
+	Create(user structure.User) (*structure.User, error)
+	GetByID(id int) (*structure.User, error)
+	GetByUsername(username string) (*structure.User, error)
+	GetAll() ([]*structure.User, error)
+	UpdateByID(id int, user *structure.User) error
 	DeleteByID(id int) error
 }
 
 type Product interface {
-	CreateNewProduct(product structure.Product) (*ent.Product, error)
-	GetSingleProductByID(id int) (*ent.Product, error)
-	GetAllProducts() ([]*ent.Product, error)
-	UpdateProductByID(prod *ent.Product, id int) error
-	DeleteProductByID(id int) error
+	Create(product structure.Product) (*ent.Product, error)
+	GetByID(id int) (*ent.Product, error)
+	GetAll() ([]*ent.Product, error)
+	UpdateByID(prod *ent.Product, id int) error
+	DeleteByID(id int) error
 }

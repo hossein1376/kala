@@ -15,7 +15,7 @@ func (h *handler) createNewProductHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	product, err := h.Models.Product.CreateNewProduct(input)
+	product, err := h.Models.Product.Create(input)
 	if err != nil {
 		switch {
 		case ent.IsConstraintError(err) || ent.IsValidationError(err):
@@ -36,7 +36,7 @@ func (h *handler) getProductByIDHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	product, err := h.Models.Product.GetSingleProductByID(id)
+	product, err := h.Models.Product.GetByID(id)
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
@@ -52,7 +52,7 @@ func (h *handler) getProductByIDHandler(w http.ResponseWriter, r *http.Request) 
 }
 
 func (h *handler) getAllProductsHandler(w http.ResponseWriter, r *http.Request) {
-	products, err := h.Models.Product.GetAllProducts()
+	products, err := h.Models.Product.GetAll()
 	if err != nil {
 		h.InternalServerErrorResponse(w, r, err)
 		return
@@ -75,7 +75,7 @@ func (h *handler) updateProductByIDHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	product, err := h.Models.Product.GetSingleProductByID(id)
+	product, err := h.Models.Product.GetByID(id)
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
@@ -111,7 +111,7 @@ func (h *handler) updateProductByIDHandler(w http.ResponseWriter, r *http.Reques
 		product.RatingCount = *input.RatingCount
 	}
 
-	err = h.Models.Product.UpdateProductByID(product, id)
+	err = h.Models.Product.UpdateByID(product, id)
 	if err != nil {
 		switch {
 		case ent.IsConstraintError(err) || ent.IsValidationError(err):
@@ -132,7 +132,7 @@ func (h *handler) deleteProductByIDHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	err := h.Models.Product.DeleteProductByID(id)
+	err := h.Models.Product.DeleteByID(id)
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):

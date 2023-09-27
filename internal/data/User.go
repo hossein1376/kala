@@ -14,7 +14,7 @@ type UserModel struct {
 	client *ent.Client
 }
 
-func (u *UserModel) Create(data structure.User) (*structure.UserResponse, error) {
+func (u *UserModel) Create(data structure.User) (*structure.User, error) {
 	user, err := u.client.User.Create().
 		SetUsername(data.Username).
 		SetPassword([]byte(data.Password.Hash)).
@@ -33,7 +33,7 @@ func (u *UserModel) Create(data structure.User) (*structure.UserResponse, error)
 		}
 	}
 
-	return &structure.UserResponse{
+	return &structure.User{
 		ID:        user.ID,
 		Username:  user.Username,
 		FirstName: user.FirstName,
@@ -43,7 +43,7 @@ func (u *UserModel) Create(data structure.User) (*structure.UserResponse, error)
 	}, nil
 }
 
-func (u *UserModel) GetByID(id int) (*structure.UserResponse, error) {
+func (u *UserModel) GetByID(id int) (*structure.User, error) {
 	user, err := u.client.User.Get(context.Background(), id)
 	if err != nil {
 		switch {
@@ -54,7 +54,7 @@ func (u *UserModel) GetByID(id int) (*structure.UserResponse, error) {
 		}
 	}
 
-	return &structure.UserResponse{
+	return &structure.User{
 		ID:        user.ID,
 		Username:  user.Username,
 		Password:  user.Password,
@@ -65,7 +65,7 @@ func (u *UserModel) GetByID(id int) (*structure.UserResponse, error) {
 	}, nil
 }
 
-func (u *UserModel) GetByUsername(username string) (*structure.UserResponse, error) {
+func (u *UserModel) GetByUsername(username string) (*structure.User, error) {
 	user, err := u.client.User.
 		Query().
 		Where(entUser.Username(username)).
@@ -83,7 +83,7 @@ func (u *UserModel) GetByUsername(username string) (*structure.UserResponse, err
 		return nil, response.UserDisabled{Username: &username}
 	}
 
-	return &structure.UserResponse{
+	return &structure.User{
 		ID:        user.ID,
 		Username:  user.Username,
 		Password:  user.Password,
@@ -94,15 +94,15 @@ func (u *UserModel) GetByUsername(username string) (*structure.UserResponse, err
 	}, err
 }
 
-func (u *UserModel) GetAll() ([]*structure.UserResponse, error) {
+func (u *UserModel) GetAll() ([]*structure.User, error) {
 	users, err := u.client.User.Query().All(context.Background())
 	if err != nil {
 		return nil, err
 	}
 
-	resp := make([]*structure.UserResponse, 0, len(users))
+	resp := make([]*structure.User, 0, len(users))
 	for _, user := range users {
-		r := &structure.UserResponse{
+		r := &structure.User{
 			ID:        user.ID,
 			Username:  user.Username,
 			FirstName: user.FirstName,
@@ -116,7 +116,7 @@ func (u *UserModel) GetAll() ([]*structure.UserResponse, error) {
 	return resp, err
 }
 
-func (u *UserModel) UpdateByID(id int, user *structure.UserResponse) error {
+func (u *UserModel) UpdateByID(id int, user *structure.User) error {
 	_, err := u.client.User.UpdateOneID(id).
 		SetUsername(user.Username).
 		SetPassword(user.Password).
