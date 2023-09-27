@@ -8,6 +8,7 @@ import (
 	entUser "github.com/hossein1376/kala/internal/ent/user"
 	"github.com/hossein1376/kala/internal/response"
 	"github.com/hossein1376/kala/internal/structure"
+	"github.com/hossein1376/kala/pkg/Password"
 )
 
 type UserModel struct {
@@ -57,7 +58,7 @@ func (u *UserModel) GetByID(id int) (*structure.User, error) {
 	return &structure.User{
 		ID:        user.ID,
 		Username:  user.Username,
-		Password:  user.Password,
+		Password:  Password.Password{Hash: user.Password},
 		FirstName: user.FirstName,
 		LastName:  user.LastName,
 		Email:     user.Email,
@@ -86,7 +87,7 @@ func (u *UserModel) GetByUsername(username string) (*structure.User, error) {
 	return &structure.User{
 		ID:        user.ID,
 		Username:  user.Username,
-		Password:  user.Password,
+		Password:  Password.Password{Hash: user.Password},
 		FirstName: user.FirstName,
 		LastName:  user.LastName,
 		Email:     user.Email,
@@ -119,7 +120,7 @@ func (u *UserModel) GetAll() ([]*structure.User, error) {
 func (u *UserModel) UpdateByID(id int, user *structure.User) error {
 	_, err := u.client.User.UpdateOneID(id).
 		SetUsername(user.Username).
-		SetPassword(user.Password).
+		SetPassword(user.Password.Hash).
 		SetEmail(user.Email).
 		SetFirstName(user.FirstName).
 		SetLastName(user.LastName).

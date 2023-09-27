@@ -9,7 +9,7 @@ import (
 
 type Password struct {
 	Plaintext *string
-	Hash      string
+	Hash      []byte
 }
 
 // ArgonSet encrypt and hashes the input password
@@ -19,7 +19,7 @@ func (p *Password) ArgonSet(plaintextPassword string) error {
 		return err
 	}
 	p.Plaintext = &plaintextPassword
-	p.Hash = hash
+	p.Hash = []byte(hash)
 	return nil
 }
 
@@ -30,7 +30,7 @@ func (p *Password) BcryptSet(plaintextPassword string) error {
 		return err
 	}
 	p.Plaintext = &plaintextPassword
-	p.Hash = string(hash)
+	p.Hash = hash
 	return nil
 }
 
@@ -39,7 +39,7 @@ func (p *Password) ArgonMatches() (bool, error) {
 	if p.Plaintext == nil {
 		return false, errors.New("'plaintext' field must be provided")
 	}
-	return argon2id.ComparePasswordAndHash(*p.Plaintext, p.Hash)
+	return argon2id.ComparePasswordAndHash(*p.Plaintext, string(p.Hash))
 }
 
 // BcryptMatches compares the existing hash with the newly hashed password to see if they match
@@ -48,7 +48,7 @@ func (p *Password) BcryptMatches() (bool, error) {
 		return false, errors.New("'plaintext' field must be provided")
 	}
 
-	err := bcrypt.CompareHashAndPassword([]byte(p.Hash), []byte(*p.Plaintext))
+	err := bcrypt.CompareHashAndPassword(p.Hash, []byte(*p.Plaintext))
 	if err != nil {
 		switch {
 		case errors.Is(err, bcrypt.ErrMismatchedHashAndPassword):

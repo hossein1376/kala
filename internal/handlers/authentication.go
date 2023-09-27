@@ -33,7 +33,7 @@ func (h *handler) loginHandler(w http.ResponseWriter, r *http.Request) {
 
 	p := Password.Password{
 		Plaintext: &input.Password,
-		Hash:      string(user.Password),
+		Hash:      user.Password.Hash,
 	}
 	ok, err := p.ArgonMatches()
 	if err != nil {

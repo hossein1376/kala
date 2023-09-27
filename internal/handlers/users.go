@@ -155,7 +155,7 @@ func (h *handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 			h.InternalServerErrorResponse(w, r, err)
 			return
 		}
-		user.Password = []byte(p.Hash)
+		user.Password.Hash = p.Hash
 	}
 
 	err = h.Models.User.UpdateByID(id, user)
