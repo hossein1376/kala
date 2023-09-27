@@ -12,7 +12,7 @@ import (
 
 func (h *handler) loginHandler(w http.ResponseWriter, r *http.Request) {
 	var input structure.LoginRequest
-	err := h.Read(w, r, &input)
+	err := h.ReadJson(w, r, &input)
 	if err != nil {
 		h.BadRequestResponse(w, r, err)
 		return

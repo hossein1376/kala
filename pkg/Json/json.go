@@ -11,13 +11,13 @@ import (
 )
 
 type Json interface {
-	Write(w http.ResponseWriter, status int, data any, headers http.Header) error
-	Read(w http.ResponseWriter, r *http.Request, dst any) error
+	WriteJson(w http.ResponseWriter, status int, data any, headers http.Header) error
+	ReadJson(w http.ResponseWriter, r *http.Request, dst any) error
 }
 
 type StdJson struct{}
 
-func (StdJson) Write(w http.ResponseWriter, status int, data any, headers http.Header) error {
+func (StdJson) WriteJson(w http.ResponseWriter, status int, data any, headers http.Header) error {
 	js, err := json.Marshal(data)
 	if err != nil {
 		return err
@@ -35,7 +35,7 @@ func (StdJson) Write(w http.ResponseWriter, status int, data any, headers http.H
 	return err
 }
 
-func (StdJson) Read(w http.ResponseWriter, r *http.Request, dst any) error {
+func (StdJson) ReadJson(w http.ResponseWriter, r *http.Request, dst any) error {
 	maxBytes := 1_048_576
 	r.Body = http.MaxBytesReader(w, r.Body, int64(maxBytes))
 	dec := json.NewDecoder(r.Body)

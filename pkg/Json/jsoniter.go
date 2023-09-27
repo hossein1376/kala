@@ -14,7 +14,7 @@ import (
 
 type Jsoniter struct{}
 
-func (Jsoniter) Write(w http.ResponseWriter, status int, data any, headers http.Header) error {
+func (Jsoniter) WriteJson(w http.ResponseWriter, status int, data any, headers http.Header) error {
 	js, err := jsoniter.Marshal(data)
 	if err != nil {
 		return nil
@@ -32,7 +32,7 @@ func (Jsoniter) Write(w http.ResponseWriter, status int, data any, headers http.
 	return err
 }
 
-func (Jsoniter) Read(w http.ResponseWriter, r *http.Request, dst any) error {
+func (Jsoniter) ReadJson(w http.ResponseWriter, r *http.Request, dst any) error {
 	maxBytes := 1_048_576
 	r.Body = http.MaxBytesReader(w, r.Body, int64(maxBytes))
 	dec := jsoniter.NewDecoder(r.Body)

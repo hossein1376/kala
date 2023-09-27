@@ -37,7 +37,7 @@ type HttpResponse struct {
 
 // Respond responses with the provided message and status code, it will return 500 if case of failure
 func (res *Response) Respond(w http.ResponseWriter, r *http.Request, statusCode int, message any) {
-	err := res.Write(w, statusCode, message, nil)
+	err := res.WriteJson(w, statusCode, message, nil)
 	if err != nil {
 		res.logInternalError(r, err)
 		w.WriteHeader(500)
