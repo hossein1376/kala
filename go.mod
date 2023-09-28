@@ -1,6 +1,6 @@
 module github.com/hossein1376/kala
 
-go 1.21.1
+go 1.21
 
 require (
 	entgo.io/ent v0.12.4
