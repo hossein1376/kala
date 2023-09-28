@@ -10,7 +10,6 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/hossein1376/kala/internal/ent/logs"
 	"github.com/hossein1376/kala/internal/ent/order"
 	"github.com/hossein1376/kala/internal/ent/user"
 )
@@ -159,21 +158,6 @@ func (uc *UserCreate) AddOrder(o ...*Order) *UserCreate {
 		ids[i] = o[i].ID
 	}
 	return uc.AddOrderIDs(ids...)
-}
-
-// AddLogIDs adds the "logs" edge to the Logs entity by IDs.
-func (uc *UserCreate) AddLogIDs(ids ...int) *UserCreate {
-	uc.mutation.AddLogIDs(ids...)
-	return uc
-}
-
-// AddLogs adds the "logs" edges to the Logs entity.
-func (uc *UserCreate) AddLogs(l ...*Logs) *UserCreate {
-	ids := make([]int, len(l))
-	for i := range l {
-		ids[i] = l[i].ID
-	}
-	return uc.AddLogIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -329,22 +313,6 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := uc.mutation.LogsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.LogsTable,
-			Columns: []string{user.LogsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(logs.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

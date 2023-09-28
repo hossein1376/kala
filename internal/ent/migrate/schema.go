@@ -8,29 +8,6 @@ import (
 )
 
 var (
-	// LogsColumns holds the columns for the "logs" table.
-	LogsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "action", Type: field.TypeString, Nullable: true},
-		{Name: "ip", Type: field.TypeString},
-		{Name: "agent", Type: field.TypeString},
-		{Name: "date", Type: field.TypeTime},
-		{Name: "user", Type: field.TypeInt, Nullable: true},
-	}
-	// LogsTable holds the schema information for the "logs" table.
-	LogsTable = &schema.Table{
-		Name:       "logs",
-		Columns:    LogsColumns,
-		PrimaryKey: []*schema.Column{LogsColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "logs_users_logs",
-				Columns:    []*schema.Column{LogsColumns[5]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-		},
-	}
 	// OrdersColumns holds the columns for the "orders" table.
 	OrdersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -120,7 +97,6 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
-		LogsTable,
 		OrdersTable,
 		ProductsTable,
 		UsersTable,
@@ -129,7 +105,6 @@ var (
 )
 
 func init() {
-	LogsTable.ForeignKeys[0].RefTable = UsersTable
 	OrdersTable.ForeignKeys[0].RefTable = UsersTable
 	ProductOrderTable.ForeignKeys[0].RefTable = ProductsTable
 	ProductOrderTable.ForeignKeys[1].RefTable = OrdersTable

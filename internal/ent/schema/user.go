@@ -40,7 +40,5 @@ func (User) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("order", Order.Type).
 			StorageKey(edge.Column("user_id")),
-		edge.To("logs", Logs.Type).
-			StorageKey(edge.Column("user")),
 	}
 }

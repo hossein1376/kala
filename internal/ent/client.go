@@ -15,7 +15,6 @@ import (
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"github.com/hossein1376/kala/internal/ent/logs"
 	"github.com/hossein1376/kala/internal/ent/order"
 	"github.com/hossein1376/kala/internal/ent/product"
 	"github.com/hossein1376/kala/internal/ent/user"
@@ -26,8 +25,6 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
-	// Logs is the client for interacting with the Logs builders.
-	Logs *LogsClient
 	// Order is the client for interacting with the Order builders.
 	Order *OrderClient
 	// Product is the client for interacting with the Product builders.
@@ -47,7 +44,6 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
-	c.Logs = NewLogsClient(c.config)
 	c.Order = NewOrderClient(c.config)
 	c.Product = NewProductClient(c.config)
 	c.User = NewUserClient(c.config)
@@ -136,7 +132,6 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	return &Tx{
 		ctx:     ctx,
 		config:  cfg,
-		Logs:    NewLogsClient(cfg),
 		Order:   NewOrderClient(cfg),
 		Product: NewProductClient(cfg),
 		User:    NewUserClient(cfg),
@@ -159,7 +154,6 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	return &Tx{
 		ctx:     ctx,
 		config:  cfg,
-		Logs:    NewLogsClient(cfg),
 		Order:   NewOrderClient(cfg),
 		Product: NewProductClient(cfg),
 		User:    NewUserClient(cfg),
@@ -169,7 +163,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		Logs.
+//		Order.
 //		Query().
 //		Count(ctx)
 func (c *Client) Debug() *Client {
@@ -191,7 +185,6 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.Logs.Use(hooks...)
 	c.Order.Use(hooks...)
 	c.Product.Use(hooks...)
 	c.User.Use(hooks...)
@@ -200,7 +193,6 @@ func (c *Client) Use(hooks ...Hook) {
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
-	c.Logs.Intercept(interceptors...)
 	c.Order.Intercept(interceptors...)
 	c.Product.Intercept(interceptors...)
 	c.User.Intercept(interceptors...)
@@ -209,8 +201,6 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 // Mutate implements the ent.Mutator interface.
 func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
-	case *LogsMutation:
-		return c.Logs.mutate(ctx, m)
 	case *OrderMutation:
 		return c.Order.mutate(ctx, m)
 	case *ProductMutation:
@@ -219,155 +209,6 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.User.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
-	}
-}
-
-// LogsClient is a client for the Logs schema.
-type LogsClient struct {
-	config
-}
-
-// NewLogsClient returns a client for the Logs from the given config.
-func NewLogsClient(c config) *LogsClient {
-	return &LogsClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `logs.Hooks(f(g(h())))`.
-func (c *LogsClient) Use(hooks ...Hook) {
-	c.hooks.Logs = append(c.hooks.Logs, hooks...)
-}
-
-// Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `logs.Intercept(f(g(h())))`.
-func (c *LogsClient) Intercept(interceptors ...Interceptor) {
-	c.inters.Logs = append(c.inters.Logs, interceptors...)
-}
-
-// Create returns a builder for creating a Logs entity.
-func (c *LogsClient) Create() *LogsCreate {
-	mutation := newLogsMutation(c.config, OpCreate)
-	return &LogsCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of Logs entities.
-func (c *LogsClient) CreateBulk(builders ...*LogsCreate) *LogsCreateBulk {
-	return &LogsCreateBulk{config: c.config, builders: builders}
-}
-
-// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
-// a builder and applies setFunc on it.
-func (c *LogsClient) MapCreateBulk(slice any, setFunc func(*LogsCreate, int)) *LogsCreateBulk {
-	rv := reflect.ValueOf(slice)
-	if rv.Kind() != reflect.Slice {
-		return &LogsCreateBulk{err: fmt.Errorf("calling to LogsClient.MapCreateBulk with wrong type %T, need slice", slice)}
-	}
-	builders := make([]*LogsCreate, rv.Len())
-	for i := 0; i < rv.Len(); i++ {
-		builders[i] = c.Create()
-		setFunc(builders[i], i)
-	}
-	return &LogsCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for Logs.
-func (c *LogsClient) Update() *LogsUpdate {
-	mutation := newLogsMutation(c.config, OpUpdate)
-	return &LogsUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *LogsClient) UpdateOne(l *Logs) *LogsUpdateOne {
-	mutation := newLogsMutation(c.config, OpUpdateOne, withLogs(l))
-	return &LogsUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *LogsClient) UpdateOneID(id int) *LogsUpdateOne {
-	mutation := newLogsMutation(c.config, OpUpdateOne, withLogsID(id))
-	return &LogsUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for Logs.
-func (c *LogsClient) Delete() *LogsDelete {
-	mutation := newLogsMutation(c.config, OpDelete)
-	return &LogsDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a builder for deleting the given entity.
-func (c *LogsClient) DeleteOne(l *Logs) *LogsDeleteOne {
-	return c.DeleteOneID(l.ID)
-}
-
-// DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *LogsClient) DeleteOneID(id int) *LogsDeleteOne {
-	builder := c.Delete().Where(logs.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &LogsDeleteOne{builder}
-}
-
-// Query returns a query builder for Logs.
-func (c *LogsClient) Query() *LogsQuery {
-	return &LogsQuery{
-		config: c.config,
-		ctx:    &QueryContext{Type: TypeLogs},
-		inters: c.Interceptors(),
-	}
-}
-
-// Get returns a Logs entity by its id.
-func (c *LogsClient) Get(ctx context.Context, id int) (*Logs, error) {
-	return c.Query().Where(logs.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *LogsClient) GetX(ctx context.Context, id int) *Logs {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// QueryUser queries the user edge of a Logs.
-func (c *LogsClient) QueryUser(l *Logs) *UserQuery {
-	query := (&UserClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := l.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(logs.Table, logs.FieldID, id),
-			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, logs.UserTable, logs.UserColumn),
-		)
-		fromV = sqlgraph.Neighbors(l.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// Hooks returns the client hooks.
-func (c *LogsClient) Hooks() []Hook {
-	return c.hooks.Logs
-}
-
-// Interceptors returns the client interceptors.
-func (c *LogsClient) Interceptors() []Interceptor {
-	return c.inters.Logs
-}
-
-func (c *LogsClient) mutate(ctx context.Context, m *LogsMutation) (Value, error) {
-	switch m.Op() {
-	case OpCreate:
-		return (&LogsCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdate:
-		return (&LogsUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdateOne:
-		return (&LogsUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpDelete, OpDeleteOne:
-		return (&LogsDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
-	default:
-		return nil, fmt.Errorf("ent: unknown Logs mutation op: %q", m.Op())
 	}
 }
 
@@ -809,22 +650,6 @@ func (c *UserClient) QueryOrder(u *User) *OrderQuery {
 	return query
 }
 
-// QueryLogs queries the logs edge of a User.
-func (c *UserClient) QueryLogs(u *User) *LogsQuery {
-	query := (&LogsClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := u.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(user.Table, user.FieldID, id),
-			sqlgraph.To(logs.Table, logs.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, user.LogsTable, user.LogsColumn),
-		)
-		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
 // Hooks returns the client hooks.
 func (c *UserClient) Hooks() []Hook {
 	return c.hooks.User
@@ -853,9 +678,9 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Logs, Order, Product, User []ent.Hook
+		Order, Product, User []ent.Hook
 	}
 	inters struct {
-		Logs, Order, Product, User []ent.Interceptor
+		Order, Product, User []ent.Interceptor
 	}
 )

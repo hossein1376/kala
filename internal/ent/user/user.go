@@ -37,8 +37,6 @@ const (
 	FieldStatus = "status"
 	// EdgeOrder holds the string denoting the order edge name in mutations.
 	EdgeOrder = "order"
-	// EdgeLogs holds the string denoting the logs edge name in mutations.
-	EdgeLogs = "logs"
 	// Table holds the table name of the user in the database.
 	Table = "users"
 	// OrderTable is the table that holds the order relation/edge.
@@ -48,13 +46,6 @@ const (
 	OrderInverseTable = "orders"
 	// OrderColumn is the table column denoting the order relation/edge.
 	OrderColumn = "user_id"
-	// LogsTable is the table that holds the logs relation/edge.
-	LogsTable = "logs"
-	// LogsInverseTable is the table name for the Logs entity.
-	// It exists in this package in order to avoid circular dependency with the "logs" package.
-	LogsInverseTable = "logs"
-	// LogsColumn is the table column denoting the logs relation/edge.
-	LogsColumn = "user"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -186,31 +177,10 @@ func ByOrder(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newOrderStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
-
-// ByLogsCount orders the results by logs count.
-func ByLogsCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newLogsStep(), opts...)
-	}
-}
-
-// ByLogs orders the results by logs terms.
-func ByLogs(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newLogsStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
 func newOrderStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(OrderInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, OrderTable, OrderColumn),
-	)
-}
-func newLogsStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(LogsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, LogsTable, LogsColumn),
 	)
 }

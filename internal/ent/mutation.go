@@ -11,7 +11,6 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/hossein1376/kala/internal/ent/logs"
 	"github.com/hossein1376/kala/internal/ent/order"
 	"github.com/hossein1376/kala/internal/ent/predicate"
 	"github.com/hossein1376/kala/internal/ent/product"
@@ -27,588 +26,10 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeLogs    = "Logs"
 	TypeOrder   = "Order"
 	TypeProduct = "Product"
 	TypeUser    = "User"
 )
-
-// LogsMutation represents an operation that mutates the Logs nodes in the graph.
-type LogsMutation struct {
-	config
-	op            Op
-	typ           string
-	id            *int
-	action        *string
-	_IP           *string
-	agent         *string
-	date          *time.Time
-	clearedFields map[string]struct{}
-	user          *int
-	cleareduser   bool
-	done          bool
-	oldValue      func(context.Context) (*Logs, error)
-	predicates    []predicate.Logs
-}
-
-var _ ent.Mutation = (*LogsMutation)(nil)
-
-// logsOption allows management of the mutation configuration using functional options.
-type logsOption func(*LogsMutation)
-
-// newLogsMutation creates new mutation for the Logs entity.
-func newLogsMutation(c config, op Op, opts ...logsOption) *LogsMutation {
-	m := &LogsMutation{
-		config:        c,
-		op:            op,
-		typ:           TypeLogs,
-		clearedFields: make(map[string]struct{}),
-	}
-	for _, opt := range opts {
-		opt(m)
-	}
-	return m
-}
-
-// withLogsID sets the ID field of the mutation.
-func withLogsID(id int) logsOption {
-	return func(m *LogsMutation) {
-		var (
-			err   error
-			once  sync.Once
-			value *Logs
-		)
-		m.oldValue = func(ctx context.Context) (*Logs, error) {
-			once.Do(func() {
-				if m.done {
-					err = errors.New("querying old values post mutation is not allowed")
-				} else {
-					value, err = m.Client().Logs.Get(ctx, id)
-				}
-			})
-			return value, err
-		}
-		m.id = &id
-	}
-}
-
-// withLogs sets the old Logs of the mutation.
-func withLogs(node *Logs) logsOption {
-	return func(m *LogsMutation) {
-		m.oldValue = func(context.Context) (*Logs, error) {
-			return node, nil
-		}
-		m.id = &node.ID
-	}
-}
-
-// Client returns a new `ent.Client` from the mutation. If the mutation was
-// executed in a transaction (ent.Tx), a transactional client is returned.
-func (m LogsMutation) Client() *Client {
-	client := &Client{config: m.config}
-	client.init()
-	return client
-}
-
-// Tx returns an `ent.Tx` for mutations that were executed in transactions;
-// it returns an error otherwise.
-func (m LogsMutation) Tx() (*Tx, error) {
-	if _, ok := m.driver.(*txDriver); !ok {
-		return nil, errors.New("ent: mutation is not running in a transaction")
-	}
-	tx := &Tx{config: m.config}
-	tx.init()
-	return tx, nil
-}
-
-// ID returns the ID value in the mutation. Note that the ID is only available
-// if it was provided to the builder or after it was returned from the database.
-func (m *LogsMutation) ID() (id int, exists bool) {
-	if m.id == nil {
-		return
-	}
-	return *m.id, true
-}
-
-// IDs queries the database and returns the entity ids that match the mutation's predicate.
-// That means, if the mutation is applied within a transaction with an isolation level such
-// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
-// or updated by the mutation.
-func (m *LogsMutation) IDs(ctx context.Context) ([]int, error) {
-	switch {
-	case m.op.Is(OpUpdateOne | OpDeleteOne):
-		id, exists := m.ID()
-		if exists {
-			return []int{id}, nil
-		}
-		fallthrough
-	case m.op.Is(OpUpdate | OpDelete):
-		return m.Client().Logs.Query().Where(m.predicates...).IDs(ctx)
-	default:
-		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
-	}
-}
-
-// SetAction sets the "action" field.
-func (m *LogsMutation) SetAction(s string) {
-	m.action = &s
-}
-
-// Action returns the value of the "action" field in the mutation.
-func (m *LogsMutation) Action() (r string, exists bool) {
-	v := m.action
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldAction returns the old "action" field's value of the Logs entity.
-// If the Logs object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *LogsMutation) OldAction(ctx context.Context) (v *string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldAction is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldAction requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldAction: %w", err)
-	}
-	return oldValue.Action, nil
-}
-
-// ClearAction clears the value of the "action" field.
-func (m *LogsMutation) ClearAction() {
-	m.action = nil
-	m.clearedFields[logs.FieldAction] = struct{}{}
-}
-
-// ActionCleared returns if the "action" field was cleared in this mutation.
-func (m *LogsMutation) ActionCleared() bool {
-	_, ok := m.clearedFields[logs.FieldAction]
-	return ok
-}
-
-// ResetAction resets all changes to the "action" field.
-func (m *LogsMutation) ResetAction() {
-	m.action = nil
-	delete(m.clearedFields, logs.FieldAction)
-}
-
-// SetIP sets the "IP" field.
-func (m *LogsMutation) SetIP(s string) {
-	m._IP = &s
-}
-
-// IP returns the value of the "IP" field in the mutation.
-func (m *LogsMutation) IP() (r string, exists bool) {
-	v := m._IP
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldIP returns the old "IP" field's value of the Logs entity.
-// If the Logs object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *LogsMutation) OldIP(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldIP is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldIP requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldIP: %w", err)
-	}
-	return oldValue.IP, nil
-}
-
-// ResetIP resets all changes to the "IP" field.
-func (m *LogsMutation) ResetIP() {
-	m._IP = nil
-}
-
-// SetAgent sets the "agent" field.
-func (m *LogsMutation) SetAgent(s string) {
-	m.agent = &s
-}
-
-// Agent returns the value of the "agent" field in the mutation.
-func (m *LogsMutation) Agent() (r string, exists bool) {
-	v := m.agent
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldAgent returns the old "agent" field's value of the Logs entity.
-// If the Logs object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *LogsMutation) OldAgent(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldAgent is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldAgent requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldAgent: %w", err)
-	}
-	return oldValue.Agent, nil
-}
-
-// ResetAgent resets all changes to the "agent" field.
-func (m *LogsMutation) ResetAgent() {
-	m.agent = nil
-}
-
-// SetDate sets the "date" field.
-func (m *LogsMutation) SetDate(t time.Time) {
-	m.date = &t
-}
-
-// Date returns the value of the "date" field in the mutation.
-func (m *LogsMutation) Date() (r time.Time, exists bool) {
-	v := m.date
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldDate returns the old "date" field's value of the Logs entity.
-// If the Logs object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *LogsMutation) OldDate(ctx context.Context) (v time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldDate is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldDate requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldDate: %w", err)
-	}
-	return oldValue.Date, nil
-}
-
-// ResetDate resets all changes to the "date" field.
-func (m *LogsMutation) ResetDate() {
-	m.date = nil
-}
-
-// SetUserID sets the "user" edge to the User entity by id.
-func (m *LogsMutation) SetUserID(id int) {
-	m.user = &id
-}
-
-// ClearUser clears the "user" edge to the User entity.
-func (m *LogsMutation) ClearUser() {
-	m.cleareduser = true
-}
-
-// UserCleared reports if the "user" edge to the User entity was cleared.
-func (m *LogsMutation) UserCleared() bool {
-	return m.cleareduser
-}
-
-// UserID returns the "user" edge ID in the mutation.
-func (m *LogsMutation) UserID() (id int, exists bool) {
-	if m.user != nil {
-		return *m.user, true
-	}
-	return
-}
-
-// UserIDs returns the "user" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// UserID instead. It exists only for internal usage by the builders.
-func (m *LogsMutation) UserIDs() (ids []int) {
-	if id := m.user; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetUser resets all changes to the "user" edge.
-func (m *LogsMutation) ResetUser() {
-	m.user = nil
-	m.cleareduser = false
-}
-
-// Where appends a list predicates to the LogsMutation builder.
-func (m *LogsMutation) Where(ps ...predicate.Logs) {
-	m.predicates = append(m.predicates, ps...)
-}
-
-// WhereP appends storage-level predicates to the LogsMutation builder. Using this method,
-// users can use type-assertion to append predicates that do not depend on any generated package.
-func (m *LogsMutation) WhereP(ps ...func(*sql.Selector)) {
-	p := make([]predicate.Logs, len(ps))
-	for i := range ps {
-		p[i] = ps[i]
-	}
-	m.Where(p...)
-}
-
-// Op returns the operation name.
-func (m *LogsMutation) Op() Op {
-	return m.op
-}
-
-// SetOp allows setting the mutation operation.
-func (m *LogsMutation) SetOp(op Op) {
-	m.op = op
-}
-
-// Type returns the node type of this mutation (Logs).
-func (m *LogsMutation) Type() string {
-	return m.typ
-}
-
-// Fields returns all fields that were changed during this mutation. Note that in
-// order to get all numeric fields that were incremented/decremented, call
-// AddedFields().
-func (m *LogsMutation) Fields() []string {
-	fields := make([]string, 0, 4)
-	if m.action != nil {
-		fields = append(fields, logs.FieldAction)
-	}
-	if m._IP != nil {
-		fields = append(fields, logs.FieldIP)
-	}
-	if m.agent != nil {
-		fields = append(fields, logs.FieldAgent)
-	}
-	if m.date != nil {
-		fields = append(fields, logs.FieldDate)
-	}
-	return fields
-}
-
-// Field returns the value of a field with the given name. The second boolean
-// return value indicates that this field was not set, or was not defined in the
-// schema.
-func (m *LogsMutation) Field(name string) (ent.Value, bool) {
-	switch name {
-	case logs.FieldAction:
-		return m.Action()
-	case logs.FieldIP:
-		return m.IP()
-	case logs.FieldAgent:
-		return m.Agent()
-	case logs.FieldDate:
-		return m.Date()
-	}
-	return nil, false
-}
-
-// OldField returns the old value of the field from the database. An error is
-// returned if the mutation operation is not UpdateOne, or the query to the
-// database failed.
-func (m *LogsMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
-	switch name {
-	case logs.FieldAction:
-		return m.OldAction(ctx)
-	case logs.FieldIP:
-		return m.OldIP(ctx)
-	case logs.FieldAgent:
-		return m.OldAgent(ctx)
-	case logs.FieldDate:
-		return m.OldDate(ctx)
-	}
-	return nil, fmt.Errorf("unknown Logs field %s", name)
-}
-
-// SetField sets the value of a field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *LogsMutation) SetField(name string, value ent.Value) error {
-	switch name {
-	case logs.FieldAction:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetAction(v)
-		return nil
-	case logs.FieldIP:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetIP(v)
-		return nil
-	case logs.FieldAgent:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetAgent(v)
-		return nil
-	case logs.FieldDate:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetDate(v)
-		return nil
-	}
-	return fmt.Errorf("unknown Logs field %s", name)
-}
-
-// AddedFields returns all numeric fields that were incremented/decremented during
-// this mutation.
-func (m *LogsMutation) AddedFields() []string {
-	return nil
-}
-
-// AddedField returns the numeric value that was incremented/decremented on a field
-// with the given name. The second boolean return value indicates that this field
-// was not set, or was not defined in the schema.
-func (m *LogsMutation) AddedField(name string) (ent.Value, bool) {
-	return nil, false
-}
-
-// AddField adds the value to the field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *LogsMutation) AddField(name string, value ent.Value) error {
-	switch name {
-	}
-	return fmt.Errorf("unknown Logs numeric field %s", name)
-}
-
-// ClearedFields returns all nullable fields that were cleared during this
-// mutation.
-func (m *LogsMutation) ClearedFields() []string {
-	var fields []string
-	if m.FieldCleared(logs.FieldAction) {
-		fields = append(fields, logs.FieldAction)
-	}
-	return fields
-}
-
-// FieldCleared returns a boolean indicating if a field with the given name was
-// cleared in this mutation.
-func (m *LogsMutation) FieldCleared(name string) bool {
-	_, ok := m.clearedFields[name]
-	return ok
-}
-
-// ClearField clears the value of the field with the given name. It returns an
-// error if the field is not defined in the schema.
-func (m *LogsMutation) ClearField(name string) error {
-	switch name {
-	case logs.FieldAction:
-		m.ClearAction()
-		return nil
-	}
-	return fmt.Errorf("unknown Logs nullable field %s", name)
-}
-
-// ResetField resets all changes in the mutation for the field with the given name.
-// It returns an error if the field is not defined in the schema.
-func (m *LogsMutation) ResetField(name string) error {
-	switch name {
-	case logs.FieldAction:
-		m.ResetAction()
-		return nil
-	case logs.FieldIP:
-		m.ResetIP()
-		return nil
-	case logs.FieldAgent:
-		m.ResetAgent()
-		return nil
-	case logs.FieldDate:
-		m.ResetDate()
-		return nil
-	}
-	return fmt.Errorf("unknown Logs field %s", name)
-}
-
-// AddedEdges returns all edge names that were set/added in this mutation.
-func (m *LogsMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.user != nil {
-		edges = append(edges, logs.EdgeUser)
-	}
-	return edges
-}
-
-// AddedIDs returns all IDs (to other nodes) that were added for the given edge
-// name in this mutation.
-func (m *LogsMutation) AddedIDs(name string) []ent.Value {
-	switch name {
-	case logs.EdgeUser:
-		if id := m.user; id != nil {
-			return []ent.Value{*id}
-		}
-	}
-	return nil
-}
-
-// RemovedEdges returns all edge names that were removed in this mutation.
-func (m *LogsMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
-	return edges
-}
-
-// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
-// the given name in this mutation.
-func (m *LogsMutation) RemovedIDs(name string) []ent.Value {
-	return nil
-}
-
-// ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *LogsMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.cleareduser {
-		edges = append(edges, logs.EdgeUser)
-	}
-	return edges
-}
-
-// EdgeCleared returns a boolean which indicates if the edge with the given name
-// was cleared in this mutation.
-func (m *LogsMutation) EdgeCleared(name string) bool {
-	switch name {
-	case logs.EdgeUser:
-		return m.cleareduser
-	}
-	return false
-}
-
-// ClearEdge clears the value of the edge with the given name. It returns an error
-// if that edge is not defined in the schema.
-func (m *LogsMutation) ClearEdge(name string) error {
-	switch name {
-	case logs.EdgeUser:
-		m.ClearUser()
-		return nil
-	}
-	return fmt.Errorf("unknown Logs unique edge %s", name)
-}
-
-// ResetEdge resets all changes to the edge with the given name in this mutation.
-// It returns an error if the edge is not defined in the schema.
-func (m *LogsMutation) ResetEdge(name string) error {
-	switch name {
-	case logs.EdgeUser:
-		m.ResetUser()
-		return nil
-	}
-	return fmt.Errorf("unknown Logs edge %s", name)
-}
 
 // OrderMutation represents an operation that mutates the Order nodes in the graph.
 type OrderMutation struct {
@@ -2256,9 +1677,6 @@ type UserMutation struct {
 	_order        map[int]struct{}
 	removed_order map[int]struct{}
 	cleared_order bool
-	logs          map[int]struct{}
-	removedlogs   map[int]struct{}
-	clearedlogs   bool
 	done          bool
 	oldValue      func(context.Context) (*User, error)
 	predicates    []predicate.User
@@ -2828,60 +2246,6 @@ func (m *UserMutation) ResetOrder() {
 	m.removed_order = nil
 }
 
-// AddLogIDs adds the "logs" edge to the Logs entity by ids.
-func (m *UserMutation) AddLogIDs(ids ...int) {
-	if m.logs == nil {
-		m.logs = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.logs[ids[i]] = struct{}{}
-	}
-}
-
-// ClearLogs clears the "logs" edge to the Logs entity.
-func (m *UserMutation) ClearLogs() {
-	m.clearedlogs = true
-}
-
-// LogsCleared reports if the "logs" edge to the Logs entity was cleared.
-func (m *UserMutation) LogsCleared() bool {
-	return m.clearedlogs
-}
-
-// RemoveLogIDs removes the "logs" edge to the Logs entity by IDs.
-func (m *UserMutation) RemoveLogIDs(ids ...int) {
-	if m.removedlogs == nil {
-		m.removedlogs = make(map[int]struct{})
-	}
-	for i := range ids {
-		delete(m.logs, ids[i])
-		m.removedlogs[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedLogs returns the removed IDs of the "logs" edge to the Logs entity.
-func (m *UserMutation) RemovedLogsIDs() (ids []int) {
-	for id := range m.removedlogs {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// LogsIDs returns the "logs" edge IDs in the mutation.
-func (m *UserMutation) LogsIDs() (ids []int) {
-	for id := range m.logs {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetLogs resets all changes to the "logs" edge.
-func (m *UserMutation) ResetLogs() {
-	m.logs = nil
-	m.clearedlogs = false
-	m.removedlogs = nil
-}
-
 // Where appends a list predicates to the UserMutation builder.
 func (m *UserMutation) Where(ps ...predicate.User) {
 	m.predicates = append(m.predicates, ps...)
@@ -3195,12 +2559,9 @@ func (m *UserMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *UserMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 1)
 	if m._order != nil {
 		edges = append(edges, user.EdgeOrder)
-	}
-	if m.logs != nil {
-		edges = append(edges, user.EdgeLogs)
 	}
 	return edges
 }
@@ -3215,24 +2576,15 @@ func (m *UserMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case user.EdgeLogs:
-		ids := make([]ent.Value, 0, len(m.logs))
-		for id := range m.logs {
-			ids = append(ids, id)
-		}
-		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *UserMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 1)
 	if m.removed_order != nil {
 		edges = append(edges, user.EdgeOrder)
-	}
-	if m.removedlogs != nil {
-		edges = append(edges, user.EdgeLogs)
 	}
 	return edges
 }
@@ -3247,24 +2599,15 @@ func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case user.EdgeLogs:
-		ids := make([]ent.Value, 0, len(m.removedlogs))
-		for id := range m.removedlogs {
-			ids = append(ids, id)
-		}
-		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *UserMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 1)
 	if m.cleared_order {
 		edges = append(edges, user.EdgeOrder)
-	}
-	if m.clearedlogs {
-		edges = append(edges, user.EdgeLogs)
 	}
 	return edges
 }
@@ -3275,8 +2618,6 @@ func (m *UserMutation) EdgeCleared(name string) bool {
 	switch name {
 	case user.EdgeOrder:
 		return m.cleared_order
-	case user.EdgeLogs:
-		return m.clearedlogs
 	}
 	return false
 }
@@ -3295,9 +2636,6 @@ func (m *UserMutation) ResetEdge(name string) error {
 	switch name {
 	case user.EdgeOrder:
 		m.ResetOrder()
-		return nil
-	case user.EdgeLogs:
-		m.ResetLogs()
 		return nil
 	}
 	return fmt.Errorf("unknown User edge %s", name)

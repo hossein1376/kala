@@ -9,18 +9,6 @@ import (
 	"github.com/hossein1376/kala/internal/ent"
 )
 
-// The LogsFunc type is an adapter to allow the use of ordinary
-// function as Logs mutator.
-type LogsFunc func(context.Context, *ent.LogsMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f LogsFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.LogsMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.LogsMutation", m)
-}
-
 // The OrderFunc type is an adapter to allow the use of ordinary
 // function as Order mutator.
 type OrderFunc func(context.Context, *ent.OrderMutation) (ent.Value, error)

@@ -11,7 +11,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/hossein1376/kala/internal/ent/logs"
 	"github.com/hossein1376/kala/internal/ent/order"
 	"github.com/hossein1376/kala/internal/ent/predicate"
 	"github.com/hossein1376/kala/internal/ent/user"
@@ -171,21 +170,6 @@ func (uu *UserUpdate) AddOrder(o ...*Order) *UserUpdate {
 	return uu.AddOrderIDs(ids...)
 }
 
-// AddLogIDs adds the "logs" edge to the Logs entity by IDs.
-func (uu *UserUpdate) AddLogIDs(ids ...int) *UserUpdate {
-	uu.mutation.AddLogIDs(ids...)
-	return uu
-}
-
-// AddLogs adds the "logs" edges to the Logs entity.
-func (uu *UserUpdate) AddLogs(l ...*Logs) *UserUpdate {
-	ids := make([]int, len(l))
-	for i := range l {
-		ids[i] = l[i].ID
-	}
-	return uu.AddLogIDs(ids...)
-}
-
 // Mutation returns the UserMutation object of the builder.
 func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
@@ -210,27 +194,6 @@ func (uu *UserUpdate) RemoveOrder(o ...*Order) *UserUpdate {
 		ids[i] = o[i].ID
 	}
 	return uu.RemoveOrderIDs(ids...)
-}
-
-// ClearLogs clears all "logs" edges to the Logs entity.
-func (uu *UserUpdate) ClearLogs() *UserUpdate {
-	uu.mutation.ClearLogs()
-	return uu
-}
-
-// RemoveLogIDs removes the "logs" edge to Logs entities by IDs.
-func (uu *UserUpdate) RemoveLogIDs(ids ...int) *UserUpdate {
-	uu.mutation.RemoveLogIDs(ids...)
-	return uu
-}
-
-// RemoveLogs removes "logs" edges to Logs entities.
-func (uu *UserUpdate) RemoveLogs(l ...*Logs) *UserUpdate {
-	ids := make([]int, len(l))
-	for i := range l {
-		ids[i] = l[i].ID
-	}
-	return uu.RemoveLogIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -368,51 +331,6 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if uu.mutation.LogsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.LogsTable,
-			Columns: []string{user.LogsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(logs.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := uu.mutation.RemovedLogsIDs(); len(nodes) > 0 && !uu.mutation.LogsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.LogsTable,
-			Columns: []string{user.LogsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(logs.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := uu.mutation.LogsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.LogsTable,
-			Columns: []string{user.LogsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(logs.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -581,21 +499,6 @@ func (uuo *UserUpdateOne) AddOrder(o ...*Order) *UserUpdateOne {
 	return uuo.AddOrderIDs(ids...)
 }
 
-// AddLogIDs adds the "logs" edge to the Logs entity by IDs.
-func (uuo *UserUpdateOne) AddLogIDs(ids ...int) *UserUpdateOne {
-	uuo.mutation.AddLogIDs(ids...)
-	return uuo
-}
-
-// AddLogs adds the "logs" edges to the Logs entity.
-func (uuo *UserUpdateOne) AddLogs(l ...*Logs) *UserUpdateOne {
-	ids := make([]int, len(l))
-	for i := range l {
-		ids[i] = l[i].ID
-	}
-	return uuo.AddLogIDs(ids...)
-}
-
 // Mutation returns the UserMutation object of the builder.
 func (uuo *UserUpdateOne) Mutation() *UserMutation {
 	return uuo.mutation
@@ -620,27 +523,6 @@ func (uuo *UserUpdateOne) RemoveOrder(o ...*Order) *UserUpdateOne {
 		ids[i] = o[i].ID
 	}
 	return uuo.RemoveOrderIDs(ids...)
-}
-
-// ClearLogs clears all "logs" edges to the Logs entity.
-func (uuo *UserUpdateOne) ClearLogs() *UserUpdateOne {
-	uuo.mutation.ClearLogs()
-	return uuo
-}
-
-// RemoveLogIDs removes the "logs" edge to Logs entities by IDs.
-func (uuo *UserUpdateOne) RemoveLogIDs(ids ...int) *UserUpdateOne {
-	uuo.mutation.RemoveLogIDs(ids...)
-	return uuo
-}
-
-// RemoveLogs removes "logs" edges to Logs entities.
-func (uuo *UserUpdateOne) RemoveLogs(l ...*Logs) *UserUpdateOne {
-	ids := make([]int, len(l))
-	for i := range l {
-		ids[i] = l[i].ID
-	}
-	return uuo.RemoveLogIDs(ids...)
 }
 
 // Where appends a list predicates to the UserUpdate builder.
@@ -808,51 +690,6 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if uuo.mutation.LogsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.LogsTable,
-			Columns: []string{user.LogsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(logs.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := uuo.mutation.RemovedLogsIDs(); len(nodes) > 0 && !uuo.mutation.LogsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.LogsTable,
-			Columns: []string{user.LogsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(logs.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := uuo.mutation.LogsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.LogsTable,
-			Columns: []string{user.LogsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(logs.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
