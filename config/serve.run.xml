@@ -2,7 +2,7 @@
   <configuration default="false" name="serve" type="GoApplicationRunConfiguration" factoryName="Go Application">
     <module name="kala" />
     <working_directory value="$PROJECT_DIR$" />
-    <parameters value="-env dev" />
+    <parameters value="-env dev -c ./config/configs.json" />
     <envs>
       <env name="ENVIRONMENT" value="dev" />
       <env name="SERVER_PORT" value="8000" />

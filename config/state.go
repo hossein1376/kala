@@ -8,6 +8,16 @@ import (
 	"github.com/hossein1376/kala/internal/data"
 )
 
+const (
+	Dev  = "dev"
+	Prod = "prod"
+
+	Debug = "debug"
+	Info  = "info"
+	Warn  = "warn"
+	Error = "error"
+)
+
 type Application struct {
 	Config *Config
 	Logger *slog.Logger
@@ -15,25 +25,35 @@ type Application struct {
 }
 
 type Config struct {
-	Environment string
-	Port        string
-	JWTSecret   string
-	JWTToken    *jwtauth.JWTAuth
-	DB          DB
+	Environment string `json:"environment"`
+	Port        string `json:"port"`
+	DB          DB     `json:"db"`
+	JWT         JWT    `json:"jwt"`
+	Logger      Logger `json:"logger"`
+}
+
+type JWT struct {
+	Secret string           `json:"secret"`
+	Expire string           `json:"expire"`
+	Token  *jwtauth.JWTAuth `json:"-"`
+}
+
+type Logger struct {
+	Level string `json:"level"`
 }
 
 type DB struct {
-	Sql   Sql
-	NoSql NoSql
-	Redis Redis
+	Sql   Sql   `json:"sql"`
+	NoSql NoSql `json:"no_sql"`
+	Redis Redis `json:"redis"`
 }
 
 type Sql struct {
-	Host     string
-	Port     string
-	Username string
-	Password string
-	Name     string
+	Host     string `json:"host"`
+	Port     string `json:"port"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Name     string `json:"name"`
 }
 
 type NoSql struct {

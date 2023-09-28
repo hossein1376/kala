@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"log/slog"
+	"log"
 	"os"
 
 	"github.com/go-chi/jwtauth/v5"
@@ -14,30 +14,30 @@ import (
 )
 
 func runServer() {
-	logger := Logger.NewJsonLogger(os.Stdout)
-
 	cfg, err := newConfig()
 	if err != nil {
-		logger.Error("failed to load configurations", slog.String("error", err.Error()))
+		log.Println("failed to load configurations,", err)
 		return
 	}
+
+	logger := Logger.NewJsonLogger(os.Stdout, cfg.Logger.Level)
 	logger.Info("configurations loaded successfully")
 
 	client, err := openSqlDB(cfg)
 	if err != nil {
-		logger.Error("failed to open sql connection", slog.String("error", err.Error()))
+		logger.Error("failed to open sql connection", "error", err)
 		return
 	}
 	defer client.Close()
 	logger.Info("sql database connection established")
 
 	if err = client.Schema.Create(context.Background()); err != nil {
-		logger.Error("failed creating schema resources: %v", slog.String("error", err.Error()))
+		logger.Error("failed creating schema resources: %v", "error", err)
 		return
 	}
 
-	cfg.JWTToken = jwtauth.New("HS256", []byte(cfg.JWTSecret), nil)
-	logger.Info("JWT token generated")
+	cfg.JWT.Token = jwtauth.New("HS256", []byte(cfg.JWT.Secret), nil)
+	logger.Info("JWT token initialized")
 
 	app := &config.Application{
 		Config: cfg,
@@ -49,7 +49,7 @@ func runServer() {
 	router := handler.Router()
 	err = serve(app, router)
 	if err != nil {
-		logger.Error("failed to start server", slog.String("error", err.Error()))
+		logger.Error("failed to start server", "error", err)
 		return
 	}
 }

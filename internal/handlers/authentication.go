@@ -43,7 +43,7 @@ func (h *handler) loginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, token, err := h.Config.JWTToken.Encode(map[string]any{
+	_, token, err := h.Config.JWT.Token.Encode(map[string]any{
 		"user":   user,
 		"expire": time.Now().Add(time.Hour * 24 * 7).Format(time.RFC3339),
 	})
