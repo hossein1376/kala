@@ -30,7 +30,7 @@ func (h *handler) createNewProductHandler(w http.ResponseWriter, r *http.Request
 }
 
 func (h *handler) getProductByIDHandler(w http.ResponseWriter, r *http.Request) {
-	id := paramInt(r, "id")
+	id := h.paramInt(r, "id")
 	if id == 0 {
 		h.NotFoundResponse(w, r, nil)
 		return
@@ -62,7 +62,7 @@ func (h *handler) getAllProductsHandler(w http.ResponseWriter, r *http.Request) 
 }
 
 func (h *handler) updateProductByIDHandler(w http.ResponseWriter, r *http.Request) {
-	id := paramInt(r, "id")
+	id := h.paramInt(r, "id")
 	if id == 0 {
 		h.NotFoundResponse(w, r, nil)
 		return
@@ -126,7 +126,7 @@ func (h *handler) updateProductByIDHandler(w http.ResponseWriter, r *http.Reques
 }
 
 func (h *handler) deleteProductByIDHandler(w http.ResponseWriter, r *http.Request) {
-	id := paramInt(r, "id")
+	id := h.paramInt(r, "id")
 	if id == 0 {
 		h.NotFoundResponse(w, r, nil)
 		return

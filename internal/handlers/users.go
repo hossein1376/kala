@@ -55,7 +55,7 @@ func (h *handler) createNewUserHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *handler) getUserByIDHandler(w http.ResponseWriter, r *http.Request) {
-	id := paramInt(r, "id")
+	id := h.paramInt(r, "id")
 	if id == 0 {
 		h.NotFoundResponse(w, r, nil)
 		return
@@ -86,7 +86,7 @@ func (h *handler) getAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) {
-	id := paramInt(r, "id")
+	id := h.paramInt(r, "id")
 	if id == 0 {
 		h.NotFoundResponse(w, r, nil)
 		return
@@ -155,7 +155,7 @@ func (h *handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 }
 
 func (h *handler) deleteUserByIDHandler(w http.ResponseWriter, r *http.Request) {
-	id := paramInt(r, "id")
+	id := h.paramInt(r, "id")
 	if id == 0 {
 		h.NotFoundResponse(w, r, nil)
 		return
