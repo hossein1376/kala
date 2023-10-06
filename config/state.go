@@ -4,6 +4,7 @@ import (
 	"log/slog"
 
 	"github.com/go-chi/jwtauth/v5"
+	"github.com/redis/go-redis/v9"
 
 	"github.com/hossein1376/kala/internal/data"
 )
@@ -22,14 +23,17 @@ type Application struct {
 	Config *Config
 	Logger *slog.Logger
 	Models *data.Models
+	RDB    *redis.Client
 }
 
 type Config struct {
 	Environment string `json:"environment"`
 	Port        string `json:"port"`
-	DB          DB     `json:"db"`
-	JWT         JWT    `json:"jwt"`
-	Logger      Logger `json:"logger"`
+	Cache       bool   `json:"cache"`
+
+	DB     DB     `json:"db"`
+	JWT    JWT    `json:"jwt"`
+	Logger Logger `json:"logger"`
 }
 
 type JWT struct {
@@ -44,7 +48,6 @@ type Logger struct {
 
 type DB struct {
 	Sql   Sql   `json:"sql"`
-	NoSql NoSql `json:"no_sql"`
 	Redis Redis `json:"redis"`
 }
 
@@ -56,8 +59,9 @@ type Sql struct {
 	Name     string `json:"name"`
 }
 
-type NoSql struct {
-}
-
 type Redis struct {
+	Host     string `json:"host"`
+	Password string `json:"password"`
+	Port     string `json:"port"`
+	DB       int    `json:"db"`
 }

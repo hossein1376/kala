@@ -131,11 +131,10 @@ go run -mod=mod entgo.io/ent/cmd/ent new --target internal/ent/schema <Name>
 
 ## TODOs:
 
-- [x] Simplify the application login
+- [x] Simplify the application logic
 - [x] ~~Improve error handling~~ Created new `transfer` module
-- [ ] Load configurations from a file as an option
-- [ ] Defining the log-level from the configurations
+- [x] Load configurations from a file as an option
+- [x] Defining the log-level from the configurations
 - [ ] Add more logs to the application
 - [ ] Add a new layer between the `handlers` and `data` packages
-- [ ] Integrate Websocket and gRPC
-- [ ] Better config module
+- [ ] Integrate Websocket

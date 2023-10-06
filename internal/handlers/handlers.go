@@ -21,6 +21,7 @@ func NewHandlers(app *config.Application) *handler {
 			Config: app.Config,
 			Logger: app.Logger,
 			Models: app.Models,
+			RDB:    app.RDB,
 		},
 		Response: transfer.NewResponse(app.Logger, JsonHandler{}),
 	}

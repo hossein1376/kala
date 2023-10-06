@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"log/slog"
 	"os"
 	"strconv"
 	"time"
@@ -141,4 +142,23 @@ func verifyConfigs(cfg *config.Config) error {
 	}
 
 	return nil
+}
+
+func getLevel(level string) (slog.Level, error) {
+	switch level {
+	case "debug":
+		return slog.LevelDebug, nil
+
+	case "info":
+		return slog.LevelInfo, nil
+
+	case "warn":
+		return slog.LevelWarn, nil
+
+	case "error":
+		return slog.LevelError, nil
+
+	default:
+		return 0, fmt.Errorf("invalid log level, %s", level)
+	}
 }
