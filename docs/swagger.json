@@ -1,0 +1,19 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Online shop backend.",
+        "title": "Kala",
+        "contact": {
+            "name": "Hossein Yazdani",
+            "url": "https://GodlyNice.ir"
+        },
+        "license": {
+            "name": "MIT license",
+            "url": "https://opensource.org/license/mit/"
+        },
+        "version": "0.1.0"
+    },
+    "host": "localhost:8000",
+    "basePath": "/api/v1",
+    "paths": {}
+}

@@ -1,0 +1,14 @@
+basePath: /api/v1
+host: localhost:8000
+info:
+  contact:
+    name: Hossein Yazdani
+    url: https://GodlyNice.ir
+  description: Online shop backend.
+  license:
+    name: MIT license
+    url: https://opensource.org/license/mit/
+  title: Kala
+  version: 0.1.0
+paths: {}
+swagger: "2.0"
