@@ -1,4 +1,71 @@
 basePath: /api/v1
+definitions:
+  doc.getUserByIDHandlerResponse:
+    properties:
+      data:
+        $ref: '#/definitions/structure.User'
+    type: object
+  structure.Order:
+    properties:
+      id:
+        type: integer
+      products:
+        items:
+          $ref: '#/definitions/structure.Product'
+        type: array
+      user_id:
+        type: integer
+    type: object
+  structure.Product:
+    properties:
+      available:
+        type: boolean
+      description:
+        type: string
+      name:
+        type: string
+      price:
+        type: integer
+      quantity:
+        type: integer
+      rating:
+        type: number
+      rating_count:
+        type: integer
+      status:
+        type: boolean
+    type: object
+  structure.User:
+    properties:
+      email:
+        example: email@wmail.com
+        type: string
+      firstname:
+        example: John
+        type: string
+      id:
+        example: 1
+        type: integer
+      lastname:
+        example: Doe
+        type: string
+      orders:
+        items:
+          $ref: '#/definitions/structure.Order'
+        type: array
+      phone:
+        example: "0123456789"
+        type: string
+      username:
+        example: user
+        type: string
+    type: object
+  transfer.httpResponseError:
+    properties:
+      message:
+        example: error message
+        type: string
+    type: object
 host: localhost:8000
 info:
   contact:
@@ -10,5 +77,38 @@ info:
     url: https://opensource.org/license/mit/
   title: Kala
   version: 0.1.0
-paths: {}
+paths:
+  /users/{id}:
+    get:
+      consumes:
+      - application/json
+      description: get string by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: A single object containing user's data
+          schema:
+            $ref: '#/definitions/doc.getUserByIDHandlerResponse'
+        "400":
+          description: invalid ID
+          schema:
+            $ref: '#/definitions/transfer.httpResponseError'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/transfer.httpResponseError'
+        "500":
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/transfer.httpResponseError'
+      summary: Get a single user by id
+      tags:
+      - user management
 swagger: "2.0"

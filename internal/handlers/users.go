@@ -54,6 +54,18 @@ func (h *handler) createNewUserHandler(w http.ResponseWriter, r *http.Request) {
 	h.StatusCreatedResponse(w, r, transfer.HttpResponse{Data: u})
 }
 
+// getUserByIDHandler godoc
+// @Summary           Get a single user by id
+// @Description       get string by ID
+// @Tags              user management
+// @Accept            json
+// @Produce           json
+// @Param             id   path      int           true               "User ID"
+// @Success           200  {object}  doc.getUserByIDHandlerResponse   "A single object containing user's data"
+// @Failure           400  {object}  transfer.httpResponseError       "invalid ID"
+// @Failure           404  {object}  transfer.httpResponseError       "User not found"
+// @Failure           500  {object}  transfer.httpResponseError       "Unexpected error"
+// @Router            /users/{id} [get]
 func (h *handler) getUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 	id := h.paramInt(r, "id")
 	if id == 0 {

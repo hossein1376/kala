@@ -5,13 +5,13 @@ import (
 )
 
 type User struct {
-	ID        int               `json:"id"`
-	Username  string            `json:"username"`
+	ID        int               `json:"id" example:"1"`
+	Username  string            `json:"username" example:"user"`
 	Password  Password.Password `json:"-"`
-	FirstName string            `json:"firstname,omitempty"`
-	LastName  string            `json:"lastname,omitempty"`
-	Email     string            `json:"email,omitempty"`
-	Phone     string            `json:"phone,omitempty"`
+	FirstName string            `json:"firstname,omitempty" example:"John"`
+	LastName  string            `json:"lastname,omitempty" example:"Doe"`
+	Email     string            `json:"email,omitempty" example:"email@wmail.com"`
+	Phone     string            `json:"phone,omitempty" example:"0123456789"`
 	Orders    []Order           `json:"orders,omitempty"`
 	Role      string            `json:"-"`
 }
