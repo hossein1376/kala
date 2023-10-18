@@ -10,19 +10,19 @@ type User struct {
 	Password  Password.Password `json:"-"`
 	FirstName string            `json:"firstname,omitempty" example:"John"`
 	LastName  string            `json:"lastname,omitempty" example:"Doe"`
-	Email     string            `json:"email,omitempty" example:"email@wmail.com"`
+	Email     string            `json:"email,omitempty" example:"email@email.com"`
 	Phone     string            `json:"phone,omitempty" example:"0123456789"`
 	Orders    []Order           `json:"orders,omitempty"`
 	Role      string            `json:"-"`
 }
 
 type UserCreationRequest struct {
-	UserName  string  `json:"username"`
-	Password  string  `json:"password"`
-	FirstName *string `json:"firstname"`
-	LastName  *string `json:"lastname"`
-	Email     *string `json:"email"`
-	Phone     *string `json:"phone"`
+	UserName  string  `json:"username" example:"user"  validate:"required"`
+	Password  string  `json:"password" example:"123456"  validate:"required"`
+	FirstName *string `json:"firstname" example:"John" validate:"optional"`
+	LastName  *string `json:"lastname" example:"Doe" validate:"optional"`
+	Email     *string `json:"email" example:"email@email.com" validate:"optional"`
+	Phone     *string `json:"phone" example:"0123456789" validate:"optional"`
 }
 
 type UserUpdateRequest struct {

@@ -1,9 +1,20 @@
 basePath: /api/v1
 definitions:
+  doc.createNewUserHandlerResponse:
+    properties:
+      data:
+        $ref: '#/definitions/structure.User'
+    type: object
   doc.getUserByIDHandlerResponse:
     properties:
       data:
         $ref: '#/definitions/structure.User'
+    type: object
+  doc.httpResponseError:
+    properties:
+      message:
+        example: error message
+        type: string
     type: object
   structure.Order:
     properties:
@@ -38,7 +49,7 @@ definitions:
   structure.User:
     properties:
       email:
-        example: email@wmail.com
+        example: email@email.com
         type: string
       firstname:
         example: John
@@ -60,11 +71,29 @@ definitions:
         example: user
         type: string
     type: object
-  transfer.httpResponseError:
+  structure.UserCreationRequest:
     properties:
-      message:
-        example: error message
+      email:
+        example: email@email.com
         type: string
+      firstname:
+        example: John
+        type: string
+      lastname:
+        example: Doe
+        type: string
+      password:
+        example: "123456"
+        type: string
+      phone:
+        example: "0123456789"
+        type: string
+      username:
+        example: user
+        type: string
+    required:
+    - password
+    - username
     type: object
 host: localhost:8000
 info:
@@ -78,11 +107,41 @@ info:
   title: Kala
   version: 0.1.0
 paths:
+  /users:
+    post:
+      consumes:
+      - application/json
+      description: creates a new user and returns the newly created data
+      parameters:
+      - description: User data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/structure.UserCreationRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: single object containing user's data
+          schema:
+            $ref: '#/definitions/doc.createNewUserHandlerResponse'
+        "400":
+          description: bad input
+          schema:
+            $ref: '#/definitions/doc.httpResponseError'
+        "500":
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/doc.httpResponseError'
+      summary: Create user
+      tags:
+      - user management
   /users/{id}:
     get:
       consumes:
       - application/json
-      description: get string by ID
+      description: get a single user by id
       parameters:
       - description: User ID
         in: path
@@ -93,22 +152,22 @@ paths:
       - application/json
       responses:
         "200":
-          description: A single object containing user's data
+          description: single object containing user's data
           schema:
             $ref: '#/definitions/doc.getUserByIDHandlerResponse'
         "400":
           description: invalid ID
           schema:
-            $ref: '#/definitions/transfer.httpResponseError'
+            $ref: '#/definitions/doc.httpResponseError'
         "404":
-          description: User not found
+          description: user not found
           schema:
-            $ref: '#/definitions/transfer.httpResponseError'
+            $ref: '#/definitions/doc.httpResponseError'
         "500":
-          description: Unexpected error
+          description: unexpected error
           schema:
-            $ref: '#/definitions/transfer.httpResponseError'
-      summary: Get a single user by id
+            $ref: '#/definitions/doc.httpResponseError'
+      summary: Get user
       tags:
       - user management
 swagger: "2.0"

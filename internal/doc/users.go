@@ -7,3 +7,7 @@ import (
 type getUserByIDHandlerResponse struct {
 	Data structure.User `json:"data,omitempty"`
 }
+
+type createNewUserHandlerResponse struct {
+	Data structure.User `json:"data,omitempty"`
+}

@@ -9,6 +9,18 @@ import (
 	"github.com/hossein1376/kala/pkg/Password"
 )
 
+// createNewUserHandler godoc
+//
+// @Summary            Create user
+// @Description        creates a new user and returns the newly created data
+// @Tags               user management
+// @Accept             json
+// @Produce            json
+// @Param              request body      structure.UserCreationRequest  true  "User data"
+// @Success            201     {object}  doc.createNewUserHandlerResponse     "single object containing user's data"
+// @Failure            400     {object}  doc.httpResponseError                "bad input"
+// @Failure            500     {object}  doc.httpResponseError                "unexpected error"
+// @Router             /users [post]
 func (h *handler) createNewUserHandler(w http.ResponseWriter, r *http.Request) {
 	var input structure.UserCreationRequest
 	err := h.ReadJson(w, r, &input)
@@ -55,17 +67,18 @@ func (h *handler) createNewUserHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // getUserByIDHandler godoc
-// @Summary           Get a single user by id
-// @Description       get string by ID
-// @Tags              user management
-// @Accept            json
-// @Produce           json
-// @Param             id   path      int           true               "User ID"
-// @Success           200  {object}  doc.getUserByIDHandlerResponse   "A single object containing user's data"
-// @Failure           400  {object}  transfer.httpResponseError       "invalid ID"
-// @Failure           404  {object}  transfer.httpResponseError       "User not found"
-// @Failure           500  {object}  transfer.httpResponseError       "Unexpected error"
-// @Router            /users/{id} [get]
+//
+// @Summary          Get user
+// @Description      get a single user by id
+// @Tags             user management
+// @Accept           json
+// @Produce          json
+// @Param            id   path      int           true               "User ID"
+// @Success          200  {object}  doc.getUserByIDHandlerResponse   "single object containing user's data"
+// @Failure          400  {object}  doc.httpResponseError            "invalid ID"
+// @Failure          404  {object}  doc.httpResponseError            "user not found"
+// @Failure          500  {object}  doc.httpResponseError            "unexpected error"
+// @Router           /users/{id} [get]
 func (h *handler) getUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 	id := h.paramInt(r, "id")
 	if id == 0 {

@@ -22,9 +22,9 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/users/{id}": {
-            "get": {
-                "description": "get string by ID",
+        "/users": {
+            "post": {
+                "description": "creates a new user and returns the newly created data",
                 "consumes": [
                     "application/json"
                 ],
@@ -34,7 +34,53 @@ const docTemplate = `{
                 "tags": [
                     "user management"
                 ],
-                "summary": "Get a single user by id",
+                "summary": "Create user",
+                "parameters": [
+                    {
+                        "description": "User data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/structure.UserCreationRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "single object containing user's data",
+                        "schema": {
+                            "$ref": "#/definitions/doc.createNewUserHandlerResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "bad input",
+                        "schema": {
+                            "$ref": "#/definitions/doc.httpResponseError"
+                        }
+                    },
+                    "500": {
+                        "description": "unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/doc.httpResponseError"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/{id}": {
+            "get": {
+                "description": "get a single user by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user management"
+                ],
+                "summary": "Get user",
                 "parameters": [
                     {
                         "type": "integer",
@@ -46,7 +92,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "A single object containing user's data",
+                        "description": "single object containing user's data",
                         "schema": {
                             "$ref": "#/definitions/doc.getUserByIDHandlerResponse"
                         }
@@ -54,19 +100,19 @@ const docTemplate = `{
                     "400": {
                         "description": "invalid ID",
                         "schema": {
-                            "$ref": "#/definitions/transfer.httpResponseError"
+                            "$ref": "#/definitions/doc.httpResponseError"
                         }
                     },
                     "404": {
-                        "description": "User not found",
+                        "description": "user not found",
                         "schema": {
-                            "$ref": "#/definitions/transfer.httpResponseError"
+                            "$ref": "#/definitions/doc.httpResponseError"
                         }
                     },
                     "500": {
-                        "description": "Unexpected error",
+                        "description": "unexpected error",
                         "schema": {
-                            "$ref": "#/definitions/transfer.httpResponseError"
+                            "$ref": "#/definitions/doc.httpResponseError"
                         }
                     }
                 }
@@ -74,11 +120,28 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "doc.createNewUserHandlerResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/structure.User"
+                }
+            }
+        },
         "doc.getUserByIDHandlerResponse": {
             "type": "object",
             "properties": {
                 "data": {
                     "$ref": "#/definitions/structure.User"
+                }
+            }
+        },
+        "doc.httpResponseError": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "error message"
                 }
             }
         },
@@ -133,7 +196,7 @@ const docTemplate = `{
             "properties": {
                 "email": {
                     "type": "string",
-                    "example": "email@wmail.com"
+                    "example": "email@email.com"
                 },
                 "firstname": {
                     "type": "string",
@@ -163,12 +226,36 @@ const docTemplate = `{
                 }
             }
         },
-        "transfer.httpResponseError": {
+        "structure.UserCreationRequest": {
             "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
             "properties": {
-                "message": {
+                "email": {
                     "type": "string",
-                    "example": "error message"
+                    "example": "email@email.com"
+                },
+                "firstname": {
+                    "type": "string",
+                    "example": "John"
+                },
+                "lastname": {
+                    "type": "string",
+                    "example": "Doe"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "123456"
+                },
+                "phone": {
+                    "type": "string",
+                    "example": "0123456789"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "user"
                 }
             }
         }
