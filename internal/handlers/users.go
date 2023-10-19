@@ -100,6 +100,16 @@ func (h *handler) getUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 	h.StatusOKResponse(w, r, transfer.HttpResponse{Data: user})
 }
 
+// getAllUsersHandler godoc
+//
+// @Summary          Get all users
+// @Description      get all users
+// @Tags             user management
+// @Accept           json
+// @Produce          json
+// @Success          200  {object}  doc.getAllUsersHandlerResponse   "array of user objects"
+// @Failure          500  {object}  doc.httpResponseError            "unexpected error"
+// @Router           /users [get]
 func (h *handler) getAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 	users, err := h.Models.User.GetAll()
 	if err != nil {
@@ -110,6 +120,20 @@ func (h *handler) getAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 	h.StatusOKResponse(w, r, transfer.HttpResponse{Data: users})
 }
 
+// createNewUserHandler godoc
+//
+// @Summary            Update user
+// @Description        update a user data by its ID
+// @Tags               user management
+// @Accept             json
+// @Produce            json
+// @Param              request body      structure.UserUpdateRequest  true    "User data"
+// @Param              id      path      int                          true    "User ID"
+// @Success            200     {object}  doc.updateUserByIDHandlerResponse    "single object containing user's data"
+// @Failure            400     {object}  doc.httpResponseError                "bad input"
+// @Failure            404     {object}  doc.httpResponseError                "user not found"
+// @Failure            500     {object}  doc.httpResponseError                "unexpected error"
+// @Router             /users/{id} [patch]
 func (h *handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 	id := h.paramInt(r, "id")
 	if id == 0 {
@@ -179,6 +203,18 @@ func (h *handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 	h.StatusOKResponse(w, r, transfer.HttpResponse{Data: user})
 }
 
+// deleteUserByIDHandler godoc
+//
+// @Summary            Delete user
+// @Description        delete a user by its ID
+// @Tags               user management
+// @Accept             json
+// @Produce            json
+// @Param              id      path      int              true    "User ID"
+// @Success            204
+// @Failure            404     {object}  doc.httpResponseError   "user not found"
+// @Failure            500     {object}  doc.httpResponseError   "unexpected error"
+// @Router             /users/{id} [delete]
 func (h *handler) deleteUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 	id := h.paramInt(r, "id")
 	if id == 0 {

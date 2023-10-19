@@ -23,6 +23,33 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/users": {
+            "get": {
+                "description": "get all users",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user management"
+                ],
+                "summary": "Get all users",
+                "responses": {
+                    "200": {
+                        "description": "array of user objects",
+                        "schema": {
+                            "$ref": "#/definitions/doc.getAllUsersHandlerResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/doc.httpResponseError"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "creates a new user and returns the newly created data",
                 "consumes": [
@@ -116,6 +143,102 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "delete": {
+                "description": "delete a user by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user management"
+                ],
+                "summary": "Delete user",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "404": {
+                        "description": "user not found",
+                        "schema": {
+                            "$ref": "#/definitions/doc.httpResponseError"
+                        }
+                    },
+                    "500": {
+                        "description": "unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/doc.httpResponseError"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "update a user data by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user management"
+                ],
+                "summary": "Update user",
+                "parameters": [
+                    {
+                        "description": "User data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/structure.UserUpdateRequest"
+                        }
+                    },
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "single object containing user's data",
+                        "schema": {
+                            "$ref": "#/definitions/doc.updateUserByIDHandlerResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "bad input",
+                        "schema": {
+                            "$ref": "#/definitions/doc.httpResponseError"
+                        }
+                    },
+                    "404": {
+                        "description": "user not found",
+                        "schema": {
+                            "$ref": "#/definitions/doc.httpResponseError"
+                        }
+                    },
+                    "500": {
+                        "description": "unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/doc.httpResponseError"
+                        }
+                    }
+                }
             }
         }
     },
@@ -125,6 +248,17 @@ const docTemplate = `{
             "properties": {
                 "data": {
                     "$ref": "#/definitions/structure.User"
+                }
+            }
+        },
+        "doc.getAllUsersHandlerResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/structure.User"
+                    }
                 }
             }
         },
@@ -142,6 +276,14 @@ const docTemplate = `{
                 "message": {
                     "type": "string",
                     "example": "error message"
+                }
+            }
+        },
+        "doc.updateUserByIDHandlerResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/structure.User"
                 }
             }
         },
@@ -232,6 +374,35 @@ const docTemplate = `{
                 "password",
                 "username"
             ],
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "email@email.com"
+                },
+                "firstname": {
+                    "type": "string",
+                    "example": "John"
+                },
+                "lastname": {
+                    "type": "string",
+                    "example": "Doe"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "123456"
+                },
+                "phone": {
+                    "type": "string",
+                    "example": "0123456789"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "user"
+                }
+            }
+        },
+        "structure.UserUpdateRequest": {
+            "type": "object",
             "properties": {
                 "email": {
                     "type": "string",

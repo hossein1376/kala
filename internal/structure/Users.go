@@ -19,17 +19,17 @@ type User struct {
 type UserCreationRequest struct {
 	UserName  string  `json:"username" example:"user"  validate:"required"`
 	Password  string  `json:"password" example:"123456"  validate:"required"`
-	FirstName *string `json:"firstname" example:"John" validate:"optional"`
-	LastName  *string `json:"lastname" example:"Doe" validate:"optional"`
-	Email     *string `json:"email" example:"email@email.com" validate:"optional"`
-	Phone     *string `json:"phone" example:"0123456789" validate:"optional"`
+	FirstName *string `json:"firstname" example:"John"`
+	LastName  *string `json:"lastname" example:"Doe"`
+	Email     *string `json:"email" example:"email@email.com"`
+	Phone     *string `json:"phone" example:"0123456789"`
 }
 
 type UserUpdateRequest struct {
-	UserName  *string `json:"username"`
-	Password  *string `json:"password"`
-	FirstName *string `json:"firstname"`
-	LastName  *string `json:"lastname"`
-	Email     *string `json:"email"`
-	Phone     *string `json:"phone"`
+	UserName  *string `json:"username" example:"user"`
+	Password  *string `json:"password" example:"123456"`
+	FirstName *string `json:"firstname" example:"John"`
+	LastName  *string `json:"lastname" example:"Doe"`
+	Email     *string `json:"email" example:"email@email.com"`
+	Phone     *string `json:"phone" example:"0123456789"`
 }

@@ -5,6 +5,13 @@ definitions:
       data:
         $ref: '#/definitions/structure.User'
     type: object
+  doc.getAllUsersHandlerResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/structure.User'
+        type: array
+    type: object
   doc.getUserByIDHandlerResponse:
     properties:
       data:
@@ -15,6 +22,11 @@ definitions:
       message:
         example: error message
         type: string
+    type: object
+  doc.updateUserByIDHandlerResponse:
+    properties:
+      data:
+        $ref: '#/definitions/structure.User'
     type: object
   structure.Order:
     properties:
@@ -95,6 +107,27 @@ definitions:
     - password
     - username
     type: object
+  structure.UserUpdateRequest:
+    properties:
+      email:
+        example: email@email.com
+        type: string
+      firstname:
+        example: John
+        type: string
+      lastname:
+        example: Doe
+        type: string
+      password:
+        example: "123456"
+        type: string
+      phone:
+        example: "0123456789"
+        type: string
+      username:
+        example: user
+        type: string
+    type: object
 host: localhost:8000
 info:
   contact:
@@ -108,6 +141,24 @@ info:
   version: 0.1.0
 paths:
   /users:
+    get:
+      consumes:
+      - application/json
+      description: get all users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: array of user objects
+          schema:
+            $ref: '#/definitions/doc.getAllUsersHandlerResponse'
+        "500":
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/doc.httpResponseError'
+      summary: Get all users
+      tags:
+      - user management
     post:
       consumes:
       - application/json
@@ -138,6 +189,32 @@ paths:
       tags:
       - user management
   /users/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: delete a user by its ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: user not found
+          schema:
+            $ref: '#/definitions/doc.httpResponseError'
+        "500":
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/doc.httpResponseError'
+      summary: Delete user
+      tags:
+      - user management
     get:
       consumes:
       - application/json
@@ -168,6 +245,44 @@ paths:
           schema:
             $ref: '#/definitions/doc.httpResponseError'
       summary: Get user
+      tags:
+      - user management
+    patch:
+      consumes:
+      - application/json
+      description: update a user data by its ID
+      parameters:
+      - description: User data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/structure.UserUpdateRequest'
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: single object containing user's data
+          schema:
+            $ref: '#/definitions/doc.updateUserByIDHandlerResponse'
+        "400":
+          description: bad input
+          schema:
+            $ref: '#/definitions/doc.httpResponseError'
+        "404":
+          description: user not found
+          schema:
+            $ref: '#/definitions/doc.httpResponseError'
+        "500":
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/doc.httpResponseError'
+      summary: Update user
       tags:
       - user management
 swagger: "2.0"
