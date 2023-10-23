@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/go-chi/jwtauth/v5"
+	"github.com/redis/go-redis/v9"
 
 	"github.com/hossein1376/kala/config"
 	"github.com/hossein1376/kala/internal/data"
@@ -43,13 +44,16 @@ func runServer() {
 	}
 	logger.Debug("sql schema's migration done successfully")
 
-	rdb, err := openRedis(cfg)
-	if err != nil {
-		logger.Error("failed to open Redis connection", "error", err)
-		return
+	var rdb *redis.Client
+	if cfg.Cache {
+		rdb, err = openRedis(cfg)
+		if err != nil {
+			logger.Error("failed to open Redis connection", "error", err)
+			return
+		}
+		defer rdb.Close()
+		logger.Debug("Redis connection established")
 	}
-	defer rdb.Close()
-	logger.Debug("Redis connection established")
 
 	cfg.JWT.Token = jwtauth.New("HS256", []byte(cfg.JWT.Secret), nil)
 	logger.Debug("JWT token initialized")
