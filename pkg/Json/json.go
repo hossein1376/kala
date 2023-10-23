@@ -10,14 +10,9 @@ import (
 	"time"
 )
 
-type Json interface {
-	WriteJson(w http.ResponseWriter, status int, data any, headers http.Header) error
-	ReadJson(w http.ResponseWriter, r *http.Request, dst any) error
-}
+type Json struct{}
 
-type StdJson struct{}
-
-func (StdJson) WriteJson(w http.ResponseWriter, status int, data any, headers http.Header) error {
+func (Json) WriteJson(w http.ResponseWriter, status int, data any, headers http.Header) error {
 	js, err := json.Marshal(data)
 	if err != nil {
 		return err
@@ -35,7 +30,7 @@ func (StdJson) WriteJson(w http.ResponseWriter, status int, data any, headers ht
 	return err
 }
 
-func (StdJson) ReadJson(w http.ResponseWriter, r *http.Request, dst any) error {
+func (Json) ReadJson(w http.ResponseWriter, r *http.Request, dst any) error {
 	maxBytes := 1_048_576
 	r.Body = http.MaxBytesReader(w, r.Body, int64(maxBytes))
 	dec := json.NewDecoder(r.Body)

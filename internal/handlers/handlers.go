@@ -6,13 +6,10 @@ import (
 	"github.com/hossein1376/kala/pkg/Json"
 )
 
-// JsonHandler is alias for default json handler package
-type JsonHandler = Json.Jsoniter
-
 type handler struct {
 	*config.Application
 	*transfer.Response
-	JsonHandler
+	Json.Json
 }
 
 func NewHandlers(app *config.Application) *handler {
@@ -23,6 +20,6 @@ func NewHandlers(app *config.Application) *handler {
 			Models: app.Models,
 			RDB:    app.RDB,
 		},
-		Response: transfer.NewResponse(app.Logger, JsonHandler{}),
+		Response: transfer.NewResponse(app.Logger, Json.Json{}),
 	}
 }
