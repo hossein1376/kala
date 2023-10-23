@@ -4,7 +4,7 @@ go 1.21
 
 require (
 	entgo.io/ent v0.12.4
-	github.com/alexedwards/argon2id v0.0.0-20231016161201-27bf9713919b
+	github.com/alexedwards/argon2id v1.0.0
 	github.com/go-chi/chi/v5 v5.0.10
 	github.com/go-chi/httprate v0.7.4
 	github.com/go-chi/jwtauth/v5 v5.1.1
