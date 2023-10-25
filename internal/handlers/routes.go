@@ -24,7 +24,9 @@ func (h *handler) Router() *chi.Mux {
 		// rate limiter middleware
 		r.Use(httprate.LimitByRealIP(10, time.Minute))
 
-		r.Post("/login", h.loginHandler)
+		r.Route("/api/v1", func(r chi.Router) {
+			r.Post("/login", h.loginHandler)
+		})
 	})
 
 	// private routes

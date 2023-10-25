@@ -16,7 +16,7 @@ import (
 // @Tags               user management
 // @Accept             json
 // @Produce            json
-// @Param              request body      structure.UserCreationRequest  true  "User data"
+// @Param              request body      structure.UserCreationRequest  true  "user data"
 // @Success            201     {object}  doc.createNewUserHandlerResponse     "single object containing user's data"
 // @Failure            400     {object}  doc.httpResponseError                "bad input"
 // @Failure            500     {object}  doc.httpResponseError                "unexpected error"
@@ -73,7 +73,7 @@ func (h *handler) createNewUserHandler(w http.ResponseWriter, r *http.Request) {
 // @Tags             user management
 // @Accept           json
 // @Produce          json
-// @Param            id   path      int           true               "User ID"
+// @Param            id   path      int           true               "user ID"
 // @Success          200  {object}  doc.getUserByIDHandlerResponse   "single object containing user's data"
 // @Failure          400  {object}  doc.httpResponseError            "invalid ID"
 // @Failure          404  {object}  doc.httpResponseError            "user not found"
@@ -127,8 +127,8 @@ func (h *handler) getAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 // @Tags               user management
 // @Accept             json
 // @Produce            json
-// @Param              request body      structure.UserUpdateRequest  true    "User data"
-// @Param              id      path      int                          true    "User ID"
+// @Param              request body      structure.UserUpdateRequest  true    "user data"
+// @Param              id      path      int                          true    "user ID"
 // @Success            200     {object}  doc.updateUserByIDHandlerResponse    "single object containing user's data"
 // @Failure            400     {object}  doc.httpResponseError                "bad input"
 // @Failure            404     {object}  doc.httpResponseError                "user not found"

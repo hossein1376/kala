@@ -23,10 +23,30 @@ definitions:
         example: error message
         type: string
     type: object
+  doc.loginHandlerResponse:
+    properties:
+      data:
+        $ref: '#/definitions/structure.LoginResponse'
+    type: object
   doc.updateUserByIDHandlerResponse:
     properties:
       data:
         $ref: '#/definitions/structure.User'
+    type: object
+  structure.LoginRequest:
+    properties:
+      password:
+        example: password
+        type: string
+      username:
+        example: username
+        type: string
+    type: object
+  structure.LoginResponse:
+    properties:
+      token:
+        example: random_jwt_token
+        type: string
     type: object
   structure.Order:
     properties:
@@ -140,6 +160,40 @@ info:
   title: Kala
   version: 0.1.0
 paths:
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Sign-in into the application
+      parameters:
+      - description: user credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/structure.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: single object containing JWT token
+          schema:
+            $ref: '#/definitions/doc.loginHandlerResponse'
+        "400":
+          description: bad input
+          schema:
+            $ref: '#/definitions/doc.httpResponseError'
+        "401":
+          description: not authorized
+          schema:
+            $ref: '#/definitions/doc.httpResponseError'
+        "500":
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/doc.httpResponseError'
+      summary: Login
+      tags:
+      - authentication
   /users:
     get:
       consumes:
@@ -164,7 +218,7 @@ paths:
       - application/json
       description: creates a new user and returns the newly created data
       parameters:
-      - description: User data
+      - description: user data
         in: body
         name: request
         required: true
@@ -220,7 +274,7 @@ paths:
       - application/json
       description: get a single user by id
       parameters:
-      - description: User ID
+      - description: user ID
         in: path
         name: id
         required: true
@@ -252,13 +306,13 @@ paths:
       - application/json
       description: update a user data by its ID
       parameters:
-      - description: User data
+      - description: user data
         in: body
         name: request
         required: true
         schema:
           $ref: '#/definitions/structure.UserUpdateRequest'
-      - description: User ID
+      - description: user ID
         in: path
         name: id
         required: true

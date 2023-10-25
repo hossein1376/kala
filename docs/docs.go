@@ -22,6 +22,58 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/login": {
+            "post": {
+                "description": "Sign-in into the application",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "authentication"
+                ],
+                "summary": "Login",
+                "parameters": [
+                    {
+                        "description": "user credentials",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/structure.LoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "single object containing JWT token",
+                        "schema": {
+                            "$ref": "#/definitions/doc.loginHandlerResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "bad input",
+                        "schema": {
+                            "$ref": "#/definitions/doc.httpResponseError"
+                        }
+                    },
+                    "401": {
+                        "description": "not authorized",
+                        "schema": {
+                            "$ref": "#/definitions/doc.httpResponseError"
+                        }
+                    },
+                    "500": {
+                        "description": "unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/doc.httpResponseError"
+                        }
+                    }
+                }
+            }
+        },
         "/users": {
             "get": {
                 "description": "get all users",
@@ -64,7 +116,7 @@ const docTemplate = `{
                 "summary": "Create user",
                 "parameters": [
                     {
-                        "description": "User data",
+                        "description": "user data",
                         "name": "request",
                         "in": "body",
                         "required": true,
@@ -111,7 +163,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "User ID",
+                        "description": "user ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -197,7 +249,7 @@ const docTemplate = `{
                 "summary": "Update user",
                 "parameters": [
                     {
-                        "description": "User data",
+                        "description": "user data",
                         "name": "request",
                         "in": "body",
                         "required": true,
@@ -207,7 +259,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "User ID",
+                        "description": "user ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -279,11 +331,41 @@ const docTemplate = `{
                 }
             }
         },
+        "doc.loginHandlerResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/structure.LoginResponse"
+                }
+            }
+        },
         "doc.updateUserByIDHandlerResponse": {
             "type": "object",
             "properties": {
                 "data": {
                     "$ref": "#/definitions/structure.User"
+                }
+            }
+        },
+        "structure.LoginRequest": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string",
+                    "example": "password"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "username"
+                }
+            }
+        },
+        "structure.LoginResponse": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string",
+                    "example": "random_jwt_token"
                 }
             }
         },

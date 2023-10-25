@@ -10,6 +10,19 @@ import (
 	"github.com/hossein1376/kala/pkg/Password"
 )
 
+// loginHandler godoc
+//
+// @Summary            Login
+// @Description        Sign-in into the application
+// @Tags               authentication
+// @Accept             json
+// @Produce            json
+// @Param              request body      structure.LoginRequest    true     "user credentials"
+// @Success            200     {object}  doc.loginHandlerResponse           "single object containing JWT token"
+// @Failure            400     {object}  doc.httpResponseError              "bad input"
+// @Failure            401     {object}  doc.httpResponseError              "not authorized"
+// @Failure            500     {object}  doc.httpResponseError              "unexpected error"
+// @Router             /login [post]
 func (h *handler) loginHandler(w http.ResponseWriter, r *http.Request) {
 	var input structure.LoginRequest
 	err := h.ReadJson(w, r, &input)
@@ -53,6 +66,6 @@ func (h *handler) loginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Bearer", token)
-	resp := transfer.HttpResponse{Data: map[string]any{"token": token}}
+	resp := transfer.HttpResponse{Data: structure.LoginResponse{Token: token}}
 	h.StatusOKResponse(w, r, resp)
 }
