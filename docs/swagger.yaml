@@ -8,9 +8,7 @@ definitions:
   doc.getAllUsersHandlerResponse:
     properties:
       data:
-        items:
-          $ref: '#/definitions/structure.User'
-        type: array
+        $ref: '#/definitions/structure.GetAllUsersResponse'
     type: object
   doc.getUserByIDHandlerResponse:
     properties:
@@ -32,6 +30,22 @@ definitions:
     properties:
       data:
         $ref: '#/definitions/structure.User'
+    type: object
+  structure.GetAllUsersResponse:
+    properties:
+      current_page:
+        example: 2
+        type: integer
+      per_page:
+        example: 10
+        type: integer
+      total_pages:
+        example: 5
+        type: integer
+      users:
+        items:
+          $ref: '#/definitions/structure.User'
+        type: array
     type: object
   structure.LoginRequest:
     properties:
@@ -199,6 +213,17 @@ paths:
       consumes:
       - application/json
       description: get all users
+      parameters:
+      - description: page number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - description: number of items per page
+        in: query
+        name: count
+        required: true
+        type: integer
       produces:
       - application/json
       responses:

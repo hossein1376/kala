@@ -25,6 +25,18 @@ type UserCreationRequest struct {
 	Phone     *string `json:"phone" example:"0123456789"`
 }
 
+type GetAllUsersRequest struct {
+	Count int `schema:"count,required"`
+	Page  int `schema:"page,required"`
+}
+
+type GetAllUsersResponse struct {
+	Users       []*User `json:"users"`
+	CurrentPage int     `json:"current_page" example:"2"`
+	TotalPages  int     `json:"total_pages" example:"5"`
+	PerPage     int     `json:"per_page" example:"10"`
+}
+
 type UserUpdateRequest struct {
 	UserName  *string `json:"username" example:"user"`
 	Password  *string `json:"password" example:"123456"`

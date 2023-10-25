@@ -90,7 +90,7 @@ func (h *handler) getUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		switch {
 		case errors.As(err, &transfer.NotFoundError{}):
-			h.NotFoundResponse(w, r, err)
+			h.NotFoundResponse(w, r, nil)
 		default:
 			h.InternalServerErrorResponse(w, r, err)
 		}
@@ -107,17 +107,41 @@ func (h *handler) getUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 // @Tags             user management
 // @Accept           json
 // @Produce          json
-// @Success          200  {object}  doc.getAllUsersHandlerResponse   "array of user objects"
-// @Failure          500  {object}  doc.httpResponseError            "unexpected error"
+// @Param            page   query     int            true              "page number"
+// @Param            count  query     int           true               "number of items per page"
+// @Success          200    {object}  doc.getAllUsersHandlerResponse   "array of user objects"
+// @Failure          500    {object}  doc.httpResponseError            "unexpected error"
 // @Router           /users [get]
 func (h *handler) getAllUsersHandler(w http.ResponseWriter, r *http.Request) {
-	users, err := h.Models.User.GetAll()
+	query := new(structure.GetAllUsersRequest)
+	if err := h.decoder.Decode(query, r.URL.Query()); err != nil {
+		h.BadRequestResponse(w, r, err)
+		return
+	}
+
+	if query.Page < 1 || query.Count < 1 {
+		h.BadRequestResponse(w, r, nil)
+		return
+	}
+
+	users, count, err := h.Models.User.GetAll(query)
 	if err != nil {
 		h.InternalServerErrorResponse(w, r, err)
 		return
 	}
 
-	h.StatusOKResponse(w, r, transfer.HttpResponse{Data: users})
+	pages := count / query.Count
+	if count%query.Count != 0 {
+		pages++
+	}
+	response := structure.GetAllUsersResponse{
+		Users:       users,
+		CurrentPage: query.Page,
+		TotalPages:  pages,
+		PerPage:     query.Count,
+	}
+
+	h.StatusOKResponse(w, r, transfer.HttpResponse{Data: response})
 }
 
 // createNewUserHandler godoc

@@ -44,11 +44,17 @@ func (u *UserModel) Create(data structure.User) (*structure.User, error) {
 }
 
 func (u *UserModel) GetByID(id int) (*structure.User, error) {
-	user, err := u.client.User.Get(context.Background(), id)
+	user, err := u.client.User.
+		Query().
+		Where(
+			entUser.ID(id),
+			entUser.Status(true),
+		).
+		First(context.Background())
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
-			return nil, transfer.NotFoundError{Err: err}
+			return nil, transfer.NotFoundError{}
 		default:
 			return nil, err
 		}
@@ -94,10 +100,16 @@ func (u *UserModel) GetByUsername(username string) (*structure.User, error) {
 	}, err
 }
 
-func (u *UserModel) GetAll() ([]*structure.User, error) {
-	users, err := u.client.User.Query().All(context.Background())
+func (u *UserModel) GetAll(query *structure.GetAllUsersRequest) ([]*structure.User, int, error) {
+	users, err := u.client.User.Query().
+		Where(
+			entUser.Status(true),
+		).
+		Limit(query.Count).
+		Offset((query.Page - 1) * query.Count).
+		All(context.Background())
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	resp := make([]*structure.User, 0, len(users))
@@ -113,7 +125,13 @@ func (u *UserModel) GetAll() ([]*structure.User, error) {
 		resp = append(resp, r)
 	}
 
-	return resp, err
+	count, err := u.client.User.Query().
+		Where(
+			entUser.Status(true),
+		).
+		Count(context.Background())
+
+	return resp, count, err
 }
 
 func (u *UserModel) UpdateByID(id int, user *structure.User) error {

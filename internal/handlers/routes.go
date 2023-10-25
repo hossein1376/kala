@@ -19,23 +19,21 @@ func (h *handler) Router() *chi.Mux {
 	// custom middlewares
 	r.Use(h.logger)
 
-	// public routes
-	r.Group(func(r chi.Router) {
-		// rate limiter middleware
-		r.Use(httprate.LimitByRealIP(10, time.Minute))
+	r.Route("/api/v1", func(r chi.Router) {
+		// public routes
+		r.Group(func(r chi.Router) {
+			// rate limiter middleware
+			r.Use(httprate.LimitByRealIP(10, time.Minute))
 
-		r.Route("/api/v1", func(r chi.Router) {
 			r.Post("/login", h.loginHandler)
 		})
-	})
 
-	// private routes
-	r.Group(func(r chi.Router) {
-		// JWT middlewares
-		r.Use(jwtauth.Verifier(h.Config.JWT.Token))
-		r.Use(jwtauth.Authenticator, h.checkJWT)
+		// private routes
+		r.Group(func(r chi.Router) {
+			// JWT middlewares
+			r.Use(jwtauth.Verifier(h.Config.JWT.Token))
+			r.Use(jwtauth.Authenticator, h.checkJWT)
 
-		r.Route("/api/v1", func(r chi.Router) {
 			// user routes
 			r.Route("/users", func(r chi.Router) {
 				r.Post("/", h.createNewUserHandler)
@@ -55,6 +53,5 @@ func (h *handler) Router() *chi.Mux {
 			})
 		})
 	})
-
 	return r
 }

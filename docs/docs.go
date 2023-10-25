@@ -87,6 +87,22 @@ const docTemplate = `{
                     "user management"
                 ],
                 "summary": "Get all users",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "page number",
+                        "name": "page",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "number of items per page",
+                        "name": "count",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "array of user objects",
@@ -307,10 +323,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "data": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/structure.User"
-                    }
+                    "$ref": "#/definitions/structure.GetAllUsersResponse"
                 }
             }
         },
@@ -344,6 +357,29 @@ const docTemplate = `{
             "properties": {
                 "data": {
                     "$ref": "#/definitions/structure.User"
+                }
+            }
+        },
+        "structure.GetAllUsersResponse": {
+            "type": "object",
+            "properties": {
+                "current_page": {
+                    "type": "integer",
+                    "example": 2
+                },
+                "per_page": {
+                    "type": "integer",
+                    "example": 10
+                },
+                "total_pages": {
+                    "type": "integer",
+                    "example": 5
+                },
+                "users": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/structure.User"
+                    }
                 }
             }
         },

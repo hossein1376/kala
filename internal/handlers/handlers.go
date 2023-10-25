@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"github.com/gorilla/schema"
+
 	"github.com/hossein1376/kala/config"
 	"github.com/hossein1376/kala/internal/transfer"
 	"github.com/hossein1376/kala/pkg/Json"
@@ -9,7 +11,7 @@ import (
 type handler struct {
 	*config.Application
 	*transfer.Response
-	Json.Json
+	decoder *schema.Decoder
 }
 
 func NewHandlers(app *config.Application) *handler {
@@ -21,5 +23,6 @@ func NewHandlers(app *config.Application) *handler {
 			RDB:    app.RDB,
 		},
 		Response: transfer.NewResponse(app.Logger, Json.Json{}),
+		decoder:  schema.NewDecoder(),
 	}
 }
