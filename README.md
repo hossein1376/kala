@@ -10,7 +10,8 @@ from [Let's Go Further](https://lets-go-further.alexedwards.net/),
 but over time I found some shortcomings in that approach, which led me to explore my desired structure.  
 The following is the result of my experience of developing many Go projects, what I find more logical and extensible
 approach,
-compile-time checks (I'm looking at you, import cycle), my constant experiment with different designs, and on top of all,
+compile-time checks (I'm looking at you, import cycle), my constant experiment with different designs, and on top of
+all,
 my personal taste.
 
 While I find this overall structure to make sense the most, feel free to adapt it partially or completely for your own
@@ -54,16 +55,23 @@ projects!
 
 ### cmd/api
 
-This module is tasked with retrieving the configurations, their validation, opening database connections, and then
+This package is tasked with retrieving the configurations, their validation, opening database connections, and then
 finally starting the server.  
 It also handles the graceful shutdown as well.
 
-The configurations, logger, and one instance of `Model` will be passed down from here to the `handlers` module.
+The configurations, logger, and one instance of `Model` will be passed down from here to the `handlers` package.
 
 ### config
 
-The configuration and settings structures are defined here, as they'll be used inside the application to control the API's
-behaviour.
+The configuration and settings structures are defined here, as they'll be used inside the application to control the
+API's behaviour.  
+Application will look for configurations with the following priority:
+
+1. Config file
+2. Flag arguments
+3. Environment variables
+
+If a specific data is not present, it will look for it on the next level.
 
 ### internal/data
 
@@ -73,7 +81,7 @@ With the use of interfaces, it's easy to write mocks for test cases.
 
 ### internal/handlers
 
-The `handlers` module features the struct `handler` which all handlers are a receiver function to it. It has a single
+The `handlers` package features the struct `handler` which all handlers are a receiver function to it. It has a single
 exported receiver function named `Router` which will be called inside the `cmd/api/run.go` to instantiate the router.
 
 Multiple structs such as `Json` and `Response` will be embedded inside the `handler` struct so they can be used directly
@@ -81,15 +89,16 @@ by the handlers.
 
 ### internal/structure
 
-This module consists of structs to define the request, response, and data structure; hence the name.  
+This package consists of structs to define the request, response, and data structure; hence the name.  
 It's equivalent of `dto` in some other architectures.
 
 ### internal/transfer
 
-This module is tasked with the data transfer inside the application, as well as to the clients. It features a general
+This package is tasked with the data transfer inside the application, as well as to the clients. It features a general
 HTTP response function, besides many other helper functions each meant for a specific status code.
 
-`transfer` also is home to a handful of structs that all implement `error` interface. They are meant to be used as a mean
+`transfer` also is home to a handful of structs that all implement `error` interface. They are meant to be used as a
+mean
 of conveying state between other layers and the handlers.
 
 ### pkg
@@ -141,7 +150,7 @@ go run -mod=mod entgo.io/ent/cmd/ent new --target internal/ent/schema <Name>
 ## TODOs:
 
 - [x] Simplify the application logic
-- [x] ~~Improve error handling~~ Created new `transfer` module
+- [x] ~~Improve error handling~~ Created new `transfer` package
 - [x] Load configurations from a file as an option
 - [x] Defining the log level from the configurations
 - [ ] Add more logs to the application
