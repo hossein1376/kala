@@ -34,13 +34,13 @@ func newConfig() (*config.Config, error) {
 
 	// getting settings from command line
 	// Note that flag arguments override environment variables, if provided
-	flag.StringVar(&cfg.Environment, "env", env, "Service Environment: dev - prod")
+	flag.StringVar((*string)(&cfg.Environment), "env", env, "Service Environment: dev - prod (default: prod)")
 	flag.StringVar(&cfg.Port, "port", port, "Service Port")
 
 	flag.StringVar(&cfg.JWT.Secret, "jwt-secret", jwtSecret, "JWT Secret")
 	flag.StringVar(&cfg.JWT.Expire, "jwt-expire", jwtExpire, "JWT Expire")
 
-	flag.StringVar(&cfg.Logger.Level, "log-level", logLevel, "Log Level")
+	flag.StringVar((*string)(&cfg.Logger.Level), "log-level", logLevel, "Log Level (default: info)")
 
 	flag.StringVar(&cfg.DB.Sql.Port, "sql-port", sqlPort, "SQL Database Port")
 	flag.StringVar(&cfg.DB.Sql.Username, "sql-username", sqlUsername, "SQL Database Username")
@@ -86,11 +86,13 @@ func readConfigs(cfg *config.Config, cfgFile string) error {
 }
 
 func verifyConfigs(cfg *config.Config) error {
+	// default environment, prod
 	if cfg.Environment == "" {
-		return fmt.Errorf("environment must be specified")
+		cfg.Environment = config.Prod
 	}
-	if !(cfg.Environment == config.Dev || cfg.Environment == config.Prod) {
-		return fmt.Errorf("invalid environment, options are: %s - %s", config.Dev, config.Prod)
+	// default log level, info
+	if cfg.Logger.Level == "" {
+		cfg.Logger.Level = config.Info
 	}
 
 	if cfg.Port == "" {
@@ -123,22 +125,6 @@ func verifyConfigs(cfg *config.Config) error {
 	}
 	if cfg.DB.Sql.Username == "" {
 		return fmt.Errorf("sql username must be specified")
-	}
-
-	if cfg.Logger.Level == "" {
-		cfg.Logger.Level = config.Info
-	}
-	if !(cfg.Logger.Level == config.Debug ||
-		cfg.Logger.Level == config.Info ||
-		cfg.Logger.Level == config.Warn ||
-		cfg.Logger.Level == config.Error) {
-		return fmt.Errorf(
-			"invalid log level, options are: %s - %s - %s - %s",
-			config.Debug,
-			config.Info,
-			config.Warn,
-			config.Error,
-		)
 	}
 
 	return nil

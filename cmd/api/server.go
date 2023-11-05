@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -30,8 +29,7 @@ func serve(app *config.Application, router *chi.Mux) error {
 		signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 		sig := <-quit
 
-		app.Logger.Info("shutting down server",
-			slog.String("signal", sig.String()))
+		app.Logger.Info("shutting down server", "signal", sig.String())
 
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
@@ -39,11 +37,7 @@ func serve(app *config.Application, router *chi.Mux) error {
 		shutdownError <- server.Shutdown(ctx)
 	}()
 
-	app.Logger.Info("starting server",
-		slog.String("addr", server.Addr),
-		//slog.String("version", app.config.version),
-		slog.String("env", app.Config.Environment))
-
+	app.Logger.Info("starting server", "addr", server.Addr, "env", app.Config.Environment.String())
 	err := server.ListenAndServe()
 	if !errors.Is(err, http.ErrServerClosed) {
 		return err
@@ -54,7 +48,6 @@ func serve(app *config.Application, router *chi.Mux) error {
 		return err
 	}
 
-	app.Logger.Info("stopped server",
-		slog.String("addr", server.Addr))
+	app.Logger.Info("stopped server", "addr", server.Addr)
 	return nil
 }

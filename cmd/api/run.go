@@ -21,7 +21,7 @@ func runServer() {
 		return
 	}
 
-	logLevel, err := getLevel(cfg.Logger.Level)
+	logLevel, err := getLevel(cfg.Logger.Level.String())
 	if err != nil {
 		log.Println(err)
 		return

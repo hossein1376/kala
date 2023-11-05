@@ -9,16 +9,6 @@ import (
 	"github.com/hossein1376/kala/internal/data"
 )
 
-const (
-	Dev  = "dev"
-	Prod = "prod"
-
-	Debug = "debug"
-	Info  = "info"
-	Warn  = "warn"
-	Error = "error"
-)
-
 type Application struct {
 	Config *Config
 	Logger *slog.Logger
@@ -27,9 +17,9 @@ type Application struct {
 }
 
 type Config struct {
-	Environment string `json:"environment"`
-	Port        string `json:"port"`
-	Cache       bool   `json:"cache"`
+	Environment environment `json:"environment"`
+	Port        string      `json:"port"`
+	Cache       bool        `json:"cache"`
 
 	DB     DB     `json:"db"`
 	JWT    JWT    `json:"jwt"`
@@ -43,7 +33,7 @@ type JWT struct {
 }
 
 type Logger struct {
-	Level string `json:"level"`
+	Level level `json:"level"`
 }
 
 type DB struct {
