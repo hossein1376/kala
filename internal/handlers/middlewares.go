@@ -37,26 +37,26 @@ func (h *handler) checkJWT(next http.Handler) http.Handler {
 		}
 		expireString, ok := claims["expire"].(string)
 		if !ok {
-			h.Info(checkJWT, "status", transfer.Unauthorized, "error", "bad expiration type", "ip")
+			h.Info(checkJWT, "status", transfer.Unauthorized, "error", "bad expiration type")
 			h.UnauthorizedResponse(w, r)
 			return
 		}
 		expire, err := time.Parse(time.RFC3339, expireString)
 		if err != nil {
-			h.Info(checkJWT, "status", transfer.Unauthorized, "error", "failed to parse expire date", "ip")
+			h.Info(checkJWT, "status", transfer.Unauthorized, "error", "failed to parse expire date")
 			h.UnauthorizedResponse(w, r)
 			return
 		}
 
 		if time.Now().After(expire) {
-			h.Info(checkJWT, "status", transfer.Unauthorized, "error", "expired token", "ip")
+			h.Info(checkJWT, "status", transfer.Unauthorized, "error", "expired token")
 			h.UnauthorizedResponse(w, r)
 			return
 		}
 
 		user, ok := claims["user"].(map[string]any)
 		if !ok {
-			h.Info(checkJWT, "status", transfer.Unauthorized, "error", "bad user type", "ip")
+			h.Info(checkJWT, "status", transfer.Unauthorized, "error", "bad user type")
 			h.UnauthorizedResponse(w, r)
 			return
 		}
