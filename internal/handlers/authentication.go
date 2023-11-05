@@ -27,6 +27,7 @@ func (h *handler) loginHandler(w http.ResponseWriter, r *http.Request) {
 	var input structure.LoginRequest
 	err := h.ReadJson(w, r, &input)
 	if err != nil {
+		h.Info(login, "status", transfer.BadRequest, "error", err)
 		h.BadRequestResponse(w, r, err)
 		return
 	}
@@ -35,9 +36,11 @@ func (h *handler) loginHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		switch {
 		case errors.As(err, &transfer.NotFoundError{}) || errors.As(err, &transfer.ForbiddenError{}):
+			h.Info(login, "status", transfer.Unauthorized, "error", err, "ip", h.getIP(r))
 			h.UnauthorizedResponse(w, r)
 		default:
-			h.InternalServerErrorResponse(w, r, err)
+			h.Error(login, "status", transfer.InternalServerError, "error", err)
+			h.InternalServerErrorResponse(w, r)
 		}
 		return
 	}
@@ -48,11 +51,12 @@ func (h *handler) loginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	ok, err := p.ArgonMatches()
 	if err != nil {
-		h.InternalServerErrorResponse(w, r, err)
+		h.Error(login, "status", transfer.InternalServerError, "error", err)
 		h.InternalServerErrorResponse(w, r)
 		return
 	}
 	if !ok {
+		h.Info(login, "status", transfer.Unauthorized, "error", "password not match")
 		h.UnauthorizedResponse(w, r)
 		return
 	}
@@ -62,13 +66,13 @@ func (h *handler) loginHandler(w http.ResponseWriter, r *http.Request) {
 		"expire": time.Now().Add(time.Hour * 24 * 7).Format(time.RFC3339),
 	})
 	if err != nil {
-		h.InternalServerErrorResponse(w, r, err)
+		h.Error(login, "status", transfer.InternalServerError, "error", err)
 		h.InternalServerErrorResponse(w, r)
 		return
 	}
 
 	w.Header().Set("Bearer", token)
-	resp := transfer.HttpResponse{Data: structure.LoginResponse{Token: token}}
-	h.StatusOKResponse(w, r, resp)
 	resp := transfer.Resp{Data: structure.LoginResponse{Token: token}}
+	h.Info(login, "status", transfer.OK, "response", "login successful")
+	h.OkResponse(w, r, resp)
 }

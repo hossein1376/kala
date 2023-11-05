@@ -9,12 +9,22 @@ import (
 	"github.com/go-chi/jwtauth/v5"
 )
 
+const (
+	login = "login handler"
+
+	createNewUser  = "create new user handler"
+	getAllUsers    = "get all users handler"
+	getUserByID    = "get user by id handler"
+	updateUserByID = "update user by id handler"
+	deleteUserByID = "delete user by id handler"
+)
+
 func (h *handler) Router() *chi.Mux {
 	// create new router
 	r := chi.NewRouter()
 
 	// standard middlewares
-	r.Use(middleware.Logger, middleware.Recoverer)
+	r.Use(middleware.Recoverer)
 
 	// custom middlewares
 	r.Use(h.logger)
