@@ -47,6 +47,7 @@ func (h *handler) createNewUserHandler(w http.ResponseWriter, r *http.Request) {
 	err = user.Password.ArgonSet(input.Password)
 	if err != nil {
 		h.InternalServerErrorResponse(w, r, err)
+		h.InternalServerErrorResponse(w, r)
 		return
 	}
 
@@ -59,11 +60,14 @@ func (h *handler) createNewUserHandler(w http.ResponseWriter, r *http.Request) {
 			h.BadRequestResponse(w, r, err)
 		default:
 			h.InternalServerErrorResponse(w, r, err)
+			h.InternalServerErrorResponse(w, r)
 		}
 		return
 	}
 
 	h.StatusCreatedResponse(w, r, transfer.HttpResponse{Data: u})
+	response := transfer.Resp{Data: u}
+	h.CreatedResponse(w, r, response)
 }
 
 // getUserByIDHandler godoc
@@ -93,11 +97,13 @@ func (h *handler) getUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 			h.NotFoundResponse(w, r, nil)
 		default:
 			h.InternalServerErrorResponse(w, r, err)
+			h.InternalServerErrorResponse(w, r)
 		}
 		return
 	}
 
 	h.StatusOKResponse(w, r, transfer.HttpResponse{Data: user})
+	h.OkResponse(w, r, response)
 }
 
 // getAllUsersHandler godoc
@@ -127,6 +133,7 @@ func (h *handler) getAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 	users, count, err := h.Models.User.GetAll(query)
 	if err != nil {
 		h.InternalServerErrorResponse(w, r, err)
+		h.InternalServerErrorResponse(w, r)
 		return
 	}
 
@@ -142,6 +149,7 @@ func (h *handler) getAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	h.StatusOKResponse(w, r, transfer.HttpResponse{Data: response})
+	h.OkResponse(w, r, transfer.Resp{Data: response})
 }
 
 // createNewUserHandler godoc
@@ -174,6 +182,8 @@ func (h *handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 
 	if input == (structure.UserUpdateRequest{}) {
 		h.BadRequestResponse(w, r, errors.New("empty request"))
+		err = errors.New("empty request")
+		h.BadRequestResponse(w, r, err)
 		return
 	}
 
@@ -184,6 +194,7 @@ func (h *handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 			h.NotFoundResponse(w, r, err)
 		default:
 			h.InternalServerErrorResponse(w, r, err)
+			h.InternalServerErrorResponse(w, r)
 		}
 		return
 	}
@@ -208,6 +219,7 @@ func (h *handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 		err = p.ArgonSet(*input.Password)
 		if err != nil {
 			h.InternalServerErrorResponse(w, r, err)
+			h.InternalServerErrorResponse(w, r)
 			return
 		}
 		user.Password.Hash = p.Hash
@@ -220,11 +232,14 @@ func (h *handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 			h.NotFoundResponse(w, r, err)
 		default:
 			h.InternalServerErrorResponse(w, r, err)
+			h.InternalServerErrorResponse(w, r)
 		}
 		return
 	}
 
 	h.StatusOKResponse(w, r, transfer.HttpResponse{Data: user})
+	response := transfer.Resp{Data: user}
+	h.OkResponse(w, r, response)
 }
 
 // deleteUserByIDHandler godoc
@@ -253,9 +268,11 @@ func (h *handler) deleteUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 			h.NotFoundResponse(w, r, err)
 		default:
 			h.InternalServerErrorResponse(w, r, err)
+			h.InternalServerErrorResponse(w, r)
 		}
 		return
 	}
 
 	h.StatusNoContentResponse(w, r)
+	h.NoContentResponse(w, r)
 }

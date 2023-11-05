@@ -21,12 +21,12 @@ func (h *handler) createNewProductHandler(w http.ResponseWriter, r *http.Request
 		case ent.IsConstraintError(err) || ent.IsValidationError(err):
 			h.BadRequestResponse(w, r, err)
 		default:
-			h.InternalServerErrorResponse(w, r, err)
+			h.InternalServerErrorResponse(w, r)
 		}
 		return
 	}
 
-	h.StatusCreatedResponse(w, r, product)
+	h.CreatedResponse(w, r, product)
 }
 
 func (h *handler) getProductByIDHandler(w http.ResponseWriter, r *http.Request) {
@@ -43,22 +43,22 @@ func (h *handler) getProductByIDHandler(w http.ResponseWriter, r *http.Request) 
 			h.NotFoundResponse(w, r, err)
 			return
 		default:
-			h.InternalServerErrorResponse(w, r, err)
+			h.InternalServerErrorResponse(w, r)
 			return
 		}
 	}
 
-	h.StatusOKResponse(w, r, product)
+	h.OkResponse(w, r, product)
 }
 
 func (h *handler) getAllProductsHandler(w http.ResponseWriter, r *http.Request) {
 	products, err := h.Models.Product.GetAll()
 	if err != nil {
-		h.InternalServerErrorResponse(w, r, err)
+		h.InternalServerErrorResponse(w, r)
 		return
 	}
 
-	h.StatusOKResponse(w, r, products)
+	h.OkResponse(w, r, products)
 }
 
 func (h *handler) updateProductByIDHandler(w http.ResponseWriter, r *http.Request) {
@@ -81,7 +81,7 @@ func (h *handler) updateProductByIDHandler(w http.ResponseWriter, r *http.Reques
 		case ent.IsNotFound(err):
 			h.NotFoundResponse(w, r, err)
 		default:
-			h.InternalServerErrorResponse(w, r, err)
+			h.InternalServerErrorResponse(w, r)
 		}
 		return
 	}
@@ -117,12 +117,12 @@ func (h *handler) updateProductByIDHandler(w http.ResponseWriter, r *http.Reques
 		case ent.IsConstraintError(err) || ent.IsValidationError(err):
 			h.BadRequestResponse(w, r, err)
 		default:
-			h.InternalServerErrorResponse(w, r, err)
+			h.InternalServerErrorResponse(w, r)
 		}
 		return
 	}
 
-	h.StatusNoContentResponse(w, r)
+	h.NoContentResponse(w, r)
 }
 
 func (h *handler) deleteProductByIDHandler(w http.ResponseWriter, r *http.Request) {
@@ -138,10 +138,10 @@ func (h *handler) deleteProductByIDHandler(w http.ResponseWriter, r *http.Reques
 		case ent.IsNotFound(err):
 			h.NotFoundResponse(w, r, err)
 		default:
-			h.InternalServerErrorResponse(w, r, err)
+			h.InternalServerErrorResponse(w, r)
 		}
 		return
 	}
 
-	h.StatusNoContentResponse(w, r)
+	h.NoContentResponse(w, r)
 }

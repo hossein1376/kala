@@ -20,6 +20,7 @@ func (h *handler) checkJWT(next http.Handler) http.Handler {
 		_, claims, err := jwtauth.FromContext(r.Context())
 		if err != nil {
 			h.InternalServerErrorResponse(w, r, err)
+			h.InternalServerErrorResponse(w, r)
 			return
 		}
 		expireString, ok := claims["expire"].(string)

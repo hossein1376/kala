@@ -49,6 +49,7 @@ func (h *handler) loginHandler(w http.ResponseWriter, r *http.Request) {
 	ok, err := p.ArgonMatches()
 	if err != nil {
 		h.InternalServerErrorResponse(w, r, err)
+		h.InternalServerErrorResponse(w, r)
 		return
 	}
 	if !ok {
@@ -62,10 +63,12 @@ func (h *handler) loginHandler(w http.ResponseWriter, r *http.Request) {
 	})
 	if err != nil {
 		h.InternalServerErrorResponse(w, r, err)
+		h.InternalServerErrorResponse(w, r)
 		return
 	}
 
 	w.Header().Set("Bearer", token)
 	resp := transfer.HttpResponse{Data: structure.LoginResponse{Token: token}}
 	h.StatusOKResponse(w, r, resp)
+	resp := transfer.Resp{Data: structure.LoginResponse{Token: token}}
 }
