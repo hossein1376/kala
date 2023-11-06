@@ -25,8 +25,8 @@ func (h *handler) createNewUserHandler(w http.ResponseWriter, r *http.Request) {
 	var input structure.UserCreationRequest
 	err := h.ReadJson(w, r, &input)
 	if err != nil {
-		h.Info(createNewUser, "status", transfer.BadRequest, "error", err)
-		h.BadRequestResponse(w, r, err)
+		h.Info(createNewUser, "status", transfer.StatusBadRequest, "error", err)
+		h.BadRequestResponse(w, err)
 		return
 	}
 
@@ -47,8 +47,8 @@ func (h *handler) createNewUserHandler(w http.ResponseWriter, r *http.Request) {
 
 	err = user.Password.ArgonSet(input.Password)
 	if err != nil {
-		h.Error(createNewUser, "status", transfer.InternalServerError, "error", err)
-		h.InternalServerErrorResponse(w, r)
+		h.Error(createNewUser, "status", transfer.StatusInternalServerError, "error", err)
+		h.InternalServerErrorResponse(w)
 		return
 	}
 
@@ -58,18 +58,18 @@ func (h *handler) createNewUserHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		switch {
 		case errors.As(err, &transfer.BadRequestError{}):
-			h.Info(createNewUser, "status", transfer.BadRequest, "error", err)
-			h.BadRequestResponse(w, r, err)
+			h.Info(createNewUser, "status", transfer.StatusBadRequest, "error", err)
+			h.BadRequestResponse(w, err)
 		default:
-			h.Error(createNewUser, "status", transfer.InternalServerError, "error", err)
-			h.InternalServerErrorResponse(w, r)
+			h.Error(createNewUser, "status", transfer.StatusInternalServerError, "error", err)
+			h.InternalServerErrorResponse(w)
 		}
 		return
 	}
 
 	response := transfer.Resp{Data: u}
-	h.Info(createNewUser, "status", transfer.Created, "response", response)
-	h.CreatedResponse(w, r, response)
+	h.Info(createNewUser, "status", transfer.StatusCreated, "response", response)
+	h.CreatedResponse(w, response)
 }
 
 // getUserByIDHandler godoc
@@ -88,8 +88,8 @@ func (h *handler) createNewUserHandler(w http.ResponseWriter, r *http.Request) {
 func (h *handler) getUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 	id := h.paramInt(r, "id")
 	if id == 0 {
-		h.Info(getUserByID, "status", transfer.NotFound, "error", "invalid param")
-		h.NotFoundResponse(w, r, nil)
+		h.Info(getUserByID, "status", transfer.StatusNotFound, "error", "invalid param")
+		h.NotFoundResponse(w)
 		return
 	}
 
@@ -97,18 +97,18 @@ func (h *handler) getUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		switch {
 		case errors.As(err, &transfer.NotFoundError{}):
-			h.Info(getUserByID, "status", transfer.NotFound, "error", err)
-			h.NotFoundResponse(w, r, nil)
+			h.Info(getUserByID, "status", transfer.StatusNotFound, "error", err)
+			h.NotFoundResponse(w)
 		default:
-			h.Error(getUserByID, "status", transfer.InternalServerError, "error", err)
-			h.InternalServerErrorResponse(w, r)
+			h.Error(getUserByID, "status", transfer.StatusInternalServerError, "error", err)
+			h.InternalServerErrorResponse(w)
 		}
 		return
 	}
 
 	response := transfer.Resp{Data: user}
-	h.Info(getUserByID, "status", transfer.OK, "response", response)
-	h.OkResponse(w, r, response)
+	h.Info(getUserByID, "status", transfer.StatusOK, "response", response)
+	h.OkResponse(w, response)
 }
 
 // getAllUsersHandler godoc
@@ -126,21 +126,21 @@ func (h *handler) getUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 func (h *handler) getAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 	query := new(structure.GetAllUsersRequest)
 	if err := h.decoder.Decode(query, r.URL.Query()); err != nil {
-		h.Info(getAllUsers, "status", transfer.BadRequest, "error", err)
-		h.BadRequestResponse(w, r, err)
+		h.Info(getAllUsers, "status", transfer.StatusBadRequest, "error", err)
+		h.BadRequestResponse(w, err)
 		return
 	}
 
 	if query.Page < 1 || query.Count < 1 {
-		h.Info(getAllUsers, "status", transfer.NotFound, "error", "invalid page or count")
-		h.BadRequestResponse(w, r, nil)
+		h.Info(getAllUsers, "status", transfer.StatusNotFound, "error", "invalid page or count")
+		h.BadRequestResponse(w)
 		return
 	}
 
 	users, count, err := h.Models.User.GetAll(query)
 	if err != nil {
-		h.Error(getAllUsers, "status", transfer.InternalServerError, "error", err)
-		h.InternalServerErrorResponse(w, r)
+		h.Error(getAllUsers, "status", transfer.StatusInternalServerError, "error", err)
+		h.InternalServerErrorResponse(w)
 		return
 	}
 
@@ -148,15 +148,16 @@ func (h *handler) getAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 	if count%query.Count != 0 {
 		pages++
 	}
-	response := structure.GetAllUsersResponse{
+	resp := structure.GetAllUsersResponse{
 		Users:       users,
 		CurrentPage: query.Page,
 		TotalPages:  pages,
 		PerPage:     query.Count,
 	}
 
-	h.Info(getAllUsers, "status", transfer.OK, "response", response)
-	h.OkResponse(w, r, transfer.Resp{Data: response})
+	response := transfer.Resp{Data: resp}
+	h.Info(getAllUsers, "status", transfer.StatusOK, "response", response)
+	h.OkResponse(w, response)
 }
 
 // createNewUserHandler godoc
@@ -176,23 +177,23 @@ func (h *handler) getAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 func (h *handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 	id := h.paramInt(r, "id")
 	if id == 0 {
-		h.Info(updateUserByID, "status", transfer.NotFound, "error", "invalid param")
-		h.NotFoundResponse(w, r, nil)
+		h.Info(updateUserByID, "status", transfer.StatusNotFound, "error", "invalid param")
+		h.NotFoundResponse(w)
 		return
 	}
 
 	var input structure.UserUpdateRequest
 	err := h.ReadJson(w, r, &input)
 	if err != nil {
-		h.Info(updateUserByID, "status", transfer.BadRequest, "error", err)
-		h.BadRequestResponse(w, r, err)
+		h.Info(updateUserByID, "status", transfer.StatusBadRequest, "error", err)
+		h.BadRequestResponse(w, err)
 		return
 	}
 
 	if input == (structure.UserUpdateRequest{}) {
 		err = errors.New("empty request")
-		h.Info(updateUserByID, "status", transfer.BadRequest, "error", err)
-		h.BadRequestResponse(w, r, err)
+		h.Info(updateUserByID, "status", transfer.StatusBadRequest, "error", err)
+		h.BadRequestResponse(w, err)
 		return
 	}
 
@@ -200,11 +201,11 @@ func (h *handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 	if err != nil {
 		switch {
 		case errors.As(err, &transfer.NotFoundError{}):
-			h.Info(updateUserByID, "status", transfer.NotFound, "error", err)
-			h.NotFoundResponse(w, r, err)
+			h.Info(updateUserByID, "status", transfer.StatusNotFound, "error", err)
+			h.NotFoundResponse(w, err)
 		default:
-			h.Error(updateUserByID, "status", transfer.InternalServerError, "error", err)
-			h.InternalServerErrorResponse(w, r)
+			h.Error(updateUserByID, "status", transfer.StatusInternalServerError, "error", err)
+			h.InternalServerErrorResponse(w)
 		}
 		return
 	}
@@ -228,8 +229,8 @@ func (h *handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 		var p Password.Password
 		err = p.ArgonSet(*input.Password)
 		if err != nil {
-			h.Error(updateUserByID, "status", transfer.InternalServerError, "error", err)
-			h.InternalServerErrorResponse(w, r)
+			h.Error(updateUserByID, "status", transfer.StatusInternalServerError, "error", err)
+			h.InternalServerErrorResponse(w)
 			return
 		}
 		user.Password.Hash = p.Hash
@@ -239,18 +240,18 @@ func (h *handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 	if err != nil {
 		switch {
 		case errors.As(err, &transfer.NotFoundError{}):
-			h.Info(updateUserByID, "status", transfer.NotFound, "error", err)
-			h.NotFoundResponse(w, r, err)
+			h.Info(updateUserByID, "status", transfer.StatusNotFound, "error", err)
+			h.NotFoundResponse(w, err)
 		default:
-			h.Error(updateUserByID, "status", transfer.InternalServerError, "error", err)
-			h.InternalServerErrorResponse(w, r)
+			h.Error(updateUserByID, "status", transfer.StatusInternalServerError, "error", err)
+			h.InternalServerErrorResponse(w)
 		}
 		return
 	}
 
 	response := transfer.Resp{Data: user}
-	h.Info(updateUserByID, "status", transfer.OK, "response", response)
-	h.OkResponse(w, r, response)
+	h.Info(updateUserByID, "status", transfer.StatusOK, "response", response)
+	h.OkResponse(w, response)
 }
 
 // deleteUserByIDHandler godoc
@@ -268,8 +269,8 @@ func (h *handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 func (h *handler) deleteUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 	id := h.paramInt(r, "id")
 	if id == 0 {
-		h.Info(deleteUserByID, "status", transfer.NotFound, "error", "invalid param")
-		h.NotFoundResponse(w, r, nil)
+		h.Info(deleteUserByID, "status", transfer.StatusNotFound, "error", "invalid param")
+		h.NotFoundResponse(w)
 		return
 	}
 
@@ -277,15 +278,15 @@ func (h *handler) deleteUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 	if err != nil {
 		switch {
 		case errors.As(err, &transfer.NotFoundError{}):
-			h.Info(deleteUserByID, "status", transfer.NotFound, "error", err)
-			h.NotFoundResponse(w, r, err)
+			h.Info(deleteUserByID, "status", transfer.StatusNotFound, "error", err)
+			h.NotFoundResponse(w, err)
 		default:
-			h.Error(deleteUserByID, "status", transfer.InternalServerError, "error", err)
-			h.InternalServerErrorResponse(w, r)
+			h.Error(deleteUserByID, "status", transfer.StatusInternalServerError, "error", err)
+			h.InternalServerErrorResponse(w)
 		}
 		return
 	}
 
-	h.Info(deleteUserByID, "status", transfer.NoContent, "error", err)
-	h.NoContentResponse(w, r)
+	h.Info(deleteUserByID, "status", transfer.StatusNoContent, "error", err)
+	h.NoContentResponse(w)
 }

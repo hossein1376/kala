@@ -1,7 +1,6 @@
 package transfer
 
 import (
-	"fmt"
 	"log/slog"
 	"net/http"
 
@@ -25,82 +24,79 @@ type Resp struct {
 	Data    any `json:"data,omitempty"`
 }
 
-// Responder responses with the provided message and status code, it will return 500 if case of failure
-func (res *Response) Responder(w http.ResponseWriter, r *http.Request, statusCode int, message any) {
+// Responder is a generic function which responses with the provided message and status code,
+// it will return 500 if case of failure
+func (res *Response) Responder(w http.ResponseWriter, statusCode int, message any) {
 	err := res.WriteJson(w, statusCode, message, nil)
 	if err != nil {
-		res.logInternalError(err)
+		res.logInternalError(err, message)
 		w.WriteHeader(500)
 	}
 }
 
-// logInternalError logs the error details to the standard logger
-func (res *Response) logInternalError(err error) {
-	res.Error("writing json response", "status", InternalServerError, "error", err)
-}
-
 // OkResponse means everything went as expected
-func (res *Response) OkResponse(w http.ResponseWriter, r *http.Request, data any) {
-	res.Responder(w, r, http.StatusOK, data)
+func (res *Response) OkResponse(w http.ResponseWriter, data any) {
+	res.Responder(w, http.StatusOK, data)
 }
 
 // CreatedResponse indicates that requested resource(s) have been successfully created
-func (res *Response) CreatedResponse(w http.ResponseWriter, r *http.Request, data any) {
-	res.Responder(w, r, http.StatusCreated, data)
+func (res *Response) CreatedResponse(w http.ResponseWriter, data any) {
+	res.Responder(w, http.StatusCreated, data)
 }
 
 // NoContentResponse means the operation was successful, and server has nothing more to say about it
-func (res *Response) NoContentResponse(w http.ResponseWriter, r *http.Request) {
-	res.Responder(w, r, http.StatusNoContent, nil)
+func (res *Response) NoContentResponse(w http.ResponseWriter) {
+	res.Responder(w, http.StatusNoContent, nil)
 }
 
 // BadRequestResponse indicates that the request has been deemed unacceptable by server
-func (res *Response) BadRequestResponse(w http.ResponseWriter, r *http.Request, err error) {
+func (res *Response) BadRequestResponse(w http.ResponseWriter, err ...error) {
 	msg := http.StatusText(http.StatusBadRequest)
-	if err != nil {
-		msg = err.Error()
+	if len(err) != 0 {
+		msg = err[0].Error()
 	}
 
 	response := Resp{Message: msg}
-	res.Responder(w, r, http.StatusBadRequest, response)
+	res.Responder(w, http.StatusBadRequest, response)
 }
 
 // UnauthorizedResponse responds when user is not authorized
-func (res *Response) UnauthorizedResponse(w http.ResponseWriter, r *http.Request) {
-	res.Responder(w, r, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
+func (res *Response) UnauthorizedResponse(w http.ResponseWriter) {
+	response := Resp{Message: http.StatusText(http.StatusUnauthorized)}
+	res.Responder(w, http.StatusUnauthorized, response)
 }
 
 // ForbiddenResponse indicates that the action is not allowed
-func (res *Response) ForbiddenResponse(w http.ResponseWriter, r *http.Request) {
-	res.Responder(w, r, http.StatusForbidden, http.StatusText(http.StatusForbidden))
+func (res *Response) ForbiddenResponse(w http.ResponseWriter) {
+	response := Resp{Message: http.StatusText(http.StatusForbidden)}
+	res.Responder(w, http.StatusForbidden, response)
 }
 
-// NotFoundResponse will return 404 with, if provided, the error message.
-// Otherwise, it'll return the classic 404 error message.
-func (res *Response) NotFoundResponse(w http.ResponseWriter, r *http.Request, err error) {
+// NotFoundResponse will return with classic 404 error message.
+// if error message is provided, it will return that instead.
+func (res *Response) NotFoundResponse(w http.ResponseWriter, err ...error) {
 	msg := http.StatusText(http.StatusNotFound)
-	if err != nil {
-		msg = err.Error()
+	if len(err) != 0 {
+		msg = err[0].Error()
 	}
 
 	response := Resp{Message: msg}
-	res.Responder(w, r, http.StatusNotFound, response)
+	res.Responder(w, http.StatusNotFound, response)
 }
 
-// MethodNotAllowedResponse is returned when the request's method is not acceptable
-func (res *Response) MethodNotAllowedResponse(w http.ResponseWriter, r *http.Request) {
-	response := Resp{Message: fmt.Sprintf("the %s method is not supported for this content", r.Method)}
-	res.Responder(w, r, http.StatusMethodNotAllowed, response)
-}
-
-// DuplicateRequestResponse kicks in when the request was already handled before
-func (res *Response) DuplicateRequestResponse(w http.ResponseWriter, r *http.Request) {
+// DuplicateRequestResponse indicates a similar request has already been handled.
+func (res *Response) DuplicateRequestResponse(w http.ResponseWriter) {
 	response := Resp{Message: "the content you're trying to add already exists"}
-	res.Responder(w, r, http.StatusNotAcceptable, response)
+	res.Responder(w, http.StatusNotAcceptable, response)
 }
 
-// InternalServerErrorResponse indicates something has gone wrong unexpectedly
-func (res *Response) InternalServerErrorResponse(w http.ResponseWriter, r *http.Request) {
+// InternalServerErrorResponse indicates something has gone wrong unexpectedly.
+func (res *Response) InternalServerErrorResponse(w http.ResponseWriter) {
 	response := Resp{Message: http.StatusText(http.StatusInternalServerError)}
-	res.Responder(w, r, http.StatusInternalServerError, response)
+	res.Responder(w, http.StatusInternalServerError, response)
+}
+
+// logInternalError logs the error when writing json response fails
+func (res *Response) logInternalError(err error, data any) {
+	res.Error("writing json response", "error", err, "data", data)
 }

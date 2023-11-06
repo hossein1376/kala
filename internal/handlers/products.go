@@ -11,7 +11,7 @@ func (h *handler) createNewProductHandler(w http.ResponseWriter, r *http.Request
 	var input structure.Product
 	err := h.ReadJson(w, r, &input)
 	if err != nil {
-		h.BadRequestResponse(w, r, err)
+		h.BadRequestResponse(w, err)
 		return
 	}
 
@@ -19,20 +19,20 @@ func (h *handler) createNewProductHandler(w http.ResponseWriter, r *http.Request
 	if err != nil {
 		switch {
 		case ent.IsConstraintError(err) || ent.IsValidationError(err):
-			h.BadRequestResponse(w, r, err)
+			h.BadRequestResponse(w, err)
 		default:
-			h.InternalServerErrorResponse(w, r)
+			h.InternalServerErrorResponse(w)
 		}
 		return
 	}
 
-	h.CreatedResponse(w, r, product)
+	h.CreatedResponse(w, product)
 }
 
 func (h *handler) getProductByIDHandler(w http.ResponseWriter, r *http.Request) {
 	id := h.paramInt(r, "id")
 	if id == 0 {
-		h.NotFoundResponse(w, r, nil)
+		h.NotFoundResponse(w, nil)
 		return
 	}
 
@@ -40,38 +40,38 @@ func (h *handler) getProductByIDHandler(w http.ResponseWriter, r *http.Request) 
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
-			h.NotFoundResponse(w, r, err)
+			h.NotFoundResponse(w, err)
 			return
 		default:
-			h.InternalServerErrorResponse(w, r)
+			h.InternalServerErrorResponse(w)
 			return
 		}
 	}
 
-	h.OkResponse(w, r, product)
+	h.OkResponse(w, product)
 }
 
 func (h *handler) getAllProductsHandler(w http.ResponseWriter, r *http.Request) {
 	products, err := h.Models.Product.GetAll()
 	if err != nil {
-		h.InternalServerErrorResponse(w, r)
+		h.InternalServerErrorResponse(w)
 		return
 	}
 
-	h.OkResponse(w, r, products)
+	h.OkResponse(w, products)
 }
 
 func (h *handler) updateProductByIDHandler(w http.ResponseWriter, r *http.Request) {
 	id := h.paramInt(r, "id")
 	if id == 0 {
-		h.NotFoundResponse(w, r, nil)
+		h.NotFoundResponse(w)
 		return
 	}
 
 	var input structure.ProductUpdate
 	err := h.ReadJson(w, r, &input)
 	if err != nil {
-		h.BadRequestResponse(w, r, err)
+		h.BadRequestResponse(w, err)
 		return
 	}
 
@@ -79,9 +79,9 @@ func (h *handler) updateProductByIDHandler(w http.ResponseWriter, r *http.Reques
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
-			h.NotFoundResponse(w, r, err)
+			h.NotFoundResponse(w, err)
 		default:
-			h.InternalServerErrorResponse(w, r)
+			h.InternalServerErrorResponse(w)
 		}
 		return
 	}
@@ -115,20 +115,20 @@ func (h *handler) updateProductByIDHandler(w http.ResponseWriter, r *http.Reques
 	if err != nil {
 		switch {
 		case ent.IsConstraintError(err) || ent.IsValidationError(err):
-			h.BadRequestResponse(w, r, err)
+			h.BadRequestResponse(w, err)
 		default:
-			h.InternalServerErrorResponse(w, r)
+			h.InternalServerErrorResponse(w)
 		}
 		return
 	}
 
-	h.NoContentResponse(w, r)
+	h.NoContentResponse(w)
 }
 
 func (h *handler) deleteProductByIDHandler(w http.ResponseWriter, r *http.Request) {
 	id := h.paramInt(r, "id")
 	if id == 0 {
-		h.NotFoundResponse(w, r, nil)
+		h.NotFoundResponse(w)
 		return
 	}
 
@@ -136,12 +136,12 @@ func (h *handler) deleteProductByIDHandler(w http.ResponseWriter, r *http.Reques
 	if err != nil {
 		switch {
 		case ent.IsNotFound(err):
-			h.NotFoundResponse(w, r, err)
+			h.NotFoundResponse(w, err)
 		default:
-			h.InternalServerErrorResponse(w, r)
+			h.InternalServerErrorResponse(w)
 		}
 		return
 	}
 
-	h.NoContentResponse(w, r)
+	h.NoContentResponse(w)
 }

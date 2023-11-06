@@ -31,33 +31,33 @@ func (h *handler) checkJWT(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		_, claims, err := jwtauth.FromContext(r.Context())
 		if err != nil {
-			h.Error(checkJWT, "status", transfer.InternalServerError, "error", err)
-			h.InternalServerErrorResponse(w, r)
+			h.Error(checkJWT, "status", transfer.StatusInternalServerError, "error", err)
+			h.InternalServerErrorResponse(w)
 			return
 		}
 		expireString, ok := claims["expire"].(string)
 		if !ok {
-			h.Info(checkJWT, "status", transfer.Unauthorized, "error", "bad expiration type")
-			h.UnauthorizedResponse(w, r)
+			h.Info(checkJWT, "status", transfer.StatusUnauthorized, "error", "bad expiration type")
+			h.UnauthorizedResponse(w)
 			return
 		}
 		expire, err := time.Parse(time.RFC3339, expireString)
 		if err != nil {
-			h.Info(checkJWT, "status", transfer.Unauthorized, "error", "failed to parse expire date")
-			h.UnauthorizedResponse(w, r)
+			h.Info(checkJWT, "status", transfer.StatusUnauthorized, "error", "failed to parse expire date")
+			h.UnauthorizedResponse(w)
 			return
 		}
 
 		if time.Now().After(expire) {
-			h.Info(checkJWT, "status", transfer.Unauthorized, "error", "expired token")
-			h.UnauthorizedResponse(w, r)
+			h.Info(checkJWT, "status", transfer.StatusUnauthorized, "error", "expired token")
+			h.UnauthorizedResponse(w)
 			return
 		}
 
 		user, ok := claims["user"].(map[string]any)
 		if !ok {
-			h.Info(checkJWT, "status", transfer.Unauthorized, "error", "bad user type")
-			h.UnauthorizedResponse(w, r)
+			h.Info(checkJWT, "status", transfer.StatusUnauthorized, "error", "bad user type")
+			h.UnauthorizedResponse(w)
 			return
 		}
 
