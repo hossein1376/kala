@@ -17,7 +17,7 @@ type User struct {
 }
 
 type UserCreationRequest struct {
-	UserName  string  `json:"username" example:"user"  validate:"required"`
+	Username  string  `json:"username" example:"user"  validate:"required"`
 	Password  string  `json:"password" example:"123456"  validate:"required"`
 	FirstName *string `json:"firstname" example:"John"`
 	LastName  *string `json:"lastname" example:"Doe"`

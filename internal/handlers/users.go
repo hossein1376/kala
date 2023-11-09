@@ -7,6 +7,7 @@ import (
 	"github.com/hossein1376/kala/internal/structure"
 	"github.com/hossein1376/kala/internal/transfer"
 	"github.com/hossein1376/kala/pkg/password"
+	"github.com/hossein1376/kala/pkg/validator"
 )
 
 // createNewUserHandler godoc
@@ -31,18 +32,49 @@ func (h *handler) createNewUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var user structure.User
-	user.Username = input.UserName
+	v := validator.New()
+
+	user.Username = input.Username
+	v.Check("username",
+		validator.Case{Cond: validator.MinLength(user.Username, 4), Msg: "must be at least 4 characters"},
+		validator.Case{Cond: validator.MaxLength(user.Username, 20), Msg: "must be at most 20 characters"},
+	)
+
+	v.Check("password",
+		validator.Case{Cond: validator.RangeLength(input.Password, 4, 50), Msg: "must be between 4 and 50 characters"},
+	)
+
 	if input.FirstName != nil {
 		user.FirstName = *input.FirstName
+		v.Check("first name",
+			validator.Case{Cond: validator.NotEmpty(user.FirstName), Msg: "must not be empty"},
+		)
 	}
 	if input.LastName != nil {
 		user.LastName = *input.LastName
+		v.Check("lastname",
+			validator.Case{Cond: validator.NotEmpty(user.LastName), Msg: "must not be empty"},
+		)
 	}
 	if input.Email != nil {
 		user.Email = *input.Email
+		v.Check("email",
+			validator.Case{Cond: validator.Matches(user.Email, validator.EmailRX), Msg: "must be valid"},
+		)
 	}
 	if input.Phone != nil {
 		user.Phone = *input.Phone
+		v.Check("phone",
+			validator.Case{Cond: validator.IsNumber(user.Phone), Msg: "must be only numbers"},
+			validator.Case{Cond: validator.RangeLength(user.Phone, 2, 20), Msg: "must be between 2 to 20 digits"},
+		)
+	}
+
+	if ok := v.Valid(); !ok {
+		response := transfer.Resp{Message: v.Errors}
+		h.Info(createNewUser, "status", transfer.StatusBadRequest, "error", v.Errors)
+		h.Responder(w, http.StatusBadRequest, response)
+		return
 	}
 
 	err = user.Password.ArgonSet(input.Password)
@@ -51,8 +83,6 @@ func (h *handler) createNewUserHandler(w http.ResponseWriter, r *http.Request) {
 		h.InternalServerErrorResponse(w)
 		return
 	}
-
-	// TODO: validations
 
 	u, err := h.Models.User.Create(user)
 	if err != nil {
