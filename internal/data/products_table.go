@@ -9,11 +9,11 @@ import (
 	"github.com/hossein1376/kala/internal/structure"
 )
 
-type ProductModel struct {
+type ProductsTable struct {
 	client *ent.Client
 }
 
-func (p *ProductModel) Create(product structure.Product) (*ent.Product, error) {
+func (p *ProductsTable) Create(product structure.Product) (*ent.Product, error) {
 	return p.client.Product.Create().
 		SetName(product.Name).
 		SetPrice(product.Price).
@@ -28,18 +28,18 @@ func (p *ProductModel) Create(product structure.Product) (*ent.Product, error) {
 		Save(context.Background())
 }
 
-func (p *ProductModel) GetByID(id int) (*ent.Product, error) {
+func (p *ProductsTable) GetByID(id int) (*ent.Product, error) {
 	return p.client.Product.Query().
 		Where(entProduct.ID(id)).
 		Only(context.Background())
 }
 
-func (p *ProductModel) GetAll() ([]*ent.Product, error) {
+func (p *ProductsTable) GetAll() ([]*ent.Product, error) {
 	return p.client.Product.Query().
 		All(context.Background())
 }
 
-func (p *ProductModel) UpdateByID(prod *ent.Product, id int) error {
+func (p *ProductsTable) UpdateByID(prod *ent.Product, id int) error {
 	_, err := p.client.Product.UpdateOneID(id).
 		Where(entProduct.Available(true), entProduct.Status(true)).
 		SetName(prod.Name).
@@ -56,7 +56,7 @@ func (p *ProductModel) UpdateByID(prod *ent.Product, id int) error {
 	return err
 }
 
-func (p *ProductModel) DeleteByID(id int) error {
+func (p *ProductsTable) DeleteByID(id int) error {
 	_, err := p.client.Product.UpdateOneID(id).
 		Where(entProduct.Available(true), entProduct.Status(true)).
 		SetStatus(false).

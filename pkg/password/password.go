@@ -1,4 +1,4 @@
-package Password
+package password
 
 import (
 	"errors"

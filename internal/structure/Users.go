@@ -1,13 +1,13 @@
 package structure
 
 import (
-	"github.com/hossein1376/kala/pkg/Password"
+	"github.com/hossein1376/kala/pkg/password"
 )
 
 type User struct {
 	ID        int               `json:"id" example:"1"`
 	Username  string            `json:"username" example:"user"`
-	Password  Password.Password `json:"-"`
+	Password  password.Password `json:"-"`
 	FirstName string            `json:"firstname,omitempty" example:"John"`
 	LastName  string            `json:"lastname,omitempty" example:"Doe"`
 	Email     string            `json:"email,omitempty" example:"email@email.com"`

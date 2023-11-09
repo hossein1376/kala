@@ -7,7 +7,7 @@ import (
 
 	"github.com/hossein1376/kala/internal/structure"
 	"github.com/hossein1376/kala/internal/transfer"
-	"github.com/hossein1376/kala/pkg/Password"
+	"github.com/hossein1376/kala/pkg/password"
 )
 
 // loginHandler godoc
@@ -45,7 +45,7 @@ func (h *handler) loginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	p := Password.Password{
+	p := password.Password{
 		Plaintext: &input.Password,
 		Hash:      user.Password.Hash,
 	}

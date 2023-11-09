@@ -6,18 +6,18 @@ import (
 )
 
 type Models struct {
-	User    User
-	Product Product
+	User    Users
+	Product Products
 }
 
 func NewModels(client *ent.Client) *Models {
 	return &Models{
-		User:    &UserModel{client: client},
-		Product: &ProductModel{client: client},
+		User:    &UsersTable{client: client},
+		Product: &ProductsTable{client: client},
 	}
 }
 
-type User interface {
+type Users interface {
 	Create(structure.User) (*structure.User, error)
 	GetByID(int) (*structure.User, error)
 	GetByUsername(string) (*structure.User, error)
@@ -26,7 +26,7 @@ type User interface {
 	DeleteByID(int) error
 }
 
-type Product interface {
+type Products interface {
 	Create(product structure.Product) (*ent.Product, error)
 	GetByID(id int) (*ent.Product, error)
 	GetAll() ([]*ent.Product, error)

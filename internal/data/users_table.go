@@ -7,14 +7,14 @@ import (
 	entUser "github.com/hossein1376/kala/internal/ent/user"
 	"github.com/hossein1376/kala/internal/structure"
 	"github.com/hossein1376/kala/internal/transfer"
-	"github.com/hossein1376/kala/pkg/Password"
+	"github.com/hossein1376/kala/pkg/password"
 )
 
-type UserModel struct {
+type UsersTable struct {
 	client *ent.Client
 }
 
-func (u *UserModel) Create(data structure.User) (*structure.User, error) {
+func (u *UsersTable) Create(data structure.User) (*structure.User, error) {
 	user, err := u.client.User.Create().
 		SetUsername(data.Username).
 		SetPassword([]byte(data.Password.Hash)).
@@ -43,7 +43,7 @@ func (u *UserModel) Create(data structure.User) (*structure.User, error) {
 	}, nil
 }
 
-func (u *UserModel) GetByID(id int) (*structure.User, error) {
+func (u *UsersTable) GetByID(id int) (*structure.User, error) {
 	user, err := u.client.User.
 		Query().
 		Where(
@@ -63,7 +63,7 @@ func (u *UserModel) GetByID(id int) (*structure.User, error) {
 	return &structure.User{
 		ID:        user.ID,
 		Username:  user.Username,
-		Password:  Password.Password{Hash: user.Password},
+		Password:  password.Password{Hash: user.Password},
 		FirstName: user.FirstName,
 		LastName:  user.LastName,
 		Email:     user.Email,
@@ -71,7 +71,7 @@ func (u *UserModel) GetByID(id int) (*structure.User, error) {
 	}, nil
 }
 
-func (u *UserModel) GetByUsername(username string) (*structure.User, error) {
+func (u *UsersTable) GetByUsername(username string) (*structure.User, error) {
 	user, err := u.client.User.
 		Query().
 		Where(entUser.Username(username)).
@@ -92,7 +92,7 @@ func (u *UserModel) GetByUsername(username string) (*structure.User, error) {
 	return &structure.User{
 		ID:        user.ID,
 		Username:  user.Username,
-		Password:  Password.Password{Hash: user.Password},
+		Password:  password.Password{Hash: user.Password},
 		FirstName: user.FirstName,
 		LastName:  user.LastName,
 		Email:     user.Email,
@@ -100,7 +100,7 @@ func (u *UserModel) GetByUsername(username string) (*structure.User, error) {
 	}, err
 }
 
-func (u *UserModel) GetAll(query *structure.GetAllUsersRequest) ([]*structure.User, int, error) {
+func (u *UsersTable) GetAll(query *structure.GetAllUsersRequest) ([]*structure.User, int, error) {
 	users, err := u.client.User.Query().
 		Where(
 			entUser.Status(true),
@@ -134,7 +134,7 @@ func (u *UserModel) GetAll(query *structure.GetAllUsersRequest) ([]*structure.Us
 	return resp, count, err
 }
 
-func (u *UserModel) UpdateByID(id int, user *structure.User) error {
+func (u *UsersTable) UpdateByID(id int, user *structure.User) error {
 	_, err := u.client.User.UpdateOneID(id).
 		SetUsername(user.Username).
 		SetPassword(user.Password.Hash).
@@ -155,7 +155,7 @@ func (u *UserModel) UpdateByID(id int, user *structure.User) error {
 	return nil
 }
 
-func (u *UserModel) DeleteByID(id int) error {
+func (u *UsersTable) DeleteByID(id int) error {
 	_, err := u.client.User.UpdateOneID(id).
 		SetStatus(false).
 		Save(context.Background())

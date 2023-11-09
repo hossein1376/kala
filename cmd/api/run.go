@@ -11,7 +11,7 @@ import (
 	"github.com/hossein1376/kala/config"
 	"github.com/hossein1376/kala/internal/data"
 	"github.com/hossein1376/kala/internal/handlers"
-	"github.com/hossein1376/kala/pkg/Logger"
+	"github.com/hossein1376/kala/pkg/logger"
 )
 
 func runServer() {
@@ -27,7 +27,7 @@ func runServer() {
 		return
 	}
 
-	logger := Logger.NewJsonLogger(os.Stdout, logLevel)
+	logger := logger.NewJsonLogger(os.Stdout, logLevel)
 	logger.Debug("configurations loaded successfully")
 
 	client, err := openSqlDB(cfg)

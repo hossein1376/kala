@@ -6,7 +6,7 @@ import (
 
 	"github.com/hossein1376/kala/internal/structure"
 	"github.com/hossein1376/kala/internal/transfer"
-	"github.com/hossein1376/kala/pkg/Password"
+	"github.com/hossein1376/kala/pkg/password"
 )
 
 // createNewUserHandler godoc
@@ -226,7 +226,7 @@ func (h *handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 		user.Phone = *input.Phone
 	}
 	if input.Password != nil {
-		var p Password.Password
+		var p password.Password
 		err = p.ArgonSet(*input.Password)
 		if err != nil {
 			h.Error(updateUserByID, "status", transfer.StatusInternalServerError, "error", err)
