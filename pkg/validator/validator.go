@@ -1,7 +1,9 @@
 package validator
 
 import (
+	"cmp"
 	"regexp"
+	"slices"
 	"strconv"
 )
 
@@ -39,23 +41,19 @@ func (v *Validator) IsNumber(value string, key, message string) {
 	}
 }
 
-func In(value string, list ...string) bool {
-	for i := range list {
-		if value == list[i] {
-			return true
-		}
-	}
-	return false
+func In[T comparable](value T, list ...T) bool {
+	return slices.Contains(list, value)
 }
 
 func Matches(value string, rx *regexp.Regexp) bool {
 	return rx.MatchString(value)
 }
 
-func Unique(values []string) bool {
-	uniqueValues := make(map[string]bool)
-	for _, value := range values {
-		uniqueValues[value] = true
+func Unique[T cmp.Ordered](values []T) bool {
+	s := slices.Clone(values)
+	slices.Sort(s)
+	if len(slices.Compact(s)) != len(values) {
+		return false
 	}
-	return len(values) == len(uniqueValues)
+	return true
 }
