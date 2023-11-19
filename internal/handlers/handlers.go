@@ -10,7 +10,7 @@ import (
 
 type handler struct {
 	*config.Application
-	*transfer.Response
+	*transfer.Responder
 	decoder *schema.Decoder
 }
 
@@ -22,7 +22,7 @@ func NewHandlers(app *config.Application) *handler {
 			Models: app.Models,
 			RDB:    app.RDB,
 		},
-		Response: transfer.NewResponse(app.Logger, Json.Json{}),
-		decoder:  schema.NewDecoder(),
+		Responder: transfer.NewResponse(app.Logger, Json.Json{}),
+		decoder:   schema.NewDecoder(),
 	}
 }

@@ -73,7 +73,7 @@ func (h *handler) createNewUserHandler(w http.ResponseWriter, r *http.Request) {
 	if ok := v.Valid(); !ok {
 		response := transfer.Resp{Message: v.Errors}
 		h.Info(createNewUser, "status", transfer.StatusBadRequest, "error", v.Errors)
-		h.Responder(w, http.StatusBadRequest, response)
+		h.Response(w, http.StatusBadRequest, response)
 		return
 	}
 
