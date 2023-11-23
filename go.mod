@@ -7,7 +7,7 @@ require (
 	github.com/alexedwards/argon2id v1.0.0
 	github.com/go-chi/chi/v5 v5.0.10
 	github.com/go-chi/httprate v0.7.4
-	github.com/go-chi/jwtauth/v5 v5.1.1
+	github.com/go-chi/jwtauth/v5 v5.2.0
 	github.com/gorilla/schema v1.2.1
 	github.com/json-iterator/go v1.1.12
 	github.com/lib/pq v1.10.9
