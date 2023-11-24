@@ -41,8 +41,8 @@ func (h *handler) Router() *chi.Mux {
 		// private routes
 		r.Group(func(r chi.Router) {
 			// JWT middlewares
-			r.Use(jwtauth.Verifier(h.Config.JWT.Token))
-			r.Use(jwtauth.Authenticator, h.checkJWT)
+			r.Use(jwtauth.Verifier(h.Config.JWT.Token), jwtauth.Authenticator(h.Config.JWT.Token))
+			r.Use(h.checkJWT)
 
 			// user routes
 			r.Route("/users", func(r chi.Router) {
