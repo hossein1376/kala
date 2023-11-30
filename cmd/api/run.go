@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"log"
 	"os"
 
@@ -38,7 +37,7 @@ func runServer() {
 	defer client.Close()
 	logger.Debug("sql database connection established")
 
-	if err = client.Schema.Create(context.Background()); err != nil {
+	if err = migrate(client, "./migrations"); err != nil {
 		logger.Error("failed creating schema resources: %v", "error", err)
 		return
 	}
