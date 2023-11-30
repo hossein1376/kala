@@ -31,8 +31,7 @@ func (h *handler) createNewUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var user structure.User
-	v := validator.New()
+	user, v := new(structure.User), validator.New()
 
 	user.Username = input.Username
 	v.Check("username",
@@ -45,28 +44,28 @@ func (h *handler) createNewUserHandler(w http.ResponseWriter, r *http.Request) {
 	)
 
 	if input.FirstName != nil {
-		user.FirstName = *input.FirstName
+		user.FirstName = input.FirstName
 		v.Check("first name",
-			validator.Case{Cond: validator.NotEmpty(user.FirstName), Msg: "must not be empty"},
+			validator.Case{Cond: validator.NotEmpty(*user.FirstName), Msg: "must not be empty"},
 		)
 	}
 	if input.LastName != nil {
-		user.LastName = *input.LastName
+		user.LastName = input.LastName
 		v.Check("lastname",
-			validator.Case{Cond: validator.NotEmpty(user.LastName), Msg: "must not be empty"},
+			validator.Case{Cond: validator.NotEmpty(*user.LastName), Msg: "must not be empty"},
 		)
 	}
 	if input.Email != nil {
-		user.Email = *input.Email
+		user.Email = input.Email
 		v.Check("email",
-			validator.Case{Cond: validator.Matches(user.Email, validator.EmailRX), Msg: "must be valid"},
+			validator.Case{Cond: validator.Matches(*user.Email, validator.EmailRX), Msg: "must be valid"},
 		)
 	}
 	if input.Phone != nil {
-		user.Phone = *input.Phone
+		user.Phone = input.Phone
 		v.Check("phone",
-			validator.Case{Cond: validator.IsNumber(user.Phone), Msg: "must be only numbers"},
-			validator.Case{Cond: validator.RangeLength(user.Phone, 2, 20), Msg: "must be between 2 to 20 digits"},
+			validator.Case{Cond: validator.IsNumber(*user.Phone), Msg: "must be only numbers"},
+			validator.Case{Cond: validator.RangeLength(*user.Phone, 2, 20), Msg: "must be between 2 to 20 digits"},
 		)
 	}
 
@@ -84,7 +83,7 @@ func (h *handler) createNewUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	u, err := h.Models.User.Create(user)
+	err = h.Models.User.Create(user)
 	if err != nil {
 		switch {
 		case errors.As(err, &transfer.BadRequestError{}):
@@ -97,7 +96,7 @@ func (h *handler) createNewUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := transfer.Resp{Data: u}
+	response := transfer.Resp{Data: user}
 	h.Info(createNewUser, "status", transfer.StatusCreated, "response", response)
 	h.CreatedResponse(w, response)
 }
@@ -199,7 +198,7 @@ func (h *handler) getAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 // @Produce            json
 // @Param              request body      structure.UserUpdateRequest  true    "user data"
 // @Param              id      path      int                          true    "user ID"
-// @Success            200     {object}  doc.updateUserByIDHandlerResponse    "single object containing user's data"
+// @Success            204
 // @Failure            400     {object}  doc.httpResponseError                "bad input"
 // @Failure            404     {object}  doc.httpResponseError                "user not found"
 // @Failure            500     {object}  doc.httpResponseError                "unexpected error"
@@ -240,21 +239,6 @@ func (h *handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	if input.UserName != nil {
-		user.Username = *input.UserName
-	}
-	if input.FirstName != nil {
-		user.FirstName = *input.FirstName
-	}
-	if input.LastName != nil {
-		user.LastName = *input.LastName
-	}
-	if input.Email != nil {
-		user.Email = *input.Email
-	}
-	if input.Phone != nil {
-		user.Phone = *input.Phone
-	}
 	if input.Password != nil {
 		var p password.Password
 		err = p.ArgonSet(*input.Password)
@@ -265,6 +249,14 @@ func (h *handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 		}
 		user.Password.Hash = p.Hash
 	}
+
+	if input.UserName != nil {
+		user.Username = *input.UserName
+	}
+	user.FirstName = input.FirstName
+	user.LastName = input.LastName
+	user.Email = input.Email
+	user.Phone = input.Phone
 
 	err = h.Models.User.UpdateByID(id, user)
 	if err != nil {
@@ -279,9 +271,8 @@ func (h *handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	response := transfer.Resp{Data: user}
-	h.Info(updateUserByID, "status", transfer.StatusOK, "response", response)
-	h.OkResponse(w, response)
+	h.Info(updateUserByID, "status", transfer.StatusNoContent)
+	h.NoContentResponse(w)
 }
 
 // deleteUserByIDHandler godoc
