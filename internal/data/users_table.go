@@ -1,10 +1,8 @@
 package data
 
 import (
-	"context"
 	"database/sql"
 	"errors"
-	"time"
 
 	"github.com/jmoiron/sqlx"
 
@@ -54,11 +52,8 @@ func (u *UsersTable) GetByID(id int) (*structure.User, error) {
 	FROM users
 	WHERE id = $1;`
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
 	var user structure.User
-	err := u.DB.QueryRowContext(ctx, query, id).Scan(
+	err := u.DB.QueryRow(query, id).Scan(
 		&user.ID,
 		&user.Username,
 		&user.Password.Hash,
@@ -126,7 +121,7 @@ func (u *UsersTable) GetAll(pagination *structure.GetAllUsersRequest) ([]structu
 	LIMIT $1
 	OFFSET $2;`
 
-	users := make([]structure.User, 0)
+	users := make([]structure.User, 0, pagination.Count)
 	rows, err := u.DB.Query(query, pagination.Count, (pagination.Page-1)*pagination.Count)
 	if err != nil {
 		return nil, 0, err
