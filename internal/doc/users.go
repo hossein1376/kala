@@ -15,7 +15,3 @@ type getUserByIDHandlerResponse struct {
 type getAllUsersHandlerResponse struct {
 	Data structure.GetAllUsersResponse `json:"data,omitempty"`
 }
-
-type updateUserByIDHandlerResponse struct {
-	Data structure.User `json:"data,omitempty"`
-}

@@ -4,14 +4,14 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"github.com/redis/go-redis/v9"
 
 	"github.com/hossein1376/kala/config"
-	"github.com/hossein1376/kala/internal/ent"
 )
 
-func openSqlDB(cfg *config.Config) (*ent.Client, error) {
+func openSqlDB(cfg *config.Config) (*sqlx.DB, error) {
 	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		cfg.DB.Sql.Host,
 		cfg.DB.Sql.Port,
@@ -19,8 +19,12 @@ func openSqlDB(cfg *config.Config) (*ent.Client, error) {
 		cfg.DB.Sql.Password,
 		cfg.DB.Sql.Name)
 
-	client, err := ent.Open("postgres", dsn)
+	client, err := sqlx.Connect("postgres", dsn)
 	if err != nil {
+		return nil, err
+	}
+
+	if err = client.Ping(); err != nil {
 		return nil, err
 	}
 

@@ -282,11 +282,8 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "single object containing user's data",
-                        "schema": {
-                            "$ref": "#/definitions/doc.updateUserByIDHandlerResponse"
-                        }
+                    "204": {
+                        "description": "No Content"
                     },
                     "400": {
                         "description": "bad input",
@@ -349,14 +346,6 @@ const docTemplate = `{
             "properties": {
                 "data": {
                     "$ref": "#/definitions/structure.LoginResponse"
-                }
-            }
-        },
-        "doc.updateUserByIDHandlerResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "$ref": "#/definitions/structure.User"
                 }
             }
         },

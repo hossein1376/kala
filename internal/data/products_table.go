@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/jmoiron/sqlx"
+
 	"github.com/hossein1376/kala/internal/ent"
 	entProduct "github.com/hossein1376/kala/internal/ent/product"
 	"github.com/hossein1376/kala/internal/structure"
@@ -11,6 +13,7 @@ import (
 
 type ProductsTable struct {
 	client *ent.Client
+	*sqlx.DB
 }
 
 func (p *ProductsTable) Create(product structure.Product) (*ent.Product, error) {

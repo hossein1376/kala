@@ -8,10 +8,11 @@ type User struct {
 	ID        int               `json:"id" example:"1"`
 	Username  string            `json:"username" example:"user"`
 	Password  password.Password `json:"-"`
-	FirstName string            `json:"firstname,omitempty" example:"John"`
-	LastName  string            `json:"lastname,omitempty" example:"Doe"`
-	Email     string            `json:"email,omitempty" example:"email@email.com"`
-	Phone     string            `json:"phone,omitempty" example:"0123456789"`
+	FirstName *string           `json:"firstname,omitempty" example:"John"`
+	LastName  *string           `json:"lastname,omitempty" example:"Doe"`
+	Email     *string           `json:"email,omitempty" example:"email@email.com"`
+	Phone     *string           `json:"phone,omitempty" example:"0123456789"`
+	Status    bool              `json:"-"`
 	Orders    []Order           `json:"orders,omitempty"`
 	Role      string            `json:"-"`
 }
@@ -31,10 +32,10 @@ type GetAllUsersRequest struct {
 }
 
 type GetAllUsersResponse struct {
-	Users       []*User `json:"users"`
-	CurrentPage int     `json:"current_page" example:"2"`
-	TotalPages  int     `json:"total_pages" example:"5"`
-	PerPage     int     `json:"per_page" example:"10"`
+	Users       []User `json:"users"`
+	CurrentPage int    `json:"current_page" example:"2"`
+	TotalPages  int    `json:"total_pages" example:"5"`
+	PerPage     int    `json:"per_page" example:"10"`
 }
 
 type UserUpdateRequest struct {
