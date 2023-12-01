@@ -20,12 +20,12 @@ func NewModels(client *sqlx.DB) *Models {
 }
 
 type Users interface {
-	Create(*structure.User) error
-	GetByID(int) (*structure.User, error)
-	GetByUsername(string) (*structure.User, error)
-	GetAll(*structure.GetAllUsersRequest) ([]structure.User, int, error)
-	UpdateByID(int, *structure.User) error
-	DeleteByID(int) error
+	Create(user *structure.User) error
+	GetByID(id int) (*structure.User, error)
+	GetByUsername(username string) (*structure.User, error)
+	GetAll(pagination *structure.GetAllUsersRequest) ([]structure.User, int, error)
+	UpdateByID(id int, user *structure.User) error
+	DeleteByID(id int) error
 }
 
 type Products interface {
