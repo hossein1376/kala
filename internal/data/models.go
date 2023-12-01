@@ -3,7 +3,6 @@ package data
 import (
 	"github.com/jmoiron/sqlx"
 
-	"github.com/hossein1376/kala/internal/ent"
 	"github.com/hossein1376/kala/internal/structure"
 )
 
@@ -12,10 +11,10 @@ type Models struct {
 	Product Products
 }
 
-func NewModels(client *sqlx.DB) *Models {
+func NewModels(db *sqlx.DB) *Models {
 	return &Models{
-		User:    &UsersTable{DB: client},
-		Product: &ProductsTable{DB: client},
+		User:    &UsersTable{DB: db},
+		Product: &ProductsTable{DB: db},
 	}
 }
 
@@ -29,9 +28,9 @@ type Users interface {
 }
 
 type Products interface {
-	Create(product structure.Product) (*ent.Product, error)
-	GetByID(id int) (*ent.Product, error)
-	GetAll() ([]*ent.Product, error)
-	UpdateByID(prod *ent.Product, id int) error
+	Create(product *structure.Product) error
+	GetByID(id int) (*structure.Product, error)
+	GetAll() ([]structure.Product, error)
+	UpdateByID(id int, product *structure.Product) error
 	DeleteByID(id int) error
 }

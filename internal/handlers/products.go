@@ -1,10 +1,11 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
 
-	"github.com/hossein1376/kala/internal/ent"
 	"github.com/hossein1376/kala/internal/structure"
+	"github.com/hossein1376/kala/internal/transfer"
 )
 
 func (h *handler) createNewProductHandler(w http.ResponseWriter, r *http.Request) {
@@ -15,18 +16,13 @@ func (h *handler) createNewProductHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	product, err := h.Models.Product.Create(input)
+	err = h.Models.Product.Create(&input)
 	if err != nil {
-		switch {
-		case ent.IsConstraintError(err) || ent.IsValidationError(err):
-			h.BadRequestResponse(w, err)
-		default:
-			h.InternalServerErrorResponse(w)
-		}
+		h.InternalServerErrorResponse(w)
 		return
 	}
 
-	h.CreatedResponse(w, product)
+	h.CreatedResponse(w, input)
 }
 
 func (h *handler) getProductByIDHandler(w http.ResponseWriter, r *http.Request) {
@@ -39,7 +35,7 @@ func (h *handler) getProductByIDHandler(w http.ResponseWriter, r *http.Request) 
 	product, err := h.Models.Product.GetByID(id)
 	if err != nil {
 		switch {
-		case ent.IsNotFound(err):
+		case errors.As(err, &transfer.NotFoundError{}):
 			h.NotFoundResponse(w, err)
 			return
 		default:
@@ -78,7 +74,7 @@ func (h *handler) updateProductByIDHandler(w http.ResponseWriter, r *http.Reques
 	product, err := h.Models.Product.GetByID(id)
 	if err != nil {
 		switch {
-		case ent.IsNotFound(err):
+		case errors.As(err, &transfer.NotFoundError{}):
 			h.NotFoundResponse(w, err)
 		default:
 			h.InternalServerErrorResponse(w)
@@ -111,14 +107,9 @@ func (h *handler) updateProductByIDHandler(w http.ResponseWriter, r *http.Reques
 		product.RatingCount = *input.RatingCount
 	}
 
-	err = h.Models.Product.UpdateByID(product, id)
+	err = h.Models.Product.UpdateByID(id, product)
 	if err != nil {
-		switch {
-		case ent.IsConstraintError(err) || ent.IsValidationError(err):
-			h.BadRequestResponse(w, err)
-		default:
-			h.InternalServerErrorResponse(w)
-		}
+		h.InternalServerErrorResponse(w)
 		return
 	}
 
@@ -135,7 +126,7 @@ func (h *handler) deleteProductByIDHandler(w http.ResponseWriter, r *http.Reques
 	err := h.Models.Product.DeleteByID(id)
 	if err != nil {
 		switch {
-		case ent.IsNotFound(err):
+		case errors.As(err, &transfer.NotFoundError{}):
 			h.NotFoundResponse(w, err)
 		default:
 			h.InternalServerErrorResponse(w)
