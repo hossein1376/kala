@@ -9,7 +9,6 @@ require (
 	github.com/go-chi/jwtauth/v5 v5.2.0
 	github.com/gorilla/schema v1.2.1
 	github.com/jmoiron/sqlx v1.3.5
-	github.com/json-iterator/go v1.1.12
 	github.com/lib/pq v1.10.9
 	github.com/redis/go-redis/v9 v9.3.0
 	github.com/swaggo/swag v1.16.2
@@ -35,8 +34,6 @@ require (
 	github.com/lestrrat-go/option v1.0.1 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-sqlite3 v1.14.16 // indirect
-	github.com/modern-go/concurrent v0.0.0-20180228061459-e0a39a4cb421 // indirect
-	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/rogpeppe/go-internal v1.11.0 // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
 	golang.org/x/sys v0.15.0 // indirect
