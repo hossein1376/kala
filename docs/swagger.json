@@ -414,6 +414,9 @@
                 "description": {
                     "type": "string"
                 },
+                "id": {
+                    "type": "integer"
+                },
                 "name": {
                     "type": "string"
                 },
@@ -428,6 +431,9 @@
                 },
                 "rating_count": {
                     "type": "integer"
+                },
+                "review": {
+                    "type": "string"
                 },
                 "status": {
                     "type": "boolean"

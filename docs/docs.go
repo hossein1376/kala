@@ -420,6 +420,9 @@ const docTemplate = `{
                 "description": {
                     "type": "string"
                 },
+                "id": {
+                    "type": "integer"
+                },
                 "name": {
                     "type": "string"
                 },
@@ -434,6 +437,9 @@ const docTemplate = `{
                 },
                 "rating_count": {
                     "type": "integer"
+                },
+                "review": {
+                    "type": "string"
                 },
                 "status": {
                     "type": "boolean"
