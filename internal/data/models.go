@@ -1,6 +1,8 @@
 package data
 
 import (
+	"context"
+
 	"github.com/jmoiron/sqlx"
 
 	"github.com/hossein1376/kala/internal/structure"
@@ -19,18 +21,18 @@ func NewModels(db *sqlx.DB) *Models {
 }
 
 type Users interface {
-	Create(user *structure.User) error
-	GetByID(id int) (*structure.User, error)
-	GetByUsername(username string) (*structure.User, error)
-	GetAll(pagination *structure.GetAllUsersRequest) ([]structure.User, int, error)
-	UpdateByID(id int, user *structure.User) error
-	DeleteByID(id int) error
+	Create(ctx context.Context, user *structure.User) error
+	GetByID(ctx context.Context, id int) (*structure.User, error)
+	GetByUsername(ctx context.Context, username string) (*structure.User, error)
+	GetAll(ctx context.Context, pagination *structure.GetAllUsersRequest) ([]structure.User, int, error)
+	UpdateByID(ctx context.Context, id int, user *structure.User) error
+	DeleteByID(ctx context.Context, id int) error
 }
 
 type Products interface {
-	Create(product *structure.Product) error
-	GetByID(id int) (*structure.Product, error)
-	GetAll() ([]structure.Product, error)
-	UpdateByID(id int, product *structure.Product) error
-	DeleteByID(id int) error
+	Create(ctx context.Context, product *structure.Product) error
+	GetByID(ctx context.Context, id int) (*structure.Product, error)
+	GetAll(ctx context.Context) ([]structure.Product, error)
+	UpdateByID(ctx context.Context, id int, product *structure.Product) error
+	DeleteByID(ctx context.Context, id int) error
 }

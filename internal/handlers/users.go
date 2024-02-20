@@ -1,8 +1,10 @@
 package handlers
 
 import (
+	"context"
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/hossein1376/kala/internal/structure"
 	"github.com/hossein1376/kala/internal/transfer"
@@ -83,7 +85,10 @@ func (h *handler) createNewUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.Models.User.Create(user)
+	ctx, cancel := context.WithTimeout(r.Context(), 30*time.Second)
+	defer cancel()
+
+	err = h.Models.User.Create(ctx, user)
 	if err != nil {
 		switch {
 		case errors.As(err, &transfer.BadRequestError{}):
@@ -122,7 +127,10 @@ func (h *handler) getUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := h.Models.User.GetByID(id)
+	ctx, cancel := context.WithTimeout(r.Context(), 30*time.Second)
+	defer cancel()
+
+	user, err := h.Models.User.GetByID(ctx, id)
 	if err != nil {
 		switch {
 		case errors.As(err, &transfer.NotFoundError{}):
@@ -166,7 +174,10 @@ func (h *handler) getAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	users, count, err := h.Models.User.GetAll(query)
+	ctx, cancel := context.WithTimeout(r.Context(), 30*time.Second)
+	defer cancel()
+
+	users, count, err := h.Models.User.GetAll(ctx, query)
 	if err != nil {
 		h.Error(getAllUsers, "status", transfer.StatusInternalServerError, "error", err)
 		h.InternalServerErrorResponse(w)
@@ -226,7 +237,10 @@ func (h *handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	user, err := h.Models.User.GetByID(id)
+	ctx, cancel := context.WithTimeout(r.Context(), 30*time.Second)
+	defer cancel()
+
+	user, err := h.Models.User.GetByID(ctx, id)
 	if err != nil {
 		switch {
 		case errors.As(err, &transfer.NotFoundError{}):
@@ -258,7 +272,7 @@ func (h *handler) updateUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 	user.Email = input.Email
 	user.Phone = input.Phone
 
-	err = h.Models.User.UpdateByID(id, user)
+	err = h.Models.User.UpdateByID(ctx, id, user)
 	if err != nil {
 		switch {
 		case errors.As(err, &transfer.NotFoundError{}):
@@ -295,7 +309,10 @@ func (h *handler) deleteUserByIDHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	err := h.Models.User.DeleteByID(id)
+	ctx, cancel := context.WithTimeout(r.Context(), 30*time.Second)
+	defer cancel()
+
+	err := h.Models.User.DeleteByID(ctx, id)
 	if err != nil {
 		switch {
 		case errors.As(err, &transfer.NotFoundError{}):

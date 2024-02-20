@@ -1,6 +1,7 @@
 package data
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 
@@ -18,7 +19,7 @@ type UsersTable struct {
 	DB *sqlx.DB
 }
 
-func (u *UsersTable) Create(data *structure.User) error {
+func (u *UsersTable) Create(ctx context.Context, data *structure.User) error {
 	query := `
 	INSERT INTO users (
 	                   username,
@@ -32,7 +33,7 @@ func (u *UsersTable) Create(data *structure.User) error {
 	RETURNING id;`
 
 	args, id := []any{data.Username, data.Password.Hash, data.FirstName, data.LastName, data.Email, data.Phone}, 0
-	err := u.DB.QueryRow(query, args...).Scan(&id)
+	err := u.DB.QueryRowContext(ctx, query, args...).Scan(&id)
 	if err != nil {
 		switch {
 		case err.Error() == duplicateUsernameError:
@@ -46,14 +47,14 @@ func (u *UsersTable) Create(data *structure.User) error {
 	return nil
 }
 
-func (u *UsersTable) GetByID(id int) (*structure.User, error) {
+func (u *UsersTable) GetByID(ctx context.Context, id int) (*structure.User, error) {
 	query := `
 	SELECT id, username, password, first_name, last_name, email, phone, status
 	FROM users
 	WHERE id = $1;`
 
 	var user structure.User
-	err := u.DB.QueryRow(query, id).Scan(
+	err := u.DB.QueryRowContext(ctx, query, id).Scan(
 		&user.ID,
 		&user.Username,
 		&user.Password.Hash,
@@ -79,14 +80,14 @@ func (u *UsersTable) GetByID(id int) (*structure.User, error) {
 	return &user, nil
 }
 
-func (u *UsersTable) GetByUsername(username string) (*structure.User, error) {
+func (u *UsersTable) GetByUsername(ctx context.Context, username string) (*structure.User, error) {
 	query := `
 	SELECT id, username, password, first_name, last_name, email, phone, status
 	FROM users
 	WHERE id = $1;`
 
 	var user structure.User
-	err := u.DB.QueryRow(query, username).Scan(
+	err := u.DB.QueryRowContext(ctx, query, username).Scan(
 		&user.ID,
 		&user.Username,
 		&user.Password.Hash,
@@ -112,7 +113,7 @@ func (u *UsersTable) GetByUsername(username string) (*structure.User, error) {
 	return &user, nil
 }
 
-func (u *UsersTable) GetAll(pagination *structure.GetAllUsersRequest) ([]structure.User, int, error) {
+func (u *UsersTable) GetAll(ctx context.Context, pagination *structure.GetAllUsersRequest) ([]structure.User, int, error) {
 	query := `
 	SELECT id, username, password, first_name, last_name, email, phone
 	FROM users
@@ -122,7 +123,7 @@ func (u *UsersTable) GetAll(pagination *structure.GetAllUsersRequest) ([]structu
 	OFFSET $2;`
 
 	users := make([]structure.User, 0, pagination.Count)
-	rows, err := u.DB.Query(query, pagination.Count, (pagination.Page-1)*pagination.Count)
+	rows, err := u.DB.QueryContext(ctx, query, pagination.Count, (pagination.Page-1)*pagination.Count)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -153,7 +154,7 @@ func (u *UsersTable) GetAll(pagination *structure.GetAllUsersRequest) ([]structu
 	WHERE status = true;`
 
 	var count int
-	rows, err = u.DB.Query(query)
+	rows, err = u.DB.QueryContext(ctx, query)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -167,7 +168,7 @@ func (u *UsersTable) GetAll(pagination *structure.GetAllUsersRequest) ([]structu
 	return users, count, nil
 }
 
-func (u *UsersTable) UpdateByID(id int, user *structure.User) error {
+func (u *UsersTable) UpdateByID(ctx context.Context, id int, user *structure.User) error {
 	query := `
 	UPDATE users
 	SET
@@ -181,7 +182,7 @@ func (u *UsersTable) UpdateByID(id int, user *structure.User) error {
 	WHERE id = $1 AND status = true AND role != 'admin';`
 
 	args := []any{id, user.Username, user.Password.Hash, user.FirstName, user.LastName, user.Email, user.Phone}
-	result, err := u.DB.Exec(query, args...)
+	result, err := u.DB.ExecContext(ctx, query, args...)
 	if err != nil {
 		return err
 	}
@@ -198,7 +199,7 @@ func (u *UsersTable) UpdateByID(id int, user *structure.User) error {
 	return nil
 }
 
-func (u *UsersTable) DeleteByID(id int) error {
+func (u *UsersTable) DeleteByID(ctx context.Context, id int) error {
 	query := `
 	UPDATE users
 	Set
@@ -206,7 +207,7 @@ func (u *UsersTable) DeleteByID(id int) error {
 	    updated_at = now()
 	WHERE id = $1 AND status = true AND role != 'admin';`
 
-	result, err := u.DB.Exec(query, id)
+	result, err := u.DB.ExecContext(ctx, query, id)
 	if err != nil {
 		return err
 	}

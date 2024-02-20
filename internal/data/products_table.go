@@ -1,6 +1,7 @@
 package data
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 
@@ -14,7 +15,7 @@ type ProductsTable struct {
 	DB *sqlx.DB
 }
 
-func (p *ProductsTable) Create(product *structure.Product) error {
+func (p *ProductsTable) Create(ctx context.Context, product *structure.Product) error {
 	query := `
 	INSERT INTO products (
 	                      name,
@@ -27,7 +28,7 @@ func (p *ProductsTable) Create(product *structure.Product) error {
 	RETURNING id;`
 
 	args, id := []any{product.Name, product.Description, product.Review, product.Price, product.Quantity}, 0
-	err := p.DB.QueryRow(query, args...).Scan(&id)
+	err := p.DB.QueryRowContext(ctx, query, args...).Scan(&id)
 	if err != nil {
 		return err
 	}
@@ -36,14 +37,14 @@ func (p *ProductsTable) Create(product *structure.Product) error {
 	return nil
 }
 
-func (p *ProductsTable) GetByID(id int) (*structure.Product, error) {
+func (p *ProductsTable) GetByID(ctx context.Context, id int) (*structure.Product, error) {
 	query := `
 	SELECT id, name, description, review, rating, rating_count, price, quantity
 	FROM products
 	WHERE id = $1 AND status = true;`
 
 	var product structure.Product
-	err := p.DB.QueryRow(query, id).Scan(
+	err := p.DB.QueryRowContext(ctx, query, id).Scan(
 		&product.ID,
 		&product.Name,
 		&product.Description,
@@ -65,7 +66,7 @@ func (p *ProductsTable) GetByID(id int) (*structure.Product, error) {
 	return &product, nil
 }
 
-func (p *ProductsTable) GetAll() ([]structure.Product, error) {
+func (p *ProductsTable) GetAll(ctx context.Context) ([]structure.Product, error) {
 	query := `
 	SELECT id, name, description, review, rating, rating_count, price, quantity
 	FROM products
@@ -73,7 +74,7 @@ func (p *ProductsTable) GetAll() ([]structure.Product, error) {
 	ORDER BY id;`
 
 	products := make([]structure.Product, 0)
-	rows, err := p.DB.Query(query)
+	rows, err := p.DB.QueryContext(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +102,7 @@ func (p *ProductsTable) GetAll() ([]structure.Product, error) {
 	return products, nil
 }
 
-func (p *ProductsTable) UpdateByID(id int, product *structure.Product) error {
+func (p *ProductsTable) UpdateByID(ctx context.Context, id int, product *structure.Product) error {
 	query := `
 	UPDATE products
 	Set
@@ -124,7 +125,7 @@ func (p *ProductsTable) UpdateByID(id int, product *structure.Product) error {
 		product.RatingCount,
 		product.Quantity,
 	}
-	result, err := p.DB.Exec(query, args...)
+	result, err := p.DB.ExecContext(ctx, query, args...)
 	if err != nil {
 		return err
 	}
@@ -141,7 +142,7 @@ func (p *ProductsTable) UpdateByID(id int, product *structure.Product) error {
 	return nil
 }
 
-func (p *ProductsTable) DeleteByID(id int) error {
+func (p *ProductsTable) DeleteByID(ctx context.Context, id int) error {
 	query := `
 	UPDATE products
 	Set
@@ -149,7 +150,7 @@ func (p *ProductsTable) DeleteByID(id int) error {
 	    updated_at = now()
 	WHERE id = $1 AND status = true;`
 
-	result, err := p.DB.Exec(query, id)
+	result, err := p.DB.ExecContext(ctx, query, id)
 	if err != nil {
 		return err
 	}

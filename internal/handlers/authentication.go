@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"time"
@@ -32,7 +33,10 @@ func (h *handler) loginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := h.Models.User.GetByUsername(input.Username)
+	ctx, cancel := context.WithTimeout(r.Context(), 30*time.Second)
+	defer cancel()
+
+	user, err := h.Models.User.GetByUsername(ctx, input.Username)
 	if err != nil {
 		switch {
 		case errors.As(err, &transfer.NotFoundError{}) || errors.As(err, &transfer.ForbiddenError{}):
