@@ -5,7 +5,7 @@ It aims to be fast, simple, and extensible. As well as a showcase of my personal
 
 ## Project Structure
 
-> **Notice:**
+> [!NOTE]
 >
 > I've been working on a new architecture which is, at least in my opinion, much more robust and maintainable.  
 > This project will see a complete overhaul in the near future. In the meantime, take this structure with a grain of
