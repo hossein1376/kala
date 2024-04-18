@@ -5,6 +5,12 @@ It aims to be fast, simple, and extensible. As well as a showcase of my personal
 
 ## Project Structure
 
+> **Notice:**
+>
+> I've been working on a new architecture which is, at least in my opinion, much more robust and maintainable.  
+> This project will see a complete overhaul in the near future. In the meantime, take this structure with a grain of
+> salt (You can get a glimpse of what I'm working on [here](https://github.com/hossein1376/BehKhan/tree/main/services/catalogue)).
+
 The general structure follows the guidelines I picked up
 from [Let's Go Further](https://lets-go-further.alexedwards.net/),
 but over time I found some shortcomings in that approach, which led me to explore my desired structure.  
